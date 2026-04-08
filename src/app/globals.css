@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+:root {
+  --fitall-bg:       #F8F9FA;
+  --fitall-surface:  #FFFFFF;
+  --fitall-dark:     #0A0A0A;
+  --fitall-accent:   #0066FF;
+  --fitall-text:     #0A0A0A;
+  --fitall-muted:    #6B7280;
+  --fitall-tertiary: #9CA3AF;
+  --fitall-border:   #E5E7EB;
+  --fitall-success:  #22C55E;
+  --fitall-error:    #EF4444;
+}
+
+@theme inline {
+  --color-background: var(--fitall-bg);
+  --color-foreground: var(--fitall-text);
+  --font-sans: "Inter", "Helvetica Neue", "Arial",
+               "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+               "Meiryo", "MS Gothic", sans-serif;
+}
+
+body {
+  background: var(--fitall-bg);
+  color: var(--fitall-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translate(-50%, -8px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
