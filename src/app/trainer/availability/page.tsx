@@ -3,30 +3,20 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { AvailabilityManager } from './AvailabilityManager'
 import { readTrainerSettingsFromBio } from '@/lib/trainer-settings'
-
-function toDateKey(date: Date): string {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
-    date.getDate()
-  ).padStart(2, '0')}`
-}
-
-function addDays(date: Date, days: number): Date {
-  const d = new Date(date)
-  d.setDate(d.getDate() + days)
-  return d
-}
+import { loadTraineeNameMap } from '@/lib/trainee-display'
+import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
+import { addDaysToDateKey, dayOfWeekForDateKey, formatJstDateKey, jstDayBounds } from '@/lib/datetime'
 
 function expandWeeklyRowsToDateSlots(rows: { day_of_week: number; start_time: string; end_time: string }[]) {
-  const now = new Date()
-  const start = addDays(now, -30)
-  const end = addDays(now, 180)
+  const startKey = addDaysToDateKey(formatJstDateKey(), -30)
   const result: { slot_date: string; start_time: string; end_time: string }[] = []
 
-  for (let cursor = new Date(start); cursor <= end; cursor = addDays(cursor, 1)) {
-    const row = rows.find((r) => r.day_of_week === cursor.getDay())
+  for (let offset = 0; offset <= 210; offset += 1) {
+    const key = addDaysToDateKey(startKey, offset)
+    const row = rows.find((r) => r.day_of_week === dayOfWeekForDateKey(key))
     if (!row) continue
     result.push({
-      slot_date: toDateKey(cursor),
+      slot_date: key,
       start_time: row.start_time,
       end_time: row.end_time,
     })
@@ -40,12 +30,56 @@ export default async function TrainerAvailabilityPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) redirect('/auth/login')
+  const devAuthBypass = isDevAuthBypassEnabled()
+
+  if (!user && !devAuthBypass) redirect('/auth/login')
+
+  if (!user && devAuthBypass) {
+    return (
+      <div className="fitall-page fitall-scroll">
+        <div className="fitall-topbar">
+          <Link href="/trainer/bookings" className="flex items-center gap-1 text-sm font-black text-[#555555]">
+            ‹ 戻る
+          </Link>
+          <h1 className="text-[17px] font-black text-[#0A0A0A]">空き時間</h1>
+          <div className="w-10" />
+        </div>
+
+        <div className="px-4 py-6 space-y-4">
+          <div className="fitall-card bg-[#E8FBFA] px-4 py-3 text-xs font-black leading-relaxed text-[#087D78]">
+            開発用UI確認モードです。空き時間設定の保存はログイン後に有効になります。
+          </div>
+          <div className="fitall-card p-5">
+            <h2 className="text-sm font-black text-[#0A0A0A]">受付時間サンプル</h2>
+            <div className="mt-4 space-y-3">
+              {[
+                ['月', '10:00 - 20:00'],
+                ['火', '09:00 - 18:00'],
+                ['木', '11:00 - 20:00'],
+                ['土', '09:00 - 14:00'],
+              ].map(([day, time]) => (
+                <div key={day} className="flex items-center justify-between rounded-[6px] bg-[#F4F7F7] px-4 py-3">
+                  <span className="text-sm font-bold text-[#0A0A0A]">毎週{day}曜日</span>
+                  <span className="text-xs font-black text-[#087D78]">{time}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <Link
+            href="/trainer/bookings"
+            className="fitall-primary-action fitall-tap"
+          >
+            予約カレンダーへ戻る
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   const { data: profile } = await supabase
     .from('trainer_profiles')
     .select('id, bio')
-    .eq('user_id', user.id)
+    .eq('user_id', user!.id)
     .maybeSingle()
 
   let availability: { slot_date: string; start_time: string; end_time: string }[] = []
@@ -69,11 +103,9 @@ export default async function TrainerAvailabilityPage() {
     }
   }
 
-  const trainerIdsForQuery = [profile?.id, user.id].filter(Boolean) as string[]
-  const rangeStart = new Date()
-  rangeStart.setDate(rangeStart.getDate() - 60)
-  const rangeEnd = new Date()
-  rangeEnd.setDate(rangeEnd.getDate() + 180)
+  const trainerIdsForQuery = [profile?.id, user!.id].filter(Boolean) as string[]
+  const { start: rangeStart } = jstDayBounds(addDaysToDateKey(formatJstDateKey(), -60))
+  const { end: rangeEnd } = jstDayBounds(addDaysToDateKey(formatJstDateKey(), 180))
 
   const { data: bookings } = trainerIdsForQuery.length
     ? await supabase
@@ -86,11 +118,10 @@ export default async function TrainerAvailabilityPage() {
         .order('scheduled_at')
     : { data: [] }
 
-  const traineeIds = [...new Set((bookings ?? []).map((b) => b.trainee_id))]
-  const { data: trainees } = traineeIds.length
-    ? await supabase.from('users').select('id, name').in('id', traineeIds)
-    : { data: [] }
-  const traineeNameMap = Object.fromEntries((trainees ?? []).map((t) => [t.id, t.name]))
+  const traineeNameMap = await loadTraineeNameMap(
+    supabase,
+    (bookings ?? []).map((b) => b.trainee_id)
+  )
 
   const { data: activeRelations } = profile
     ? await supabase
@@ -132,31 +163,30 @@ export default async function TrainerAvailabilityPage() {
   }))
 
   return (
-    <div className="px-4 pt-6 pb-4">
-      <div className="mb-6">
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <Link href="/trainer/bookings" className="text-sm text-[#6B7280] flex items-center gap-1">
-          ← 予約管理に戻る
-          </Link>
-          <Link href="/trainer/settings" className="text-sm font-semibold text-[#0066FF]">
-            運営設定へ
-          </Link>
-        </div>
-        <h1 className="text-2xl font-extrabold tracking-[-0.02em] text-[#0A0A0A]">空き時間の設定</h1>
-        <p className="text-sm text-[#6B7280] mt-1">
-          受付する日付・時間帯を設定してください。設定がない日はトレーニーが予約できません。
-        </p>
-        <p className="text-xs text-[#9CA3AF] mt-1">
-          営業時間: {trainerSettings.business_open} - {trainerSettings.business_close}
-        </p>
+    <div className="fitall-page fitall-scroll">
+      <div className="fitall-topbar">
+        <Link href="/trainer/bookings" className="flex items-center gap-1 text-sm font-black text-[#555555]">
+          ‹ 戻る
+        </Link>
+        <h1 className="text-[17px] font-black text-[#0A0A0A]">空き時間</h1>
+        <Link href="/trainer/settings" className="text-sm font-black text-[#087D78]">
+          設定
+        </Link>
       </div>
 
-      <AvailabilityManager
-        initialSlots={availability ?? []}
-        initialBookings={initialBookings}
-        clientOptions={clientOptions}
-        menuOptions={plans ?? []}
-      />
+      <div className="px-4 py-6 space-y-4">
+        <p className="text-xs text-[#666666] px-1">
+          受付する日付・時間帯を設定してください。設定がない日はお客様が予約できません。
+          営業時間: {trainerSettings.business_open} - {trainerSettings.business_close}
+        </p>
+
+        <AvailabilityManager
+          initialSlots={availability ?? []}
+          initialBookings={initialBookings}
+          clientOptions={clientOptions}
+          menuOptions={plans ?? []}
+        />
+      </div>
     </div>
   )
 }

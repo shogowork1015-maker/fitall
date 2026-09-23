@@ -12,10 +12,8 @@ export async function registerAction(
   const name = formData.get('name') as string
   const email = formData.get('email') as string
   const password = formData.get('password') as string
-  const priceStr = formData.get('price_per_session') as string
-  const price = parseInt(priceStr, 10)
 
-  if (!name || !email || !password || !price) {
+  if (!name || !email || !password) {
     return { error: 'すべての項目を入力してください' }
   }
 
@@ -81,9 +79,9 @@ export async function registerAction(
   if (!existingProfile) {
     await supabase.from('trainer_profiles').insert({
       user_id: userId,
-      price_per_session: price,
+      price_per_session: 0,
     })
   }
 
-  redirect('/trainer/dashboard')
+  redirect('/trainer/settings')
 }

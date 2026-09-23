@@ -1,13 +1,26 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
+import { getSupabaseEnv } from '@/lib/supabase-env'
 
 // 認証状態チェックと保護されたルートへのアクセス制御
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  if (!pathname.startsWith('/trainer')) {
+    return NextResponse.next({ request })
+  }
+
+  if (isDevAuthBypassEnabled()) {
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({ request })
+  const { url, anonKey } = getSupabaseEnv()
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    url,
+    anonKey,
     {
       cookies: {
         getAll() {
@@ -31,13 +44,8 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const { pathname } = request.nextUrl
-
   // 未認証ユーザーを保護されたルートからリダイレクト
-  if (
-    !user &&
-    (pathname.startsWith('/trainer') || pathname.startsWith('/trainee'))
-  ) {
+  if (!user) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)

@@ -1,0 +1,157 @@
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients for 3D effect -->
+    <linearGradient id="skinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fdbcb4;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#f4a09c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8908c;stop-opacity:1" />
+    </linearGradient>
+
+    <radialGradient id="chestGradient">
+      <stop offset="0%" style="stop-color:#fdbcb4;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#f4a09c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8908c;stop-opacity:1" />
+    </radialGradient>
+
+    <linearGradient id="armGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#fdbcb4;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#f4a09c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8908c;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="legGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#fdbcb4;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#f4a09c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8908c;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Shadow filter -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="2" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background with subtle gradient -->
+  <rect width="400" height="600" fill="url(#bgGradient)"/>
+  <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" style="stop-color:#f8f9fa;stop-opacity:1" />
+    <stop offset="100%" style="stop-color:#e9ecef;stop-opacity:1" />
+  </linearGradient>
+
+  <!-- 3D Human figure with realistic shading and depth -->
+  <g transform="translate(200, 300)" filter="url(#shadow)">
+    <!-- Head with 3D shading -->
+    <ellipse cx="0" cy="-120" rx="30" ry="34" fill="url(#skinGradient)" stroke="#e8908c" stroke-width="1.5"/>
+
+    <!-- Head shading for depth -->
+    <ellipse cx="-5" cy="-125" rx="20" ry="22" fill="#f4a09c" opacity="0.3"/>
+    <ellipse cx="8" cy="-115" rx="15" ry="18" fill="#fdbcb4" opacity="0.4"/>
+
+    <!-- Hair with 3D effect -->
+    <path d="M -30 -142 Q -25 -158 0 -163 Q 25 -158 30 -142 Q 20 -148 0 -151 Q -20 -148 -30 -142" fill="#2a2a2a"/>
+    <path d="M -25 -145 Q -15 -155 0 -158 Q 15 -155 25 -145" fill="#3a3a3a"/>
+
+    <!-- Facial features with depth -->
+    <ellipse cx="-8" cy="-120" rx="3" ry="2" fill="#333"/>
+    <ellipse cx="8" cy="-120" rx="3" ry="2" fill="#333"/>
+    <circle cx="-7" cy="-121" r="1" fill="#fff"/>
+    <circle cx="9" cy="-121" r="1" fill="#fff"/>
+
+    <!-- Nose with shading -->
+    <path d="M 0 -110 L -2 -105 L 2 -105 Z" fill="#e8908c" opacity="0.5"/>
+
+    <!-- Mouth with 3D effect -->
+    <path d="M -6 -105 Q 0 -102 6 -105" fill="none" stroke="#d4a373" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Neck with cylindrical shading -->
+    <rect x="-15" y="-95" width="30" height="25" fill="url(#skinGradient)" stroke="#e8908c" stroke-width="1.5" rx="5"/>
+    <rect x="-15" y="-95" width="10" height="25" fill="#e8908c" opacity="0.2"/>
+
+    <!-- Shoulders with 3D rounding -->
+    <ellipse cx="-42" cy="-75" rx="24" ry="16" fill="url(#armGradient)" stroke="#e8908c" stroke-width="1.5" transform="rotate(-15 -42 -75)"/>
+    <ellipse cx="42" cy="-75" rx="24" ry="16" fill="url(#armGradient)" stroke="#e8908c" stroke-width="1.5" transform="rotate(15 42 -75)"/>
+
+    <!-- Shoulder highlights -->
+    <ellipse cx="-45" cy="-78" rx="12" ry="8" fill="#fdbcb4" opacity="0.6" transform="rotate(-15 -45 -78)"/>
+    <ellipse cx="45" cy="-78" rx="12" ry="8" fill="#fdbcb4" opacity="0.6" transform="rotate(15 45 -78)"/>
+
+    <!-- Chest with muscular 3D definition -->
+    <path d="M -38 -60 Q -20 -40 0 -35 Q 20 -40 38 -60 L 35 -20 Q 0 -8 -35 -20 Z" fill="url(#chestGradient)" stroke="#e8908c" stroke-width="1.5"/>
+
+    <!-- Chest muscle definition -->
+    <path d="M -30 -55 Q -15 -38 0 -33 Q 15 -38 30 -55 L 28 -25 Q 0 -13 -28 -25 Z" fill="#ff8c42" opacity="0.15"/>
+
+    <!-- Pectoral separation -->
+    <line x1="0" y1="-35" x2="0" y2="-20" stroke="#e8908c" stroke-width="1" opacity="0.3"/>
+
+    <!-- Abs with 3D definition -->
+    <rect x="-24" y="-15" width="48" height="50" rx="8" fill="url(#skinGradient)" stroke="#e8908c" stroke-width="1.5"/>
+
+    <!-- Abs muscle lines with depth -->
+    <line x1="0" y1="-15" x2="0" y2="35" stroke="#e8908c" stroke-width="1.5" opacity="0.4"/>
+    <line x1="-12" y1="-10" x2="-12" y2="30" stroke="#e8908c" stroke-width="1" opacity="0.3"/>
+    <line x1="12" y1="-10" x2="12" y2="30" stroke="#e8908c" stroke-width="1" opacity="0.3"/>
+    <line x1="-6" y1="-8" x2="-6" y2="25" stroke="#e8908c" stroke-width="0.5" opacity="0.2"/>
+    <line x1="6" y1="-8" x2="6" y2="25" stroke="#e8908c" stroke-width="0.5" opacity="0.2"/>
+
+    <!-- Arms with 3D cylindrical effect -->
+    <!-- Left arm -->
+    <ellipse cx="-48" cy="-20" rx="16" ry="30" fill="url(#armGradient)" stroke="#e8908c" stroke-width="1.5" transform="rotate(10 -48 -20)"/>
+    <rect x="-55" y="12" width="20" height="45" rx="10" fill="url(#armGradient)" stroke="#e8908c" stroke-width="1.5" transform="rotate(5 -45 34)"/>
+
+    <!-- Right arm -->
+    <ellipse cx="48" cy="-20" rx="16" ry="30" fill="url(#armGradient)" stroke="#e8908c" stroke-width="1.5" transform="rotate(-10 48 -20)"/>
+    <rect x="35" y="12" width="20" height="45" rx="10" fill="url(#armGradient)" stroke="#e8908c" stroke-width="1.5" transform="rotate(-5 45 34)"/>
+
+    <!-- Arm highlights for 3D effect -->
+    <ellipse cx="-50" cy="-22" rx="8" ry="15" fill="#fdbcb4" opacity="0.5" transform="rotate(10 -50 -22)"/>
+    <ellipse cx="50" cy="-22" rx="8" ry="15" fill="#fdbcb4" opacity="0.5" transform="rotate(-10 50 -22)"/>
+
+    <!-- Hands with 3D rounding -->
+    <circle cx="-52" cy="60" r="11" fill="url(#skinGradient)" stroke="#e8908c" stroke-width="1.5"/>
+    <circle cx="52" cy="60" r="11" fill="url(#skinGradient)" stroke="#e8908c" stroke-width="1.5"/>
+
+    <!-- Hand highlights -->
+    <circle cx="-54" cy="58" r="5" fill="#fdbcb4" opacity="0.4"/>
+    <circle cx="54" cy="58" r="5" fill="#fdbcb4" opacity="0.4"/>
+
+    <!-- Pelvis with 3D shape -->
+    <path d="M -28 35 Q 0 48 28 35 L 23 68 Q 0 78 -23 68 Z" fill="url(#skinGradient)" stroke="#e8908c" stroke-width="1.5"/>
+
+    <!-- Legs with 3D muscular definition -->
+    <!-- Left leg -->
+    <path d="M -20 68 Q -17 95 -14 125 L -12 175 Q -8 180 0 180 Q 8 180 12 175 L 14 125 Q 17 95 20 68 Z"
+          fill="url(#legGradient)" stroke="#e8908c" stroke-width="1.5"/>
+
+    <!-- Right leg -->
+    <path d="M -10 68 Q -7 95 -4 125 L -2 175 Q 2 180 10 180 Q 18 180 22 175 L 20 125 Q 17 95 14 68 Z"
+          fill="url(#legGradient)" stroke="#e8908c" stroke-width="1.5"/>
+
+    <!-- Leg muscle highlights -->
+    <path d="M -18 72 Q -15 99 -12 129 L -10 170 Q -6 175 0 175 Q 6 175 10 170 L 12 129 Q 15 99 18 72 Z"
+          fill="#9b59b6" opacity="0.1"/>
+
+    <!-- Knee definition -->
+    <ellipse cx="-6" cy="140" rx="8" ry="6" fill="#e8908c" opacity="0.3"/>
+    <ellipse cx="6" cy="140" rx="8" ry="6" fill="#e8908c" opacity="0.3"/>
+
+    <!-- Feet with 3D shape -->
+    <ellipse cx="-10" cy="195" rx="16" ry="12" fill="url(#skinGradient)" stroke="#e8908c" stroke-width="1.5"/>
+    <ellipse cx="10" cy="195" rx="16" ry="12" fill="url(#skinGradient)" stroke="#e8908c" stroke-width="1.5"/>
+
+    <!-- Foot highlights -->
+    <ellipse cx="-12" cy="193" rx="8" ry="6" fill="#fdbcb4" opacity="0.4"/>
+    <ellipse cx="12" cy="193" rx="8" ry="6" fill="#fdbcb4" opacity="0.4"/>
+  </g>
+
+  <!-- Ground shadow with realistic blur -->
+  <ellipse cx="200" cy="580" rx="70" ry="18" fill="#000" opacity="0.2" filter="url(#shadow)"/>
+</svg>

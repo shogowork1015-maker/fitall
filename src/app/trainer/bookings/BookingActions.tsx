@@ -30,18 +30,18 @@ export function BookingActions({ bookingId, status, scheduledAt }: BookingAction
     return (
       <>
         {toast && <Toast message={toast} onDone={() => setToast(null)} />}
-        <div className="flex gap-2 mt-3">
+        <div className="mt-3 flex gap-2">
           <button
             onClick={() => handleAction(() => approveBooking(bookingId), '予約を承認しました')}
             disabled={loading}
-            className="flex-1 h-14 bg-[#0066FF] text-white text-sm font-bold rounded-full disabled:opacity-40 active:scale-[0.97] transition-transform"
+            className="h-12 flex-1 rounded-[6px] border-2 border-[#12C7BE] bg-[#12C7BE] text-sm font-black text-white disabled:opacity-40 active:scale-[0.97] transition-transform"
           >
             承認
           </button>
           <button
             onClick={() => handleAction(() => rejectBooking(bookingId), '予約を拒否しました')}
             disabled={loading}
-            className="flex-1 h-14 bg-transparent text-[#0A0A0A] text-sm font-bold rounded-full border-[1.5px] border-[#E5E7EB] disabled:opacity-40 active:scale-[0.97] transition-transform"
+            className="h-12 flex-1 rounded-[6px] border-2 border-[#DDE8E8] bg-white text-sm font-black text-[#0A0A0A] disabled:opacity-40 active:scale-[0.97] transition-transform"
           >
             拒否
           </button>
@@ -58,14 +58,14 @@ export function BookingActions({ bookingId, status, scheduledAt }: BookingAction
           <button
             onClick={() => handleAction(() => completeBooking(bookingId), 'セッションを完了しました')}
             disabled={loading}
-            className="w-full h-14 bg-[#0066FF] text-white text-sm font-bold rounded-full disabled:opacity-40 active:scale-[0.97] transition-transform"
+            className="h-12 w-full rounded-[6px] border-2 border-[#12C7BE] bg-[#12C7BE] text-sm font-black text-white disabled:opacity-40 active:scale-[0.97] transition-transform"
           >
             完了にする
           </button>
           <button
             onClick={() => setShowReschedule((v) => !v)}
             disabled={loading}
-            className="w-full h-10 text-[#6B7280] text-sm font-semibold rounded-full border border-[#E5E7EB] active:scale-[0.97] transition-transform"
+            className="h-10 w-full rounded-[6px] border-2 border-[#DDE8E8] text-sm font-black text-[#555555] active:scale-[0.97] transition-transform"
           >
             {showReschedule ? '変更をキャンセル' : '日時変更を提案'}
           </button>

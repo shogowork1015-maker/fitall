@@ -38,10 +38,10 @@ No test runner is configured yet.
 - Before writing any Next.js-specific code, read the relevant guide in `node_modules/next/dist/docs/01-app/` to verify current API shapes.
 
 
-## Project: FITALL
+## Project: Limitless App
 
 ### アプリ概要
-FITALLは、パーソナルトレーナーとトレーニーが一つのアプリで繋がる日本初のオールインワン管理アプリ。最大の差別化はトレーニーの筋トレログがリアルタイムでトレーナーに共有されること。
+Limitless Appは、パーソナルトレーナーがお客様・予約・売上・チケットをまとめて管理するトレーナー専用アプリ。
 
 ### 重要なルール
 - 常に日本語で返答する

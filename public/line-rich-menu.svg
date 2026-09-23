@@ -1,0 +1,45 @@
+<svg width="2500" height="843" viewBox="0 0 2500 843" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="2500" height="843" fill="#FFFFFF"/>
+  <rect x="24" y="24" width="2452" height="795" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="8"/>
+  <rect x="24" y="24" width="2452" height="92" fill="#12C7BE"/>
+  <text x="80" y="83" fill="#FFFFFF" font-family="sans-serif" font-size="38" font-weight="900" letter-spacing="5">LIMITLESS APP</text>
+  <line x1="625" y1="116" x2="625" y2="819" stroke="#DDE8E8" stroke-width="6"/>
+  <line x1="1250" y1="116" x2="1250" y2="819" stroke="#DDE8E8" stroke-width="6"/>
+  <line x1="1875" y1="116" x2="1875" y2="819" stroke="#DDE8E8" stroke-width="6"/>
+
+  <g transform="translate(0 116)">
+    <rect x="88" y="138" width="450" height="248" fill="#E8FBFA" stroke="#0A0A0A" stroke-width="6"/>
+    <path d="M228 298L287 357L404 223" stroke="#0A0A0A" stroke-width="28" stroke-linecap="square" stroke-linejoin="miter"/>
+    <text x="312" y="518" text-anchor="middle" fill="#0A0A0A" font-family="sans-serif" font-size="82" font-weight="900">予約する</text>
+    <text x="312" y="590" text-anchor="middle" fill="#087D78" font-family="sans-serif" font-size="34" font-weight="900">空き枠を見る</text>
+  </g>
+
+  <g transform="translate(625 116)">
+    <path d="M148 196H478V390H148V196Z" fill="#E8FBFA" stroke="#0A0A0A" stroke-width="6"/>
+    <path d="M148 250C178 250 178 336 148 336" stroke="#0A0A0A" stroke-width="6"/>
+    <path d="M478 250C448 250 448 336 478 336" stroke="#0A0A0A" stroke-width="6"/>
+    <line x1="330" y1="196" x2="330" y2="390" stroke="#0A0A0A" stroke-width="6" stroke-dasharray="18 18"/>
+    <text x="312" y="518" text-anchor="middle" fill="#0A0A0A" font-family="sans-serif" font-size="82" font-weight="900">チケット</text>
+    <text x="312" y="590" text-anchor="middle" fill="#087D78" font-family="sans-serif" font-size="34" font-weight="900">残数・購入</text>
+  </g>
+
+  <g transform="translate(1250 116)">
+    <rect x="172" y="168" width="280" height="250" fill="#E8FBFA" stroke="#0A0A0A" stroke-width="6"/>
+    <line x1="172" y1="238" x2="452" y2="238" stroke="#0A0A0A" stroke-width="6"/>
+    <line x1="232" y1="148" x2="232" y2="196" stroke="#0A0A0A" stroke-width="20"/>
+    <line x1="392" y1="148" x2="392" y2="196" stroke="#0A0A0A" stroke-width="20"/>
+    <rect x="218" y="284" width="64" height="54" fill="#12C7BE"/>
+    <rect x="342" y="284" width="64" height="54" fill="#12C7BE"/>
+    <text x="312" y="518" text-anchor="middle" fill="#0A0A0A" font-family="sans-serif" font-size="82" font-weight="900">次回予約</text>
+    <text x="312" y="590" text-anchor="middle" fill="#087D78" font-family="sans-serif" font-size="34" font-weight="900">予定を確認</text>
+  </g>
+
+  <g transform="translate(1875 116)">
+    <path d="M148 180H478V382H310L208 458V382H148V180Z" fill="#E8FBFA" stroke="#0A0A0A" stroke-width="6" stroke-linejoin="miter"/>
+    <circle cx="246" cy="282" r="18" fill="#12C7BE"/>
+    <circle cx="313" cy="282" r="18" fill="#12C7BE"/>
+    <circle cx="380" cy="282" r="18" fill="#12C7BE"/>
+    <text x="312" y="518" text-anchor="middle" fill="#0A0A0A" font-family="sans-serif" font-size="82" font-weight="900">相談する</text>
+    <text x="312" y="590" text-anchor="middle" fill="#087D78" font-family="sans-serif" font-size="34" font-weight="900">LINEで送信</text>
+  </g>
+</svg>

@@ -1,6 +1,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import { TrainerTabNav } from './TrainerTabNav'
+import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
 
 export default async function TrainerLayout({
   children,
@@ -12,25 +13,36 @@ export default async function TrainerLayout({
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  const devAuthBypass = isDevAuthBypassEnabled()
+
+  if (!user && !devAuthBypass) {
     redirect('/auth/login')
   }
 
-  // トレーニーがトレーナー画面にアクセスした場合のみリダイレクト
+  if (!user && devAuthBypass) {
+    return (
+      <div className="fitall-trainer-shell">
+        <main className="fitall-trainer-main">{children}</main>
+        <TrainerTabNav />
+      </div>
+    )
+  }
+
+  // お客様用アカウントが管理画面にアクセスした場合のみリダイレクト
   // （role が null/undefined の場合はループ防止のためリダイレクトしない）
   const { data: userData } = await supabase
     .from('users')
     .select('role, name')
-    .eq('id', user.id)
+    .eq('id', user!.id)
     .single()
 
   if (userData?.role === 'trainee') {
-    redirect('/trainee/dashboard')
+    redirect('/auth/login?trainerOnly=1')
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F8F9FA]">
-      <main className="flex-1 pb-20">{children}</main>
+    <div className="fitall-trainer-shell">
+      <main className="fitall-trainer-main">{children}</main>
       <TrainerTabNav />
     </div>
   )

@@ -27,14 +27,14 @@ export function ExerciseWeightChart({
 
   if (!exercises.length) {
     return (
-      <div className="bg-[#0A0A0A] rounded-[20px] p-6 text-center text-sm text-[#6B7280]">
+      <div className="p-4 text-center text-sm text-[#A0A0A0]">
         30日以内のトレーニング記録がありません
       </div>
     )
   }
 
   return (
-    <div className="bg-[#0A0A0A] rounded-[20px] p-4">
+    <div>
       {/* 種目選択タブ */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
         {exercises.map((ex) => (
@@ -44,8 +44,8 @@ export function ExerciseWeightChart({
             onClick={() => setSelectedId(ex.id)}
             className={`flex-shrink-0 px-3 h-8 rounded-full text-xs font-semibold transition-colors ${
               selectedId === ex.id
-                ? 'bg-[#0066FF] text-white'
-                : 'bg-[#1C1C1E] text-[#6B7280]'
+                ? 'bg-[#0A0A0A] text-white'
+                : 'bg-[#F5F5F5] text-[#666666]'
             }`}
           >
             {ex.name}
@@ -56,15 +56,15 @@ export function ExerciseWeightChart({
       {selected && selected.data.length >= 1 ? (
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={selected.data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" />
             <XAxis
               dataKey="date"
-              tick={{ fill: '#6B7280', fontSize: 10 }}
+              tick={{ fill: '#A0A0A0', fontSize: 10 }}
               axisLine={false}
               tickLine={false}
             />
             <YAxis
-              tick={{ fill: '#6B7280', fontSize: 10 }}
+              tick={{ fill: '#A0A0A0', fontSize: 10 }}
               unit="kg"
               axisLine={false}
               tickLine={false}
@@ -72,9 +72,9 @@ export function ExerciseWeightChart({
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#1C1C1E',
+                backgroundColor: '#0A0A0A',
                 border: 'none',
-                borderRadius: '8px',
+                borderRadius: '10px',
                 color: '#fff',
                 fontSize: '12px',
               }}
@@ -84,14 +84,14 @@ export function ExerciseWeightChart({
               type="monotone"
               dataKey="weight"
               stroke="#0066FF"
-              strokeWidth={2}
+              strokeWidth={2.5}
               dot={{ fill: '#0066FF', r: 3, strokeWidth: 0 }}
               activeDot={{ r: 5, strokeWidth: 0 }}
             />
           </LineChart>
         </ResponsiveContainer>
       ) : (
-        <div className="text-center text-sm text-[#6B7280] py-10">
+        <div className="text-center text-sm text-[#A0A0A0] py-10">
           この種目のデータがありません
         </div>
       )}

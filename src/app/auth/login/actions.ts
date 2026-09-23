@@ -175,11 +175,7 @@ export async function loginAction(
     redirect('/trainer/dashboard')
   }
 
-  if (resolved.role === 'trainee') {
-    redirect('/trainee/dashboard')
-  }
-
-  return { error: 'ユーザー情報の取得に失敗しました' }
+  redirect('/auth/login?trainerOnly=1')
 }
 
 export async function signOutAction() {

@@ -1,21 +1,14 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-})
-
 export const metadata: Metadata = {
-  title: 'FITALL',
-  description: 'パーソナルトレーナーとトレーニーをつなぐオールインワン管理アプリ',
+  title: 'Limitless App',
+  description: 'パーソナルトレーナーのためのお客様・予約・売上管理アプリ',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'FITALL',
+    title: 'Limitless App',
   },
 }
 
@@ -24,7 +17,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#0066FF',
+  themeColor: '#12C7BE',
 }
 
 export default function RootLayout({
@@ -33,9 +26,18 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ja" className={`${inter.variable} h-full`}>
-      <body className="min-h-full bg-[#F8F9FA] font-sans antialiased">
-        {children}
+    <html lang="ja" className="h-full">
+      <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      </head>
+      <body
+        suppressHydrationWarning
+        className="min-h-full bg-white font-sans antialiased overscroll-none select-none touch-manipulation"
+      >
+        <div className="fitall-device flex min-h-dvh w-full flex-col bg-white">
+          {children}
+        </div>
       </body>
     </html>
   )

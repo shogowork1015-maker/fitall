@@ -131,7 +131,7 @@ export function SelectionPopover({
             onClick={() => setTab('reservation')}
             className={`h-11 px-4 rounded-[12px] text-sm font-bold ${
               tab === 'reservation'
-                ? 'bg-[#DBEAFE] text-[#1D4ED8]'
+                ? 'bg-[#0A0A0A] text-white'
                 : 'bg-[#F3F4F6] text-[#6B7280]'
             }`}
           >
@@ -141,7 +141,7 @@ export function SelectionPopover({
             type="button"
             onClick={() => setTab('block')}
             className={`h-11 px-4 rounded-[12px] text-sm font-bold ${
-              tab === 'block' ? 'bg-[#DBEAFE] text-[#1D4ED8]' : 'bg-[#F3F4F6] text-[#6B7280]'
+              tab === 'block' ? 'bg-[#0A0A0A] text-white' : 'bg-[#F3F4F6] text-[#6B7280]'
             }`}
           >
             ブロック
@@ -175,6 +175,7 @@ export function SelectionPopover({
             </select>
             <input
               type="time"
+              step={300}
               value={time}
               onChange={(e) => setTime(e.target.value)}
               className="w-full h-14 px-3 rounded-[12px] border border-[#E5E7EB] text-sm font-semibold"
@@ -227,7 +228,7 @@ export function SelectionPopover({
             type="button"
             disabled={saving}
             onClick={() => void (tab === 'reservation' ? onSaveReservation() : onSaveBlock())}
-            className="h-12 px-5 rounded-full bg-[#0066FF] text-white text-sm font-bold disabled:opacity-40"
+            className="h-12 px-5 rounded-full bg-[#0A0A0A] text-white text-sm font-bold disabled:opacity-40"
           >
             保存
           </button>

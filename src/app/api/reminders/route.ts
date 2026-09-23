@@ -1,48 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { sendBookingReminderNotifications } from '@/lib/booking-notifications'
+import { addDaysToDateKey, formatJstDateKey, jstDayBounds } from '@/lib/datetime'
 import { createAdminSupabaseClient } from '@/lib/supabase-admin'
-
-// メール送信ヘルパー（Resend API 使用）
-// RESEND_API_KEY を .env.local に追加してください
-async function sendEmail(to: string, subject: string, html: string) {
-  const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
-    // メールAPIキーが未設定の場合はコンソールに出力
-    console.log(`[reminder] TO: ${to}\nSUBJECT: ${subject}\n${html}`)
-    return
-  }
-
-  await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: 'FITALL <noreply@fitall.app>',
-      to,
-      subject,
-      html,
-    }),
-  })
-}
 
 export async function GET(req: NextRequest) {
   // Vercel Cron の認証チェック
   const authHeader = req.headers.get('authorization')
   const cronSecret = process.env.CRON_SECRET
+  if (!cronSecret && process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Cron is not configured' }, { status: 503 })
+  }
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const supabase = createAdminSupabaseClient()
 
-  // 翌日の確定済み予約を取得
-  const tomorrow = new Date()
-  tomorrow.setDate(tomorrow.getDate() + 1)
-  const dayStart = new Date(tomorrow)
-  dayStart.setHours(0, 0, 0, 0)
-  const dayEnd = new Date(tomorrow)
-  dayEnd.setHours(23, 59, 59, 999)
+  // 翌日の確定済み予約をJST基準で取得
+  const tomorrowKey = addDaysToDateKey(formatJstDateKey(), 1)
+  const { start: dayStart, end: dayEnd } = jstDayBounds(tomorrowKey)
 
   const { data: bookings, error } = await supabase
     .from('bookings')
@@ -53,21 +29,46 @@ export async function GET(req: NextRequest) {
 
   if (error) {
     console.error('[reminders] fetch error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: 'Reminder fetch failed' }, { status: 500 })
   }
 
   if (!bookings?.length) {
     return NextResponse.json({ sent: 0 })
   }
 
-  // trainee_id / trainer_id から emails を取得（trainer_id は trainer_profiles.id）
-  const traineeUserIds = [...new Set(bookings.map((b) => b.trainee_id))]
+  // trainee_id は新しい公開予約では trainee_profiles.id、古い予約では users.id の可能性がある
+  const bookingTraineeIds = [...new Set(bookings.map((b) => b.trainee_id))]
   const trainerProfileIds = [...new Set(bookings.map((b) => b.trainer_id))]
 
-  const { data: traineeUsers } = await supabase
+  const { data: directTraineeUsers } = await supabase
     .from('users')
-    .select('id, name, email')
-    .in('id', traineeUserIds)
+    .select('id, name, email, line_user_id')
+    .in('id', bookingTraineeIds)
+
+  const directTraineeMap = Object.fromEntries(
+    (directTraineeUsers ?? []).map((u) => [u.id, u])
+  )
+  const missingTraineeIds = bookingTraineeIds.filter((id) => !directTraineeMap[id])
+
+  const { data: traineeProfiles } = missingTraineeIds.length
+    ? await supabase
+        .from('trainee_profiles')
+        .select('id, user_id')
+        .in('id', missingTraineeIds)
+    : { data: [] }
+
+  const profileUserIds = [...new Set((traineeProfiles ?? []).map((p) => p.user_id))]
+  const { data: profileTraineeUsers } = profileUserIds.length
+    ? await supabase.from('users').select('id, name, email, line_user_id').in('id', profileUserIds)
+    : { data: [] }
+
+  const profileUserMap = Object.fromEntries(
+    (profileTraineeUsers ?? []).map((u) => [u.id, u])
+  )
+  const traineeProfileMap = Object.fromEntries(
+    (traineeProfiles ?? []).map((p) => [p.id, profileUserMap[p.user_id]])
+  )
+  const traineeMap = { ...directTraineeMap, ...traineeProfileMap }
 
   const { data: trainerProfiles } = await supabase
     .from('trainer_profiles')
@@ -76,10 +77,9 @@ export async function GET(req: NextRequest) {
 
   const trainerUserIds = (trainerProfiles ?? []).map((p) => p.user_id)
   const { data: trainerUsers } = trainerUserIds.length
-    ? await supabase.from('users').select('id, name, email').in('id', trainerUserIds)
+    ? await supabase.from('users').select('id, name, email, line_user_id').in('id', trainerUserIds)
     : { data: [] }
 
-  const traineeMap = Object.fromEntries((traineeUsers ?? []).map((u) => [u.id, u]))
   const trainerProfileToUser = Object.fromEntries(
     (trainerProfiles ?? []).map((p) => [p.id, p.user_id])
   )
@@ -88,53 +88,15 @@ export async function GET(req: NextRequest) {
   let sent = 0
 
   for (const booking of bookings) {
-    const scheduledDate = new Date(booking.scheduled_at)
-    const dateStr = scheduledDate.toLocaleDateString('ja-JP', {
-      month: 'long',
-      day: 'numeric',
-      weekday: 'short',
-    })
-    const timeStr = scheduledDate.toLocaleTimeString('ja-JP', {
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-
-    // トレーニーへのメール
     const trainee = traineeMap[booking.trainee_id]
-    if (trainee?.email) {
-      await sendEmail(
-        trainee.email,
-        `【FITALL】明日のパーソナルトレーニングのお知らせ`,
-        `
-          <p>${trainee.name} さん</p>
-          <p>明日のパーソナルトレーニングのお知らせです。</p>
-          <p><strong>${dateStr} ${timeStr}</strong> にセッションが予定されています。</p>
-          <p>ご不明な点はトレーナーにご連絡ください。</p>
-          <br>
-          <p>FITALL</p>
-        `
-      )
-      sent++
-    }
-
-    // トレーナーへのメール
     const trainerUserId = trainerProfileToUser[booking.trainer_id]
     const trainerUser = trainerUserId ? trainerUserMap[trainerUserId] : null
-    if (trainerUser?.email && trainee) {
-      await sendEmail(
-        trainerUser.email,
-        `【FITALL】明日のセッション: ${trainee.name} さん`,
-        `
-          <p>${trainerUser.name} さん</p>
-          <p>明日のセッションのお知らせです。</p>
-          <p>お客さん: <strong>${trainee.name}</strong></p>
-          <p>日時: <strong>${dateStr} ${timeStr}</strong></p>
-          <br>
-          <p>FITALL</p>
-        `
-      )
-      sent++
-    }
+    const result = await sendBookingReminderNotifications({
+      scheduledAt: booking.scheduled_at,
+      customer: trainee,
+      trainer: trainerUser,
+    })
+    sent += result.sent
   }
 
   return NextResponse.json({ sent, bookings: bookings.length })

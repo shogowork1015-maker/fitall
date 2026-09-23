@@ -15,25 +15,25 @@ export type BodyWeightData = { date: string; weight: number; bodyFat?: number | 
 export function BodyWeightChart({ data }: { data: BodyWeightData[] }) {
   if (!data.length) {
     return (
-      <div className="bg-[#0A0A0A] rounded-[20px] p-6 text-center text-sm text-[#6B7280]">
+      <div className="p-4 text-center text-sm text-[#A0A0A0]">
         体重記録がありません
       </div>
     )
   }
 
   return (
-    <div className="bg-[#0A0A0A] rounded-[20px] p-4">
+    <div>
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" />
           <XAxis
             dataKey="date"
-            tick={{ fill: '#6B7280', fontSize: 10 }}
+            tick={{ fill: '#A0A0A0', fontSize: 10 }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
-            tick={{ fill: '#6B7280', fontSize: 10 }}
+            tick={{ fill: '#A0A0A0', fontSize: 10 }}
             unit="kg"
             axisLine={false}
             tickLine={false}
@@ -42,9 +42,9 @@ export function BodyWeightChart({ data }: { data: BodyWeightData[] }) {
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1C1C1E',
+              backgroundColor: '#0A0A0A',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: '10px',
               color: '#fff',
               fontSize: '12px',
             }}
@@ -54,7 +54,7 @@ export function BodyWeightChart({ data }: { data: BodyWeightData[] }) {
             type="monotone"
             dataKey="weight"
             stroke="#0066FF"
-            strokeWidth={2}
+            strokeWidth={2.5}
             dot={{ fill: '#0066FF', r: 3, strokeWidth: 0 }}
             activeDot={{ r: 5, strokeWidth: 0 }}
           />
@@ -62,9 +62,10 @@ export function BodyWeightChart({ data }: { data: BodyWeightData[] }) {
             <Line
               type="monotone"
               dataKey="bodyFat"
-              stroke="#F59E0B"
+              stroke="#0A0A0A"
               strokeWidth={2}
-              dot={{ fill: '#F59E0B', r: 3, strokeWidth: 0 }}
+              strokeDasharray="4 2"
+              dot={{ fill: '#0A0A0A', r: 3, strokeWidth: 0 }}
               activeDot={{ r: 5, strokeWidth: 0 }}
             />
           )}

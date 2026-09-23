@@ -22,9 +22,5 @@ export default async function HomePage() {
     redirect('/trainer/dashboard')
   }
 
-  if (userData?.role === 'trainee') {
-    redirect('/trainee/dashboard')
-  }
-
-  redirect('/auth/login')
+  redirect('/auth/login?trainerOnly=1')
 }

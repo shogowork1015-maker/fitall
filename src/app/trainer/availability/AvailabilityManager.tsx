@@ -30,7 +30,12 @@ interface Props {
 
 const DAY_NAMES = ['日', '月', '火', '水', '木', '金', '土']
 const GRID_HOURS = Array.from({ length: 24 }, (_, i) => i) // 0:00 - 23:00
-const HOUR_OPTIONS = Array.from({ length: 25 }, (_, i) => `${String(i).padStart(2, '0')}:00`)
+const TIME_OPTIONS = Array.from({ length: 24 * 6 + 1 }, (_, i) => {
+  const totalMinutes = i * 10
+  const hour = Math.floor(totalMinutes / 60)
+  const minute = totalMinutes % 60
+  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+})
 
 function toDateKey(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
@@ -583,7 +588,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
             <select
               value={weeklyPresetDay}
               onChange={(e) => setWeeklyPresetDay(Number(e.target.value))}
-              className="h-14 px-3 bg-white border border-[#E5E7EB] rounded-[12px] text-sm font-semibold text-[#0A0A0A] focus:outline-none focus:border-[#0066FF]"
+              className="h-14 px-3 bg-white border border-[#E5E7EB] rounded-[12px] text-sm font-semibold text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
             >
               {DAY_NAMES.map((name, idx) => (
                 <option key={name} value={idx}>
@@ -594,9 +599,9 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
             <select
               value={weeklyPresetStart}
               onChange={(e) => setWeeklyPresetStart(e.target.value)}
-              className="h-14 px-3 bg-white border border-[#E5E7EB] rounded-[12px] text-sm font-semibold text-[#0A0A0A] focus:outline-none focus:border-[#0066FF]"
+              className="h-14 px-3 bg-white border border-[#E5E7EB] rounded-[12px] text-sm font-semibold text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
             >
-              {HOUR_OPTIONS.map((t) => (
+              {TIME_OPTIONS.map((t) => (
                 <option key={`preset-start-${t}`} value={t}>
                   開始 {t}
                 </option>
@@ -605,9 +610,9 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
             <select
               value={weeklyPresetEnd}
               onChange={(e) => setWeeklyPresetEnd(e.target.value)}
-              className="h-14 px-3 bg-white border border-[#E5E7EB] rounded-[12px] text-sm font-semibold text-[#0A0A0A] focus:outline-none focus:border-[#0066FF]"
+              className="h-14 px-3 bg-white border border-[#E5E7EB] rounded-[12px] text-sm font-semibold text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
             >
-              {HOUR_OPTIONS.map((t) => (
+              {TIME_OPTIONS.map((t) => (
                 <option key={`preset-end-${t}`} value={t}>
                   終了 {t}
                 </option>

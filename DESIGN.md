@@ -1,13 +1,13 @@
-# Design System: FITALL
+# Design System: Limitless App
 
 > **Base source**: Apple (design-md/apple) — chosen as the closest match to Nike Training Club / Strava / Strong aesthetic (white-base, bold type, single blue accent).  
-> **Colors adapted** to FITALL brand: base `#FFFFFF`, accent `#0066FF`, background `#F8F9FA`, text `#0A0A0A`.
+> **Colors adapted** to Limitless App brand: base `#FFFFFF`, accent `#0066FF`, background `#F8F9FA`, text `#0A0A0A`.
 
 ---
 
 ## 1. Visual Theme & Atmosphere
 
-FITALL's interface is a light, high-contrast fitness companion that keeps the athlete's data front and center. The design philosophy is "performance clarity" — the UI steps back so that workout numbers, progress charts, and booking flows command full attention. Every surface is either pure white or a barely-there warm gray (`#F8F9FA`), creating a clinical precision that mirrors the discipline of training itself. The only chromatic presence is FITALL Blue (`#0066FF`), reserved for interactive elements and live data — it fires like a starting pistol against the white field.
+Limitless App's interface is a light, high-contrast fitness companion that keeps the trainer's business data front and center. The design philosophy is "performance clarity" — the UI steps back so that bookings, sales, clients, and ticket flows command full attention. Every surface is either pure white or a barely-there warm gray (`#F8F9FA`), creating a clinical precision that mirrors the discipline of training itself. The only chromatic presence is Limitless Aqua (`#12C7BE`), reserved for interactive elements and live data.
 
 Typography is bold and decisive. Headlines drop to extremely tight line-heights (1.07–1.14) and use negative letter-spacing, echoing the compressed readouts on a GPS watch. Body text stays compact and functional — this is a training log, not a magazine.
 
@@ -15,7 +15,7 @@ Geometry follows Apple's pill language: primary CTAs use full-radius pills; card
 
 **Key Characteristics:**
 - Light-native theme (`#FFFFFF` / `#F8F9FA`) — UI recedes behind the athlete's data
-- FITALL Blue (`#0066FF`) as singular chromatic accent — interactive, live, actionable
+- Limitless Aqua (`#12C7BE`) as singular chromatic accent — interactive, live, actionable
 - Inter / system-ui with optical sizing; tight line-heights at display scale
 - Pill CTAs (9999px) and 16px–20px card radius — rounded and touch-optimized
 - 8px base spacing grid with generous section breathing room
@@ -27,7 +27,7 @@ Geometry follows Apple's pill language: primary CTAs use full-radius pills; card
 ## 2. Color Palette & Roles
 
 ### Primary Brand
-- **FITALL Blue** (`#0066FF`): Primary brand accent — active states, CTAs, live data, progress indicators
+- **Limitless Aqua** (`#12C7BE`): Primary brand accent — active states, CTAs, live data, progress indicators
 - **White** (`#FFFFFF`): Card and component surface — the dominant field
 - **Background** (`#F8F9FA`): Page / screen background — warm off-white
 
@@ -280,7 +280,7 @@ All badges: 6px radius, padding 2px 10px, 12px weight 600.
 | Overlay (4) | `rgba(0,0,0,0.4)` backdrop | Full-screen overlays |
 | Fixed (5) | Strong shadow | Toast, RestTimer — always on top |
 
-**Shadow Philosophy**: FITALL uses soft shadows on a white field. A subtle 4px / 3px shadow gives cards just enough lift to be distinct without the dramatic depth of a dark-theme app. Heavier shadows (Medium/Strong) are reserved for temporary surfaces — toasts, timers, overlays — that need to feel "above" the page.
+**Shadow Philosophy**: Limitless App uses soft shadows on a white field. A subtle 4px / 3px shadow gives cards just enough lift to be distinct without the dramatic depth of a dark-theme app. Heavier shadows (Medium/Strong) are reserved for temporary surfaces — toasts, timers, overlays — that need to feel "above" the page.
 
 ---
 

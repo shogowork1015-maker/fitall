@@ -53,14 +53,14 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
   }
 
   return (
-    <div className="mt-3 bg-[#F8F9FA] rounded-[16px] p-4 border border-[#E5E7EB] space-y-4">
+    <div className="mt-3 space-y-4 rounded-[6px] border-2 border-[#DDE8E8] bg-[#F4F7F7] p-4">
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
 
       <div className="flex items-center justify-between">
-        <p className="text-sm font-bold text-[#0A0A0A]">新しい日時を選択</p>
+        <p className="text-sm font-black text-[#0A0A0A]">新しい日時を選択</p>
         <button
           onClick={onClose}
-          className="text-[#9CA3AF] text-sm font-medium"
+          className="text-sm font-black text-[#555555]"
         >
           キャンセル
         </button>
@@ -71,7 +71,7 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
       </p>
 
       {error && (
-        <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-[12px] px-3 py-2 text-xs text-[#EF4444]">
+        <div className="rounded-[6px] border-2 border-[#D4183D] bg-[#FEF2F2] px-3 py-2 text-xs font-bold text-[#D4183D]">
           {error}
         </div>
       )}
@@ -89,14 +89,14 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
               key={iso}
               type="button"
               onClick={() => { setSelectedDate(iso); setSelectedTime(null) }}
-              className={`flex flex-col items-center py-1.5 rounded-[10px] transition-colors ${
+              className={`flex flex-col items-center rounded-[6px] py-1.5 transition-colors ${
                 isSelected
-                  ? 'bg-[#0066FF] text-white'
+                  ? 'bg-[#12C7BE] text-white'
                   : isSun
-                  ? 'bg-[#FEF2F2] text-[#EF4444]'
+                  ? 'bg-white text-[#0A0A0A] border border-[#DDE8E8]'
                   : isSat
-                  ? 'bg-[#EFF6FF] text-[#0066FF]'
-                  : 'bg-white text-[#0A0A0A] border border-[#E5E7EB]'
+                  ? 'bg-[#E8FBFA] text-[#087D78]'
+                  : 'bg-white text-[#0A0A0A] border border-[#DDE8E8]'
               }`}
             >
               <span className="text-[9px] font-medium">{WEEKDAYS[day]}</span>
@@ -114,10 +114,10 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
               key={t}
               type="button"
               onClick={() => setSelectedTime(t)}
-              className={`h-10 text-sm font-semibold rounded-full transition-colors ${
+              className={`h-10 rounded-[6px] text-sm font-black transition-colors ${
                 selectedTime === t
-                  ? 'bg-[#0066FF] text-white'
-                  : 'bg-white text-[#0A0A0A] border border-[#E5E7EB]'
+                  ? 'bg-[#12C7BE] text-white'
+                  : 'bg-white text-[#0A0A0A] border border-[#DDE8E8]'
               }`}
             >
               {t}
@@ -130,7 +130,7 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-full h-12 bg-[#0A0A0A] text-white text-sm font-bold rounded-full disabled:opacity-40 active:scale-[0.97] transition-transform"
+          className="h-12 w-full rounded-[6px] bg-[#0A0A0A] text-sm font-black text-white transition-transform active:scale-[0.97] disabled:opacity-40"
         >
           {loading ? '送信中...' : `${new Date(selectedDate).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })} ${selectedTime} に変更提案`}
         </button>

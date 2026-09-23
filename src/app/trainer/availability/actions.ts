@@ -3,15 +3,17 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { revalidatePath } from 'next/cache'
 import { RECURRING_PRESET_WINDOW_DAYS } from '@/lib/booking-policy'
+import {
+  addDaysToDateKey,
+  dayOfWeekForDateKey,
+  formatJstDateKey,
+  parseJstDateTime,
+} from '@/lib/datetime'
+import { attachFirstAvailableCreditForCustomerToBooking } from '@/lib/session-credits'
+import { readTrainerSettingsFromBio } from '@/lib/trainer-settings'
 
 export interface AvailabilitySlot {
   slot_date: string
-  start_time: string
-  end_time: string
-}
-
-export interface WeeklyRecurringRule {
-  day_of_week: number
   start_time: string
   end_time: string
 }
@@ -26,25 +28,29 @@ export interface CreateTrainerReservationInput {
   repeat_until_date?: string
 }
 
-function toDateKey(date: Date): string {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
-    date.getDate()
-  ).padStart(2, '0')}`
+type ActionResult = { error?: string }
+type ActionError = { error: string }
+
+interface TrainerProfileLite {
+  id: string
+  price_per_session?: number | null
+  bio?: string | null
 }
 
-function addDays(date: Date, days: number): Date {
-  const d = new Date(date)
-  d.setDate(d.getDate() + days)
-  return d
+function toActionError(label: string, message: string): ActionResult {
+  return { error: `${label}: ${message}` }
+}
+
+function getDowFromDateKey(dateKey: string): number {
+  return dayOfWeekForDateKey(dateKey)
 }
 
 function nextDateKeyForDayOfWeek(dayOfWeek: number): string {
-  const base = new Date()
   for (let i = 0; i < 7; i += 1) {
-    const d = addDays(base, i)
-    if (d.getDay() === dayOfWeek) return toDateKey(d)
+    const key = addDaysToDateKey(formatJstDateKey(), i)
+    if (dayOfWeekForDateKey(key) === dayOfWeek) return key
   }
-  return toDateKey(base)
+  return formatJstDateKey()
 }
 
 function isMissingSlotDateColumnError(error: { message?: string; code?: string } | null): boolean {
@@ -52,24 +58,67 @@ function isMissingSlotDateColumnError(error: { message?: string; code?: string }
   return error?.code === 'PGRST204' || message.includes("'slot_date' column")
 }
 
-// 空き時間を全て上書き保存する
-export async function saveAvailabilityAction(
-  slots: AvailabilitySlot[]
-): Promise<{ error?: string }> {
+async function getAuthedTrainerProfile(
+  needsPrice = false
+): Promise<{ supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>; profile: TrainerProfileLite } | ActionError> {
   const supabase = await createServerSupabaseClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-
   if (!user) return { error: '認証が必要です' }
+
+  if (needsPrice) {
+    const { data: profile } = await supabase
+      .from('trainer_profiles')
+      .select('id, price_per_session, bio')
+      .eq('user_id', user.id)
+      .maybeSingle()
+    if (!profile) return { error: 'トレーナープロフィールが見つかりません' }
+    return { supabase, profile }
+  }
 
   const { data: profile } = await supabase
     .from('trainer_profiles')
     .select('id')
     .eq('user_id', user.id)
     .maybeSingle()
-
   if (!profile) return { error: 'トレーナープロフィールが見つかりません' }
+  return { supabase, profile }
+}
+
+function buildRowsByDate(trainerId: string, slots: AvailabilitySlot[]) {
+  return slots.map((s) => ({
+    trainer_id: trainerId,
+    slot_date: s.slot_date,
+    day_of_week: getDowFromDateKey(s.slot_date),
+    start_time: s.start_time,
+    end_time: s.end_time,
+  }))
+}
+
+function buildLegacyRowsByDate(trainerId: string, slots: AvailabilitySlot[]) {
+  const weeklyMap = new Map<number, { start_time: string; end_time: string }>()
+  for (const s of slots) {
+    weeklyMap.set(getDowFromDateKey(s.slot_date), {
+      start_time: s.start_time,
+      end_time: s.end_time,
+    })
+  }
+  return Array.from(weeklyMap.entries()).map(([day_of_week, v]) => ({
+    trainer_id: trainerId,
+    day_of_week,
+    start_time: v.start_time,
+    end_time: v.end_time,
+  }))
+}
+
+// 空き時間を全て上書き保存する
+export async function saveAvailabilityAction(
+  slots: AvailabilitySlot[]
+): Promise<ActionResult> {
+  const auth = await getAuthedTrainerProfile(false)
+  if ('error' in auth) return auth
+  const { supabase, profile } = auth
 
   // 既存レコードをすべて削除してから新規挿入
   const { error: deleteError } = await supabase
@@ -79,17 +128,11 @@ export async function saveAvailabilityAction(
 
   if (deleteError) {
     console.error('[saveAvailabilityAction] delete error:', deleteError)
-    return { error: `保存に失敗しました（削除）: ${deleteError.message}` }
+    return toActionError('保存に失敗しました（削除）', deleteError.message)
   }
 
   if (slots.length > 0) {
-    const rows = slots.map((s) => ({
-      trainer_id: profile.id,
-      slot_date: s.slot_date,
-      day_of_week: new Date(`${s.slot_date}T00:00:00`).getDay(),
-      start_time: s.start_time,
-      end_time: s.end_time,
-    }))
+    const rows = buildRowsByDate(profile.id, slots)
     const { error: insertError } = await supabase
       .from('trainer_availability')
       .insert(rows)
@@ -97,21 +140,7 @@ export async function saveAvailabilityAction(
     if (insertError) {
       // 旧スキーマ（slot_date なし）向けフォールバック
       if (isMissingSlotDateColumnError(insertError)) {
-        const weeklyMap = new Map<number, { start_time: string; end_time: string }>()
-        for (const s of slots) {
-          const dow = new Date(`${s.slot_date}T00:00:00`).getDay()
-          weeklyMap.set(dow, {
-            start_time: s.start_time,
-            end_time: s.end_time,
-          })
-        }
-
-        const legacyRows = Array.from(weeklyMap.entries()).map(([day_of_week, v]) => ({
-          trainer_id: profile.id,
-          day_of_week,
-          start_time: v.start_time,
-          end_time: v.end_time,
-        }))
+        const legacyRows = buildLegacyRowsByDate(profile.id, slots)
 
         const { error: legacyInsertError } = await supabase
           .from('trainer_availability')
@@ -119,11 +148,11 @@ export async function saveAvailabilityAction(
 
         if (legacyInsertError) {
           console.error('[saveAvailabilityAction] legacy insert error:', legacyInsertError)
-          return { error: `保存に失敗しました（登録）: ${legacyInsertError.message}` }
+          return toActionError('保存に失敗しました（登録）', legacyInsertError.message)
         }
       } else {
         console.error('[saveAvailabilityAction] insert error:', insertError)
-        return { error: `保存に失敗しました（登録）: ${insertError.message}` }
+        return toActionError('保存に失敗しました（登録）', insertError.message)
       }
     }
   }
@@ -137,24 +166,12 @@ export async function applyWeeklyPresetAction(
   startTime: string,
   endTime: string,
   mode: 'open' | 'block'
-): Promise<{ error?: string }> {
-  const supabase = await createServerSupabaseClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+): Promise<ActionResult> {
+  const auth = await getAuthedTrainerProfile(false)
+  if ('error' in auth) return auth
+  const { supabase, profile } = auth
 
-  if (!user) return { error: '認証が必要です' }
-
-  const { data: profile } = await supabase
-    .from('trainer_profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!profile) return { error: 'トレーナープロフィールが見つかりません' }
-
-  const today = new Date()
-  const end = addDays(today, RECURRING_PRESET_WINDOW_DAYS)
+  const todayKey = formatJstDateKey()
 
   const { data: existingRows, error: selectError } = await supabase
     .from('trainer_availability')
@@ -163,7 +180,7 @@ export async function applyWeeklyPresetAction(
 
   if (selectError) {
     if (!isMissingSlotDateColumnError(selectError)) {
-      return { error: `保存に失敗しました（取得）: ${selectError.message}` }
+      return toActionError('保存に失敗しました（取得）', selectError.message)
     }
 
     const { data: legacyRows, error: legacySelectError } = await supabase
@@ -172,7 +189,7 @@ export async function applyWeeklyPresetAction(
       .eq('trainer_id', profile.id)
 
     if (legacySelectError) {
-      return { error: `保存に失敗しました（取得）: ${legacySelectError.message}` }
+      return toActionError('保存に失敗しました（取得）', legacySelectError.message)
     }
 
     const legacyMap = new Map<number, { start_time: string; end_time: string }>()
@@ -195,7 +212,7 @@ export async function applyWeeklyPresetAction(
       .eq('trainer_id', profile.id)
 
     if (deleteError) {
-      return { error: `保存に失敗しました（削除）: ${deleteError.message}` }
+      return toActionError('保存に失敗しました（削除）', deleteError.message)
     }
 
     if (legacyMap.size > 0) {
@@ -207,7 +224,7 @@ export async function applyWeeklyPresetAction(
       }))
       const { error: insertError } = await supabase.from('trainer_availability').insert(rows)
       if (insertError) {
-        return { error: `保存に失敗しました（登録）: ${insertError.message}` }
+        return toActionError('保存に失敗しました（登録）', insertError.message)
       }
     }
 
@@ -226,9 +243,9 @@ export async function applyWeeklyPresetAction(
     })
   }
 
-  for (let cursor = new Date(today); cursor <= end; cursor = addDays(cursor, 1)) {
-    if (cursor.getDay() !== dayOfWeek) continue
-    const key = toDateKey(cursor)
+  for (let offset = 0; offset <= RECURRING_PRESET_WINDOW_DAYS; offset += 1) {
+    const key = addDaysToDateKey(todayKey, offset)
+    if (dayOfWeekForDateKey(key) !== dayOfWeek) continue
     if (mode === 'open') {
       byDate.set(key, {
         slot_date: key,
@@ -254,20 +271,10 @@ export async function applyWeeklyPresetAction(
 
 export async function createTrainerReservationAction(
   input: CreateTrainerReservationInput
-): Promise<{ error?: string }> {
-  const supabase = await createServerSupabaseClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) return { error: '認証が必要です' }
-
-  const { data: profile } = await supabase
-    .from('trainer_profiles')
-    .select('id, price_per_session')
-    .eq('user_id', user.id)
-    .maybeSingle()
-  if (!profile) return { error: 'トレーナープロフィールが見つかりません' }
+): Promise<ActionResult> {
+  const auth = await getAuthedTrainerProfile(true)
+  if ('error' in auth) return auth
+  const { supabase, profile } = auth
 
   const { data: relation } = await supabase
     .from('trainer_trainee')
@@ -290,14 +297,14 @@ export async function createTrainerReservationAction(
     menuPrice = plan.price
   }
 
-  const scheduledDates: Date[] = []
-  const firstDate = new Date(`${input.date}T${input.start_time}:00`)
+  const scheduledDateMap = new Map<number, Date>()
+  const firstDate = parseJstDateTime(input.date, input.start_time)
   if (Number.isNaN(firstDate.getTime())) return { error: '日時が不正です' }
-  scheduledDates.push(firstDate)
+  scheduledDateMap.set(firstDate.getTime(), firstDate)
 
   if (input.repeat_enabled) {
-    const repeatStart = new Date(`${input.repeat_start_date ?? input.date}T${input.start_time}:00`)
-    const repeatUntil = new Date(`${input.repeat_until_date ?? input.date}T23:59:59`)
+    const repeatStart = parseJstDateTime(input.repeat_start_date ?? input.date, input.start_time)
+    const repeatUntil = parseJstDateTime(input.repeat_until_date ?? input.date, '23:59:59')
     if (Number.isNaN(repeatStart.getTime()) || Number.isNaN(repeatUntil.getTime())) {
       return { error: '繰り返し日付が不正です' }
     }
@@ -306,25 +313,39 @@ export async function createTrainerReservationAction(
     }
 
     for (let cursor = new Date(repeatStart); cursor <= repeatUntil; ) {
-      if (!scheduledDates.some((d) => d.getTime() === cursor.getTime())) {
-        scheduledDates.push(new Date(cursor))
-      }
-      cursor = addDays(cursor, 7)
+      const next = new Date(cursor)
+      scheduledDateMap.set(next.getTime(), next)
+      cursor = new Date(cursor.getTime() + 7 * 24 * 60 * 60 * 1000)
     }
   }
 
+  const scheduledDates = Array.from(scheduledDateMap.values())
   scheduledDates.sort((a, b) => a.getTime() - b.getTime())
-  const isoList = scheduledDates.map((d) => d.toISOString())
+  const settings = readTrainerSettingsFromBio(profile.bio)
+  const sessionMs = settings.session_duration_minutes * 60 * 1000
+  const rangeStart = new Date(Math.min(...scheduledDates.map((d) => d.getTime())) - sessionMs)
+  const rangeEnd = new Date(Math.max(...scheduledDates.map((d) => d.getTime())) + sessionMs)
 
   const { data: duplicates } = await supabase
     .from('bookings')
     .select('id, scheduled_at')
     .eq('trainer_id', profile.id)
     .in('status', ['pending', 'confirmed', 'completed'])
-    .in('scheduled_at', isoList)
+    .gte('scheduled_at', rangeStart.toISOString())
+    .lte('scheduled_at', rangeEnd.toISOString())
 
-  if ((duplicates ?? []).length > 0) {
-    return { error: '同じ日時に既存予約があります。時間を調整してください。' }
+  const hasOverlap = scheduledDates.some((scheduledDate) => {
+    const start = scheduledDate.getTime()
+    const end = start + sessionMs
+    return (duplicates ?? []).some((booking) => {
+      const bookingStart = new Date(booking.scheduled_at).getTime()
+      const bookingEnd = bookingStart + sessionMs
+      return start < bookingEnd && end > bookingStart
+    })
+  })
+
+  if (hasOverlap) {
+    return { error: '既存予約と時間が重なっています。開始時刻を調整してください。' }
   }
 
   const rows = scheduledDates.map((d) => ({
@@ -334,13 +355,30 @@ export async function createTrainerReservationAction(
     status: 'confirmed',
     price: menuPrice,
   }))
-  const { error: insertError } = await supabase.from('bookings').insert(rows)
+  const { data: insertedBookings, error: insertError } = await supabase
+    .from('bookings')
+    .insert(rows)
+    .select('id, trainee_id')
   if (insertError) {
     return { error: `予約作成に失敗しました: ${insertError.message}` }
   }
 
+  for (const booking of insertedBookings ?? []) {
+    try {
+      await attachFirstAvailableCreditForCustomerToBooking({
+        supabase,
+        trainerId: profile.id,
+        traineeId: booking.trainee_id,
+        bookingId: booking.id,
+      })
+    } catch (error) {
+      console.error('[createTrainerReservationAction] session_credits attach error:', error)
+    }
+  }
+
   revalidatePath('/trainer/availability')
   revalidatePath('/trainer/bookings')
-  revalidatePath('/trainee/booking')
+  revalidatePath('/trainer/clients')
+  revalidatePath('/book')
   return {}
 }
