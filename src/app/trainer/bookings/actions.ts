@@ -7,6 +7,8 @@ import { findTrainerBookingOverlap } from '@/lib/booking-overlap'
 import { parseJstDateTimeInput } from '@/lib/datetime'
 import { revalidatePath } from 'next/cache'
 
+export type BookingActionResult = { error?: string; warning?: string }
+
 async function getAuthedTrainerProfile() {
   const supabase = await createServerSupabaseClient()
   const {
@@ -74,11 +76,11 @@ async function notifyTicketDepletedIfNeeded(input: {
 }
 
 // 予約を承認し、売上レコードを作成する
-export async function approveBooking(bookingId: string) {
+export async function approveBooking(bookingId: string): Promise<BookingActionResult> {
   const auth = await getAuthedTrainerProfile()
   if ('error' in auth) {
     console.error('[approveBooking]', auth.error)
-    return
+    return { error: auth.error }
   }
   const { supabase, trainerProfile } = auth
 
@@ -92,17 +94,21 @@ export async function approveBooking(bookingId: string) {
 
   if (updateError) {
     console.error('[approveBooking] update error:', updateError)
-    return
+    return { error: '予約を承認できませんでした。もう一度お試しください。' }
   }
 
+  if (!booking) return { error: '予約が見つからないか、操作する権限がありません。' }
+  let warning: string | undefined
   if (booking) {
-    const { data: existingSale } = await supabase
+    const { data: existingSale, error: salesLookupError } = await supabase
       .from('sales_records')
       .select('id')
       .eq('booking_id', bookingId)
       .maybeSingle()
 
-    if (!existingSale) {
+    if (salesLookupError) {
+      warning = '予約は承認されましたが、売上を確認できませんでした。売上一覧を確認してください。'
+    } else if (!existingSale) {
       const { error: salesError } = await supabase.from('sales_records').insert({
         trainer_id: booking.trainer_id,
         booking_id: bookingId,
@@ -111,32 +117,40 @@ export async function approveBooking(bookingId: string) {
       })
       if (salesError) {
         console.error('[approveBooking] sales_records insert error:', salesError)
+        warning = '予約は承認されましたが、売上の登録に失敗しました。売上一覧を確認してください。'
       }
     }
   }
 
   revalidatePath('/trainer/bookings')
   revalidatePath('/trainer/dashboard')
+  return { warning }
 }
 
 // 予約を拒否する
-export async function rejectBooking(bookingId: string) {
+export async function rejectBooking(bookingId: string): Promise<BookingActionResult> {
   const auth = await getAuthedTrainerProfile()
   if ('error' in auth) {
     console.error('[rejectBooking]', auth.error)
-    return
+    return { error: auth.error }
   }
   const { supabase, trainerProfile } = auth
 
-  const { error } = await supabase
+  let warning: string | undefined
+  const { data: updatedBooking, error } = await supabase
     .from('bookings')
     .update({ status: 'cancelled' })
     .eq('id', bookingId)
     .eq('trainer_id', trainerProfile.id)
+    .select('id')
+    .maybeSingle()
 
   if (error) {
     console.error('[rejectBooking] update error:', error)
-  } else {
+    return { error: '予約をキャンセルにできませんでした。もう一度お試しください。' }
+  }
+  if (!updatedBooking) return { error: '予約が見つからないか、操作する権限がありません。' }
+  {
     const { error: creditError } = await supabase
       .from('session_credits')
       .update({ status: 'available', booking_id: null })
@@ -145,31 +159,39 @@ export async function rejectBooking(bookingId: string) {
 
     if (creditError) {
       console.error('[rejectBooking] session_credits release error:', creditError)
+      warning = '予約はキャンセルになりましたが、チケットの更新に失敗しました。残回数を確認してください。'
     }
   }
 
   revalidatePath('/trainer/bookings')
   revalidatePath('/trainer/dashboard')
+  return { warning }
 }
 
 // 予約を完了にする
-export async function completeBooking(bookingId: string) {
+export async function completeBooking(bookingId: string): Promise<BookingActionResult> {
   const auth = await getAuthedTrainerProfile()
   if ('error' in auth) {
     console.error('[completeBooking]', auth.error)
-    return
+    return { error: auth.error }
   }
   const { supabase, trainerProfile } = auth
 
-  const { error } = await supabase
+  let warning: string | undefined
+  const { data: updatedBooking, error } = await supabase
     .from('bookings')
     .update({ status: 'completed' })
     .eq('id', bookingId)
     .eq('trainer_id', trainerProfile.id)
+    .select('id')
+    .maybeSingle()
 
   if (error) {
     console.error('[completeBooking] update error:', error)
-  } else {
+    return { error: '予約を完了にできませんでした。もう一度お試しください。' }
+  }
+  if (!updatedBooking) return { error: '予約が見つからないか、操作する権限がありません。' }
+  {
     const { data: usedCredit, error: creditError } = await supabase
       .from('session_credits')
       .update({ status: 'used', used_at: new Date().toISOString() })
@@ -180,6 +202,7 @@ export async function completeBooking(bookingId: string) {
 
     if (creditError) {
       console.error('[completeBooking] session_credits update error:', creditError)
+      warning = '予約は完了になりましたが、チケットの更新に失敗しました。残回数を確認してください。'
     } else if (usedCredit) {
       try {
         await notifyTicketDepletedIfNeeded({
@@ -188,6 +211,7 @@ export async function completeBooking(bookingId: string) {
         })
       } catch (notificationError) {
         console.error('[completeBooking] ticket depleted notification error:', notificationError)
+        warning = '予約は完了しましたが、チケット残数の通知に失敗しました。'
       }
     }
   }
@@ -195,6 +219,7 @@ export async function completeBooking(bookingId: string) {
   revalidatePath('/trainer/bookings')
   revalidatePath('/trainer/clients')
   revalidatePath('/trainer/sales')
+  return { warning }
 }
 
 // トレーナーが日時変更を提案する

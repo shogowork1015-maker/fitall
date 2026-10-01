@@ -232,7 +232,8 @@ async function createBookingFromCheckout(event: CheckoutSessionCompletedEvent) {
       quantity,
     })
   } catch (error) {
-    if (!isMissingCreditStorageError(error)) throw error
+    // Ticket-only purchases must never acknowledge payment without issuing credits.
+    if (!scheduledAt || !isMissingCreditStorageError(error)) throw error
     console.error('[stripe webhook] session credit storage is missing; booking will continue')
   }
 

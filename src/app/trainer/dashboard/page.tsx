@@ -200,7 +200,7 @@ function DashboardScreen({
     </div>
     <div className="fitall-desktop-ui fitall-desktop-page">
       <div className="fitall-desktop-container">
-        <header className="fitall-desktop-header">
+        <header className="fitall-desktop-header flex-wrap">
           <div>
             <p className="fitall-kicker">{todayLabel}</p>
             <h1 className="fitall-desktop-title">ホーム</h1>
@@ -208,11 +208,11 @@ function DashboardScreen({
               今日の予約、売上、承認待ちをまとめて確認できます。
             </p>
           </div>
-          <div className="flex gap-3">
-            <Link href="/trainer/invite" className="fitall-aqua-action fitall-tap w-auto min-w-[180px]">
+          <div className="flex flex-wrap gap-3">
+            <Link href="/trainer/invite" className="fitall-aqua-action fitall-tap !w-auto shrink-0 whitespace-nowrap">
               登録リンクを送る
             </Link>
-            <Link href="/trainer/bookings" className="fitall-secondary-action fitall-tap min-w-[150px]">
+            <Link href="/trainer/bookings" className="fitall-secondary-action fitall-tap shrink-0 whitespace-nowrap">
               カレンダー
             </Link>
           </div>

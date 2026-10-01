@@ -1,7 +1,6 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 import { sendTicketBookingConfirmationNotifications } from '@/lib/booking-notifications'
 import { findTrainerBookingOverlap } from '@/lib/booking-overlap'
 import { loadCustomerAppMutationContext } from '@/lib/customer-app'
@@ -117,11 +116,12 @@ export async function createCustomerBookingAction(
     }
   }
 
-  await sendTicketBookingConfirmationNotifications({
-    scheduledAt,
-    customer: customerUser,
-    trainer: trainerUser,
-  })
+  let notificationFailed = false
+  try {
+    await sendTicketBookingConfirmationNotifications({ scheduledAt, customer: customerUser, trainer: trainerUser })
+  } catch {
+    notificationFailed = true
+  }
 
   revalidatePath('/customer/app')
   revalidatePath('/customer/app/bookings')
@@ -129,5 +129,7 @@ export async function createCustomerBookingAction(
   revalidatePath('/trainer/bookings')
   revalidatePath('/trainer/dashboard')
 
-  redirect('/customer/app/bookings?booked=1')
+  return { status: 'success', message: notificationFailed
+    ? '予約は確定しました。通知を送信できなかったため、予約一覧で内容をご確認ください。'
+    : '予約が確定しました。' }
 }

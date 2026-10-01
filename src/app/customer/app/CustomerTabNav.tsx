@@ -50,7 +50,7 @@ function LineIcon({ active }: { active: boolean }) {
 
 const tabs = [
   { href: '/customer/app', label: 'ホーム', Icon: HomeIcon, exact: true },
-  { href: '/customer/app/bookings', label: '予約', Icon: CalendarIcon },
+  { href: '/customer/app/bookings/list', label: '予約', Icon: CalendarIcon },
   { href: '/customer/app/tickets', label: 'チケット', Icon: TicketIcon },
   { href: '/customer/app/mypage', label: 'マイページ', Icon: LineIcon },
 ]
@@ -61,7 +61,7 @@ export function CustomerTabNav() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto grid h-[86px] max-w-[430px] grid-cols-4 border-t-2 border-[#DDE8E8] bg-white pb-5 pt-2 md:left-1/2 md:-translate-x-1/2">
       {tabs.map(({ href, label, Icon, exact }) => {
-        const active = exact ? pathname === href : pathname.startsWith(href)
+        const active = exact ? pathname === href : pathname.startsWith(href === '/customer/app/bookings/list' ? '/customer/app/bookings' : href)
         return (
           <Link
             key={href}
