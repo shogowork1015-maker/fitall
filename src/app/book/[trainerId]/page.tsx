@@ -7,8 +7,8 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function PublicBookingPage({ params, searchParams }: {
-  params: Promise<{ trainerId: string }> | { trainerId: string }
-  searchParams: Promise<{ cancelled?: string }> | { cancelled?: string }
+  params: Promise<{ trainerId: string }>
+  searchParams: Promise<{ cancelled?: string }>
 }) {
   const { trainerId } = await params
   const resolvedSearchParams = await searchParams
