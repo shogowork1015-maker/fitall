@@ -1,0 +1,22 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "limitless-dev-preview",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "FITALL_BOOKING_PREVIEW=1",
+        "FITALL_CUSTOMER_PREVIEW=1",
+        "npx",
+        "next",
+        "dev",
+        "--webpack",
+        "--hostname",
+        "127.0.0.1",
+        "--port",
+        "3107"
+      ],
+      "port": 3107
+    }
+  ]
+}

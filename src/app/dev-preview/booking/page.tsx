@@ -28,7 +28,7 @@ export default async function BookingPreview({ searchParams }: { searchParams: P
   if (query.view === 'manage') return <BookingManagementPreview slots={data.slots} late={query.test === 'late'} fail={query.test === 'error'} />
   if (query.view !== 'purchase') return <TicketFlowPreview source={data} empty={query.empty === '1'} fail={query.test === 'error'} />
   return <>
-    <p className="bg-[#E8FBFA] px-4 py-3 text-center text-xs font-bold text-[#064F4B]">開発プレビュー · サンプル表示 · 予約・決済・通知は行いません</p>
+    <p className="bg-accent-soft px-4 py-3 text-center text-base font-bold text-brand">開発プレビュー · サンプル表示 · 予約・決済・通知は行いません</p>
     {query.test === 'error' || query.test === 'exception'
       ? <BookingFailurePreview data={data} exception={query.test === 'exception'} />
       : <BookingPageContent data={data} cancelled={query.cancelled === '1'} />}

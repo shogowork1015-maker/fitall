@@ -51,34 +51,34 @@ export function MoveBookingForm({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="h-10 rounded-[6px] border-2 border-[#DDE8E8] bg-white px-4 text-xs font-black text-[#0A0A0A] active:scale-[0.97]"
+          className="fitall-secondary-action w-full"
         >
           日時を移動
         </button>
       ) : (
-        <div className="rounded-[6px] border-2 border-[#DDE8E8] bg-[#F4F7F7] p-3">
-          <label className="text-[11px] font-black text-[#555555]">移動先日時</label>
+        <div className="fitall-fade rounded-control bg-surface-soft p-3">
+          <label className="text-base font-medium text-ink-muted">移動先日時</label>
           <input
             type="datetime-local"
             step={300}
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="mt-2 h-11 w-full rounded-[6px] border-2 border-[#DDE8E8] bg-white px-3 text-sm font-bold text-[#0A0A0A] outline-none focus:border-[#12C7BE]"
+            className="mt-2 h-14 w-full rounded-control border border-line bg-white px-3 text-base font-bold text-ink outline-none focus:border-accent"
           />
-          {error && <p className="mt-2 text-xs font-semibold text-[#D4183D]">{error}</p>}
+          {error && <p className="mt-2 text-base font-semibold text-danger">{error}</p>}
           <div className="mt-3 flex gap-2">
             <button
               type="button"
               onClick={submit}
               disabled={pending}
-              className="h-10 flex-1 rounded-[6px] bg-[#0A0A0A] text-xs font-black text-white disabled:opacity-40"
+              className="fitall-primary-action flex-1 disabled:opacity-40"
             >
               {pending ? '移動中...' : '移動する'}
             </button>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="h-10 flex-1 rounded-[6px] border-2 border-[#DDE8E8] bg-white text-xs font-black text-[#555555]"
+              className="fitall-secondary-action flex-1"
             >
               閉じる
             </button>

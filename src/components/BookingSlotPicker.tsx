@@ -28,20 +28,20 @@ export function BookingSlotPicker({ slots, value, onChange, disabled = false }: 
       <p>{formatJstDate(parseJstDateTime(visibleDays[0].dateKey, '00:00'), { year: 'numeric', month: 'long' })}</p>
       <button type="button" aria-label="次の週" disabled={(visibleWeek + 1) * 7 >= days.length} onClick={() => changeWeek(visibleWeek + 1)}>›</button>
     </div>
-    <div className={styles.days} aria-label="予約日">
+    <div key={visibleWeek} className={styles.days} role="group" aria-label="予約日">
       {visibleDays.map(day => {
         const date = parseJstDateTime(day.dateKey, '00:00')
         return <button type="button" key={day.dateKey} disabled={!day.slots.length} aria-pressed={activeDate === day.dateKey}
           aria-label={`${formatJstDate(date, { month: 'long', day: 'numeric', weekday: 'long' })}${day.slots.length ? '' : ' 空きなし'}`}
           onClick={() => { if (activeDate !== day.dateKey) { setDateKey(day.dateKey); onChange('') } }}>
           <small>{formatJstDate(date, { weekday: 'short' })}</small>
-          <strong>{formatJstDate(date, { month: 'numeric', day: 'numeric' })}</strong>
-          <small>{day.slots.length ? '空きあり' : '—'}</small>
+          <strong>{formatJstDate(date, { day: 'numeric' }).replace('日', '')}</strong>
+          <i aria-hidden="true" data-open={day.slots.length > 0} />
         </button>
       })}
     </div>
     <p className={styles.dateTitle}>{formatJstDate(parseJstDateTime(activeDate!, '00:00'), { month: 'long', day: 'numeric', weekday: 'short' })}の空き時間 <small>日本時間</small></p>
-    <div key={activeDate} className={styles.times} aria-label="予約時間">
+    <div key={activeDate} className={styles.times} role="group" aria-label="予約時間">
       {dateSlots.map(slot => <button type="button" key={slot.value} aria-pressed={value === slot.value}
         onClick={() => onChange(slot.value)}>{formatJstTime(slot.value)}</button>)}
     </div>

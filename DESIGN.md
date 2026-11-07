@@ -1,5 +1,7 @@
 # Design System: Limitless App
 
+> **実装の正は `src/app/globals.css` のデザイントークンです。** 色・角丸・影・動きはトークン（`text-ink` / `bg-accent` / `rounded-card` など）で指定し、16進の色を直接書かないでください。下記の本文には過去の配色案（青 `#0066FF` など）が残っています。現行の配色は白・黒・アクアで、アクア地の文字は黒、白地の強調文字は `brand`（`#087D78`）です。文字は最小16px、タップ領域は最小56pxです。
+
 > **Base source**: Apple (design-md/apple) — chosen as the closest match to Nike Training Club / Strava / Strong aesthetic (white-base, bold type, single blue accent).  
 > **Colors adapted** to Limitless App brand: base `#FFFFFF`, accent `#0066FF`, background `#F8F9FA`, text `#0A0A0A`.
 

@@ -38,19 +38,19 @@ export default async function TrainerAvailabilityPage() {
     return (
       <div className="fitall-page fitall-scroll">
         <div className="fitall-topbar">
-          <Link href="/trainer/bookings" className="flex items-center gap-1 text-sm font-black text-[#555555]">
+          <Link href="/trainer/bookings" className="flex items-center gap-1 text-base font-medium text-ink-muted">
             ‹ 戻る
           </Link>
-          <h1 className="text-[17px] font-black text-[#0A0A0A]">空き時間</h1>
-          <div className="w-10" />
+          <h1 className="text-[17px] font-black text-ink">空き時間</h1>
+          <div className="w-14" />
         </div>
 
         <div className="px-4 py-6 space-y-4">
-          <div className="fitall-card bg-[#E8FBFA] px-4 py-3 text-xs font-black leading-relaxed text-[#087D78]">
+          <div className="fitall-card bg-accent-soft px-4 py-3 text-base font-bold leading-relaxed text-brand">
             開発用UI確認モードです。空き時間設定の保存はログイン後に有効になります。
           </div>
           <div className="fitall-card p-5">
-            <h2 className="text-sm font-black text-[#0A0A0A]">受付時間サンプル</h2>
+            <h2 className="text-base font-bold text-ink">受付時間サンプル</h2>
             <div className="mt-4 space-y-3">
               {[
                 ['月', '10:00 - 20:00'],
@@ -58,9 +58,9 @@ export default async function TrainerAvailabilityPage() {
                 ['木', '11:00 - 20:00'],
                 ['土', '09:00 - 14:00'],
               ].map(([day, time]) => (
-                <div key={day} className="flex items-center justify-between rounded-[6px] bg-[#F4F7F7] px-4 py-3">
-                  <span className="text-sm font-bold text-[#0A0A0A]">毎週{day}曜日</span>
-                  <span className="text-xs font-black text-[#087D78]">{time}</span>
+                <div key={day} className="flex items-center justify-between rounded-control bg-surface-soft px-4 py-3">
+                  <span className="text-base font-bold text-ink">毎週{day}曜日</span>
+                  <span className="text-base font-bold text-brand">{time}</span>
                 </div>
               ))}
             </div>
@@ -144,7 +144,7 @@ export default async function TrainerAvailabilityPage() {
   const traineeUserMap = Object.fromEntries((traineeUsers ?? []).map((u) => [u.id, u.name]))
   const clientOptions = (traineeProfiles ?? []).map((p) => ({
     trainee_id: p.id,
-    name: traineeUserMap[p.user_id] ?? 'お客さん',
+    name: traineeUserMap[p.user_id] ?? 'お客様',
   }))
 
   const { data: plans } = profile
@@ -159,23 +159,23 @@ export default async function TrainerAvailabilityPage() {
     id: b.id,
     scheduled_at: b.scheduled_at,
     status: b.status,
-    trainee_name: traineeNameMap[b.trainee_id] ?? 'お客さん',
+    trainee_name: traineeNameMap[b.trainee_id] ?? 'お客様',
   }))
 
   return (
     <div className="fitall-page fitall-scroll">
       <div className="fitall-topbar">
-        <Link href="/trainer/bookings" className="flex items-center gap-1 text-sm font-black text-[#555555]">
+        <Link href="/trainer/bookings" className="flex items-center gap-1 text-base font-medium text-ink-muted">
           ‹ 戻る
         </Link>
-        <h1 className="text-[17px] font-black text-[#0A0A0A]">空き時間</h1>
-        <Link href="/trainer/settings" className="text-sm font-black text-[#087D78]">
+        <h1 className="text-[17px] font-black text-ink">空き時間</h1>
+        <Link href="/trainer/settings" className="text-base font-bold text-brand">
           設定
         </Link>
       </div>
 
       <div className="px-4 py-6 space-y-4">
-        <p className="text-xs text-[#666666] px-1">
+        <p className="text-base text-ink-muted px-1">
           受付する日付・時間帯を設定してください。設定がない日はお客様が予約できません。
           営業時間: {trainerSettings.business_open} - {trainerSettings.business_close}
         </p>

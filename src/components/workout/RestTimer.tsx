@@ -33,7 +33,7 @@ export function RestTimer({ duration, onDone, onSkip }: RestTimerProps) {
 
   return (
     <div className="fixed bottom-20 inset-x-0 mx-4 z-40 pointer-events-none">
-      <div className="bg-[#0A0A0A] text-white rounded-[20px] px-5 py-3 shadow-2xl flex items-center gap-4 pointer-events-auto">
+      <div className="bg-ink text-white rounded-card px-5 py-3 shadow-2xl flex items-center gap-4 pointer-events-auto">
         {/* 円形カウントダウン */}
         <div className="relative w-12 h-12 flex-shrink-0">
           <svg className="w-12 h-12 -rotate-90" viewBox="0 0 48 48">
@@ -50,13 +50,13 @@ export function RestTimer({ duration, onDone, onSkip }: RestTimerProps) {
               style={{ transition: 'stroke-dashoffset 1s linear' }}
             />
           </svg>
-          <span className="absolute inset-0 flex items-center justify-center text-xs font-black text-white">
+          <span className="absolute inset-0 flex items-center justify-center text-base font-bold text-white">
             {timeStr}
           </span>
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] text-[#6B7280] font-medium">インターバル中</p>
+          <p className="text-base text-ink-muted font-medium">インターバル中</p>
           <p className="text-base font-bold truncate">
             {mins > 0 ? `${mins}:${String(secs).padStart(2, '0')} 残り` : `${secs}秒 残り`}
           </p>
@@ -64,7 +64,7 @@ export function RestTimer({ duration, onDone, onSkip }: RestTimerProps) {
 
         <button
           onClick={onSkip}
-          className="flex-shrink-0 px-4 h-9 bg-[#262626] rounded-full text-sm font-semibold transition-colors active:scale-[0.97]"
+          className="flex-shrink-0 px-4 h-9 bg-ink rounded-full text-base font-semibold transition-colors active:scale-[0.97]"
         >
           スキップ
         </button>

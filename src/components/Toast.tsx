@@ -1,6 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+
+const VISIBLE_MS = 2200
+const LEAVE_MS = 220
 
 export function Toast({
   message,
@@ -9,15 +12,21 @@ export function Toast({
   message: string
   onDone: () => void
 }) {
+  const [leaving, setLeaving] = useState(false)
+
   useEffect(() => {
-    const t = setTimeout(onDone, 2200)
-    return () => clearTimeout(t)
+    const leave = setTimeout(() => setLeaving(true), VISIBLE_MS)
+    const done = setTimeout(onDone, VISIBLE_MS + LEAVE_MS)
+    return () => {
+      clearTimeout(leave)
+      clearTimeout(done)
+    }
   }, [onDone])
 
   return (
-    <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-[#0A0A0A] text-white px-5 py-3 rounded-full text-sm font-semibold shadow-[0_8px_24px_rgba(0,0,0,0.16)] animate-fade-in whitespace-nowrap">
-      <span className="text-[#0066FF]">✓</span>
-      {message}
+    <div role="status" aria-live="polite" data-leaving={leaving} className="fitall-toast">
+      <span aria-hidden="true" className="fitall-toast-check">✓</span>
+      <span>{message}</span>
     </div>
   )
 }

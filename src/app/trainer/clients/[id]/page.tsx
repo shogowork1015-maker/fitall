@@ -14,37 +14,37 @@ function PreviewClientDetailPage({ id }: { id: string }) {
   const client = previewClients[id] ?? previewClients['preview-1']!
 
   return (
-    <div className="fitall-page fitall-scroll md:bg-[#F7FBFB]">
+    <div className="fitall-page fitall-scroll md:bg-surface-soft">
       <div className="fitall-topbar">
-        <Link href="/trainer/clients" className="w-10 text-xs font-black text-[#087D78]">
+        <Link href="/trainer/clients" className="w-14 font-bold text-brand">
           戻る
         </Link>
-        <h1 className="flex-1 text-center text-[17px] font-black text-[#0A0A0A]">顧客詳細</h1>
-        <div className="w-10" />
+        <h1 className="flex-1 text-center text-[17px] font-black text-ink">お客様詳細</h1>
+        <div className="w-14" />
       </div>
 
       <div className="fitall-page-pad mx-auto max-w-[980px] space-y-5">
         <section className="fitall-card-strong overflow-hidden">
-          <div className="bg-[#12C7BE] px-4 py-5 text-white md:px-5">
-            <p className="text-[10px] font-black tracking-[0.12em] text-white/80">PREVIEW CUSTOMER</p>
+          <div className="bg-accent px-4 py-5 text-ink md:px-5">
+            <p className="text-base font-bold text-ink/70">サンプル</p>
             <div className="mt-3 flex items-center gap-3">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[6px] bg-[#0A0A0A] text-xl font-black text-white">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-control bg-ink text-xl font-black text-white">
                 {client.name[0]}
               </div>
               <div className="min-w-0">
                 <h2 className="break-words text-2xl font-black leading-tight">{client.name}</h2>
-                <p className="mt-1 break-all text-xs font-bold text-white/85">{client.email}</p>
+                <p className="mt-1 break-all text-base font-bold text-white/85">{client.email}</p>
               </div>
             </div>
           </div>
           <div className="grid gap-2 p-4 md:grid-cols-3">
-            <Link href="/trainer/bookings" className="fitall-primary-action fitall-tap h-11 text-xs">
+            <Link href="/trainer/bookings" className="fitall-primary-action fitall-tap h-11 text-base">
               予約を入れる
             </Link>
-            <Link href="/trainer/settings" className="fitall-secondary-action fitall-tap h-11 text-xs">
+            <Link href="/trainer/settings" className="fitall-secondary-action fitall-tap h-11 text-base">
               メニュー調整
             </Link>
-            <Link href="/trainer/invite" className="fitall-secondary-action fitall-tap h-11 text-xs">
+            <Link href="/trainer/invite" className="fitall-secondary-action fitall-tap h-11 text-base">
               登録リンクを送る
             </Link>
           </div>
@@ -52,24 +52,24 @@ function PreviewClientDetailPage({ id }: { id: string }) {
 
         <section className="grid gap-3 md:grid-cols-3">
           <div className="fitall-card p-4">
-            <p className="fitall-kicker">TICKET</p>
-            <p className="mt-2 text-4xl font-black text-[#0A0A0A]">{client.credits}</p>
-            <p className="mt-1 text-xs font-bold text-[#555555]">利用可能</p>
+            <p className="fitall-kicker">チケット</p>
+            <p className="mt-2 text-4xl font-black text-ink">{client.credits}</p>
+            <p className="mt-1 text-base font-medium text-ink-muted">利用可能</p>
           </div>
           <div className="fitall-card p-4">
-            <p className="fitall-kicker">NEXT</p>
-            <p className="mt-2 text-lg font-black text-[#0A0A0A]">7/18 10:00</p>
-            <p className="mt-1 text-xs font-bold text-[#555555]">次回予約</p>
+            <p className="fitall-kicker">次回</p>
+            <p className="mt-2 text-lg font-black text-ink">7/18 10:00</p>
+            <p className="mt-1 text-base font-medium text-ink-muted">次回予約</p>
           </div>
           <div className="fitall-card p-4">
-            <p className="fitall-kicker">GOAL</p>
-            <p className="mt-2 text-sm font-black leading-relaxed text-[#0A0A0A]">{client.goal}</p>
+            <p className="fitall-kicker">目標</p>
+            <p className="mt-2 text-base font-bold leading-relaxed text-ink">{client.goal}</p>
           </div>
         </section>
 
         <section className="fitall-card p-4">
           <h2 className="fitall-section-title">直近のメモ</h2>
-          <div className="mt-3 space-y-2 text-sm font-bold leading-relaxed text-[#555555]">
+          <div className="mt-3 space-y-2 text-base font-medium leading-relaxed text-ink-muted">
             <p>フォーム確認用のプレビューです。実データの保存操作はありません。</p>
             <p>本番では予約履歴、チケット、トレーニング記録、身体データがここに紐づきます。</p>
           </div>
@@ -253,44 +253,44 @@ export default async function ClientDetailPage({
   }
 
   const statusBadge: Record<string, string> = {
-    pending: 'bg-white text-[#0A0A0A] border-[#0A0A0A]',
-    confirmed: 'bg-[#12C7BE] text-white border-[#12C7BE]',
-    cancelled: 'bg-[#F4F7F7] text-[#555555] border-[#DDE8E8]',
-    completed: 'bg-[#0A0A0A] text-white border-[#0A0A0A]',
+    pending: 'bg-white text-ink border-ink',
+    confirmed: 'bg-accent text-ink border-accent',
+    cancelled: 'bg-surface-soft text-ink-muted border-line',
+    completed: 'bg-ink text-white border-ink',
   }
 
   return (
-    <div className="fitall-page fitall-scroll md:bg-[#F7FBFB]">
+    <div className="fitall-page fitall-scroll md:bg-surface-soft">
       <div className="fitall-topbar">
-        <Link href="/trainer/clients" className="w-10 text-xs font-black text-[#087D78]">
+        <Link href="/trainer/clients" className="w-14 font-bold text-brand">
           戻る
         </Link>
-        <h1 className="flex-1 text-center text-[17px] font-black text-[#0A0A0A]">顧客詳細</h1>
-        <div className="w-10" />
+        <h1 className="flex-1 text-center text-[17px] font-black text-ink">お客様詳細</h1>
+        <div className="w-14" />
       </div>
 
       <div className="fitall-page-pad mx-auto max-w-[980px] space-y-5">
         <section className="fitall-card-strong overflow-hidden">
-          <div className="bg-[#12C7BE] px-4 py-5 text-white md:px-5">
-            <p className="text-[10px] font-black tracking-[0.12em] text-white/80">CUSTOMER</p>
+          <div className="bg-accent px-4 py-5 text-ink md:px-5">
+            <p className="text-base font-bold text-ink/70">お客様</p>
             <div className="mt-3 flex items-center gap-3">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[6px] bg-[#0A0A0A] text-xl font-black text-white">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-control bg-ink text-xl font-black text-white">
                 {trainee?.name?.[0] ?? '?'}
               </div>
               <div className="min-w-0">
                 <h2 className="break-words text-2xl font-black leading-tight">{trainee?.name ?? 'お客様'}</h2>
-                <p className="mt-1 break-all text-xs font-bold text-white/85">{trainee?.email ?? 'メール未登録'}</p>
+                <p className="mt-1 break-all text-base font-bold text-white/85">{trainee?.email ?? 'メール未登録'}</p>
               </div>
             </div>
           </div>
           <div className="grid gap-2 p-4 md:grid-cols-3">
-            <Link href="/trainer/bookings" className="fitall-primary-action fitall-tap h-11 text-xs">
+            <Link href="/trainer/bookings" className="fitall-primary-action fitall-tap h-11 text-base">
               予約を入れる
             </Link>
-            <Link href="/trainer/settings" className="fitall-secondary-action fitall-tap h-11 text-xs">
+            <Link href="/trainer/settings" className="fitall-secondary-action fitall-tap h-11 text-base">
               メニュー調整
             </Link>
-            <Link href="/trainer/invite" className="fitall-secondary-action fitall-tap h-11 text-xs">
+            <Link href="/trainer/invite" className="fitall-secondary-action fitall-tap h-11 text-base">
               登録リンクを送る
             </Link>
           </div>
@@ -299,23 +299,23 @@ export default async function ClientDetailPage({
         <section>
           <div className="mb-3 flex items-center justify-between px-1">
             <h3 className="fitall-section-title">チケット</h3>
-            <span className="text-xs font-black text-[#087D78]">未消化 {activeCredits}回</span>
+            <span className="text-base font-bold text-brand">未消化 {activeCredits}回</span>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div className="fitall-card p-4 text-center">
-              <p className="text-[10px] font-black text-[#087D78]">未消化</p>
-              <p className="text-xl font-black text-[#0A0A0A]">{activeCredits}</p>
-              <p className="mt-1 text-[10px] font-black text-[#555555]">回</p>
+              <p className="text-base font-bold text-brand">未消化</p>
+              <p className="text-xl font-black text-ink">{activeCredits}</p>
+              <p className="mt-1 text-base font-medium text-ink-muted">回</p>
             </div>
             <div className="fitall-card p-4 text-center">
-              <p className="text-[10px] font-black text-[#087D78]">予約済み</p>
-              <p className="text-xl font-black text-[#0A0A0A]">{creditSummary.scheduled}</p>
-              <p className="mt-1 text-[10px] font-black text-[#555555]">回</p>
+              <p className="text-base font-bold text-brand">予約済み</p>
+              <p className="text-xl font-black text-ink">{creditSummary.scheduled}</p>
+              <p className="mt-1 text-base font-medium text-ink-muted">回</p>
             </div>
             <div className="fitall-card p-4 text-center">
-              <p className="text-[10px] font-black text-[#087D78]">使用済み</p>
-              <p className="text-xl font-black text-[#0A0A0A]">{creditSummary.used}</p>
-              <p className="mt-1 text-[10px] font-black text-[#555555]">回</p>
+              <p className="text-base font-bold text-brand">使用済み</p>
+              <p className="text-xl font-black text-ink">{creditSummary.used}</p>
+              <p className="mt-1 text-base font-medium text-ink-muted">回</p>
             </div>
           </div>
         </section>
@@ -324,22 +324,22 @@ export default async function ClientDetailPage({
           <h3 className="fitall-section-title mb-3 px-1">身体データ</h3>
           <div className="grid grid-cols-3 gap-3">
             <div className="fitall-card p-4 text-center">
-              <p className="text-[10px] font-black text-[#087D78]">身長</p>
-              <p className="text-xl font-black text-[#0A0A0A]">
+              <p className="text-base font-bold text-brand">身長</p>
+              <p className="text-xl font-black text-ink">
                 {profile?.height ?? '-'}
               </p>
-              <p className="mt-1 text-[10px] font-black text-[#555555]">cm</p>
+              <p className="mt-1 text-base font-medium text-ink-muted">cm</p>
             </div>
             <div className="fitall-card p-4 text-center">
-              <p className="text-[10px] font-black text-[#087D78]">体重</p>
-              <p className="text-xl font-black text-[#0A0A0A]">
+              <p className="text-base font-bold text-brand">体重</p>
+              <p className="text-xl font-black text-ink">
                 {profile?.weight ?? '-'}
               </p>
-              <p className="mt-1 text-[10px] font-black text-[#555555]">kg</p>
+              <p className="mt-1 text-base font-medium text-ink-muted">kg</p>
             </div>
             <div className="fitall-card p-4 text-center">
-              <p className="text-[10px] font-black text-[#087D78]">目標</p>
-              <p className="mt-1 line-clamp-3 text-[10px] font-black text-[#0A0A0A]">{profile?.goal ?? '-'}</p>
+              <p className="text-base font-bold text-brand">目標</p>
+              <p className="mt-1 line-clamp-3 text-base font-bold text-ink">{profile?.goal ?? '-'}</p>
             </div>
           </div>
         </section>
@@ -361,7 +361,7 @@ export default async function ClientDetailPage({
         <section>
           <h3 className="fitall-section-title mb-3 px-1">最近のトレーニング</h3>
           {!logs?.length ? (
-            <div className="fitall-card border-dashed p-6 text-center text-sm font-black text-[#555555]">
+            <div className="fitall-card border-dashed p-6 text-center text-base font-medium text-ink-muted">
               まだ記録がありません
             </div>
           ) : (
@@ -385,7 +385,7 @@ export default async function ClientDetailPage({
                     key={log.id}
                     className="fitall-card p-4"
                   >
-                    <p className="mb-3 text-sm font-black text-[#0A0A0A]">
+                    <p className="mb-3 text-base font-bold text-ink">
                       {new Date(log.logged_at).toLocaleDateString('ja-JP', {
                         month: 'long',
                         day: 'numeric',
@@ -394,15 +394,15 @@ export default async function ClientDetailPage({
                     </p>
                     <div className="space-y-2">
                       {Object.values(exerciseSummary).map((e) => (
-                        <div key={e.name} className="flex justify-between gap-3 border-b border-[#DDE8E8] pb-2 text-sm last:border-0 last:pb-0">
-                          <span className="font-black text-[#0A0A0A]">{e.name}</span>
-                          <span className="text-right text-xs font-bold text-[#555555]">最大 {e.maxWeight}kg × {e.totalReps}reps</span>
+                        <div key={e.name} className="flex justify-between gap-3 border-b border-line pb-2 text-base last:border-0 last:pb-0">
+                          <span className="font-black text-ink">{e.name}</span>
+                          <span className="text-right text-base font-medium text-ink-muted">最大 {e.maxWeight}kg × {e.totalReps}reps</span>
                         </div>
                       ))}
                     </div>
                     {log.memo && (
-                      <div className="mt-3 border-2 border-[#DDE8E8] bg-[#F4F7F7] p-3">
-                        <p className="text-[11px] font-bold leading-relaxed text-[#555555]">{log.memo}</p>
+                      <div className="mt-3 border border-line bg-surface-soft p-3">
+                        <p className="text-base font-medium leading-relaxed text-ink-muted">{log.memo}</p>
                       </div>
                     )}
                   </div>
@@ -415,7 +415,7 @@ export default async function ClientDetailPage({
         <section>
           <h3 className="fitall-section-title mb-3 px-1">予約履歴</h3>
           {!bookings?.length ? (
-            <div className="fitall-card border-dashed p-6 text-center text-sm font-black text-[#555555]">
+            <div className="fitall-card border-dashed p-6 text-center text-base font-medium text-ink-muted">
               まだ予約がありません
             </div>
           ) : (
@@ -426,7 +426,7 @@ export default async function ClientDetailPage({
                   className="fitall-card flex items-center justify-between gap-3 px-4 py-3"
                 >
                   <div>
-                    <p className="text-sm font-black text-[#0A0A0A]">
+                    <p className="text-base font-bold text-ink">
                       {new Date(b.scheduled_at).toLocaleString('ja-JP', {
                         month: 'numeric',
                         day: 'numeric',
@@ -434,9 +434,9 @@ export default async function ClientDetailPage({
                         minute: '2-digit',
                       })}
                     </p>
-                    <p className="mt-0.5 text-xs font-bold text-[#555555]">¥{b.price.toLocaleString()}</p>
+                    <p className="mt-0.5 text-base font-medium text-ink-muted">¥{b.price.toLocaleString()}</p>
                   </div>
-                  <span className={`border px-2.5 py-1 text-[11px] font-black ${statusBadge[b.status] ?? 'bg-[#F4F7F7] text-[#555555] border-[#DDE8E8]'}`}>
+                  <span className={`border px-2.5 py-1 text-base font-medium ${statusBadge[b.status] ?? 'bg-surface-soft text-ink-muted border-line'}`}>
                     {statusLabel[b.status] ?? b.status}
                   </span>
                 </div>

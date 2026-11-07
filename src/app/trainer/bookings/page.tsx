@@ -86,11 +86,11 @@ export default async function TrainerBookingsPage() {
   if (!user && devAuthBypass) {
     const mock = mockCalendarData()
     return (
-      <div className="fitall-page fitall-scroll md:bg-[#F7FBFB]">
+      <div className="fitall-page fitall-scroll md:bg-surface-soft">
         <div className="fitall-mobile-ui fitall-topbar">
-          <div className="w-10" />
-          <h1 className="text-[17px] font-black text-[#0A0A0A] flex-1 text-center">予約</h1>
-          <Link href="/trainer/invite" className="w-10 text-right text-xs font-black text-[#087D78]">
+          <div className="w-14" />
+          <h1 className="text-[17px] font-black text-ink flex-1 text-center">予約</h1>
+          <Link href="/trainer/invite" className="w-14 font-bold text-brand">
             送る
           </Link>
         </div>
@@ -99,9 +99,9 @@ export default async function TrainerBookingsPage() {
           <div className="fitall-desktop-container">
             <header className="fitall-desktop-header">
               <div>
-                <p className="fitall-kicker">CALENDAR</p>
+                <p className="fitall-kicker">カレンダー</p>
                 <h1 className="fitall-desktop-title">予約管理</h1>
-                <p className="mt-2 text-sm font-bold text-[#555555]">PCでは週・月カレンダーを広く見ながら予約を管理できます。</p>
+                <p className="mt-2 text-base font-medium text-ink-muted">PCでは週・月カレンダーを広く見ながら予約を管理できます。</p>
               </div>
               <div className="flex gap-3">
                 <Link href="/trainer/invite" className="fitall-aqua-action fitall-tap w-auto min-w-[170px]">リンク送信</Link>
@@ -113,7 +113,7 @@ export default async function TrainerBookingsPage() {
 
         <div className="px-4 pt-4 md:px-8 md:pt-0">
           <div className="fitall-desktop-container">
-          <div className="fitall-card bg-[#E8FBFA] px-4 py-3 text-xs font-black leading-relaxed text-[#087D78]">
+          <div className="fitall-card bg-accent-soft px-4 py-3 text-base font-bold leading-relaxed text-brand">
             開発用UI確認モードです。ログインなしで表示しています。予約作成・移動・完了などの保存は実行されません。
           </div>
           </div>
@@ -141,15 +141,15 @@ export default async function TrainerBookingsPage() {
 
   if (!trainerProfile) {
     return (
-      <div className="fitall-page fitall-scroll md:bg-[#F7FBFB]">
+      <div className="fitall-page fitall-scroll md:bg-surface-soft">
         <div className="fitall-mobile-ui fitall-topbar">
-          <div className="w-10" />
-          <h1 className="text-[17px] font-black text-[#0A0A0A] flex-1 text-center">予約</h1>
-          <div className="w-10" />
+          <div className="w-14" />
+          <h1 className="text-[17px] font-black text-ink flex-1 text-center">予約</h1>
+          <div className="w-14" />
         </div>
         <div className="px-4 py-8 md:px-8">
           <div className="fitall-desktop-container">
-          <div className="fitall-card p-6 text-center text-sm font-black text-[#555555]">
+          <div className="fitall-card p-6 text-center text-base font-medium text-ink-muted">
             トレーナープロフィールが見つかりません
           </div>
           </div>
@@ -210,7 +210,7 @@ export default async function TrainerBookingsPage() {
   const traineeUserNameMap = Object.fromEntries((traineeUsers ?? []).map((u) => [u.id, u.name]))
   const clientOptions = (traineeProfiles ?? []).map((profile) => ({
     trainee_id: profile.id,
-    name: traineeUserNameMap[profile.user_id] ?? 'お客さん',
+    name: traineeUserNameMap[profile.user_id] ?? 'お客様',
   }))
 
   const { data: planRows } = await supabase
@@ -225,14 +225,14 @@ export default async function TrainerBookingsPage() {
       : [{ id: '', name: '通常セッション', price: trainerProfile.price_per_session ?? 0 }]
 
   return (
-    <div className="fitall-page fitall-scroll md:bg-[#F7FBFB]">
+    <div className="fitall-page fitall-scroll md:bg-surface-soft">
       <div className="fitall-mobile-ui fitall-topbar">
-        <div className="w-10" />
-        <h1 className="text-[17px] font-black text-[#0A0A0A] flex-1 text-center">予約</h1>
-        <div className="w-10 flex justify-end">
+        <div className="w-14" />
+        <h1 className="text-[17px] font-black text-ink flex-1 text-center">予約</h1>
+        <div className="flex w-14 justify-end">
           <Link
             href="/trainer/availability"
-            className="text-xs font-black text-[#087D78]"
+            className="text-base font-bold text-brand"
           >
             空き
           </Link>
@@ -243,9 +243,9 @@ export default async function TrainerBookingsPage() {
         <div className="fitall-desktop-container">
           <header className="fitall-desktop-header">
             <div>
-              <p className="fitall-kicker">CALENDAR</p>
+              <p className="fitall-kicker">カレンダー</p>
               <h1 className="fitall-desktop-title">予約管理</h1>
-              <p className="mt-2 text-sm font-bold text-[#555555]">カレンダーから予約作成、移動、完了処理まで行えます。</p>
+              <p className="mt-2 text-base font-medium text-ink-muted">カレンダーから予約作成、移動、完了処理まで行えます。</p>
             </div>
             <div className="flex gap-3">
               <Link href="/trainer/invite" className="fitall-aqua-action fitall-tap w-auto min-w-[170px]">リンク送信</Link>

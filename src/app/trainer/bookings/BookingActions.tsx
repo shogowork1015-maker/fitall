@@ -16,6 +16,7 @@ export function BookingActions({ bookingId, status, scheduledAt }: BookingAction
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
   const [showReschedule, setShowReschedule] = useState(false)
+  const [confirmingReject, setConfirmingReject] = useState(false)
 
   const [feedback, setFeedback] = useState<string | null>(null)
   const actionPending = useRef(false)
@@ -45,24 +46,37 @@ export function BookingActions({ bookingId, status, scheduledAt }: BookingAction
   return (
     <div aria-busy={loading}>
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
-      {feedback && <p role="alert" className="my-3 rounded-md border border-[#DDE8E8] bg-white p-3 text-sm font-bold">{feedback}</p>}
-      {loading && <p role="status" className="text-sm font-bold">処理中…</p>}
-      {status === 'pending' && (
-        <div className="mt-3 flex gap-2">
+      {feedback && <p role="alert" className="my-3 rounded-control border border-danger-line bg-danger-soft p-3 font-bold text-danger">{feedback}</p>}
+      {loading && <p role="status" className="mt-2 flex items-center gap-2 font-bold"><span aria-hidden="true" className="fitall-spinner" />処理中…</p>}
+      {status === 'pending' && !confirmingReject && (
+        <div className="mt-3 grid grid-cols-2 gap-2">
           <button
             onClick={() => handleAction(() => approveBooking(bookingId), '予約を承認しました')}
             disabled={loading}
-            className="h-12 flex-1 rounded-[6px] border-2 border-[#12C7BE] bg-[#12C7BE] text-sm font-black text-white disabled:opacity-40 active:scale-[0.97] transition-transform"
+            className="fitall-aqua-action disabled:opacity-40"
           >
             承認
           </button>
-          <button
-            onClick={() => handleAction(() => rejectBooking(bookingId), '予約を拒否しました')}
-            disabled={loading}
-            className="h-12 flex-1 rounded-[6px] border-2 border-[#DDE8E8] bg-white text-sm font-black text-[#0A0A0A] disabled:opacity-40 active:scale-[0.97] transition-transform"
-          >
+          <button onClick={() => setConfirmingReject(true)} disabled={loading} className="fitall-secondary-action disabled:opacity-40">
             拒否
           </button>
+        </div>
+      )}
+      {status === 'pending' && confirmingReject && (
+        <div className="fitall-fade mt-3 rounded-control bg-danger-soft p-3">
+          <p className="font-bold text-danger">この予約を拒否しますか？</p>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <button
+              onClick={() => handleAction(() => rejectBooking(bookingId), '予約を拒否しました')}
+              disabled={loading}
+              className="fitall-danger-action disabled:opacity-40"
+            >
+              拒否する
+            </button>
+            <button onClick={() => setConfirmingReject(false)} disabled={loading} className="fitall-secondary-action">
+              戻る
+            </button>
+          </div>
         </div>
       )}
       {status === 'confirmed' && (
@@ -71,16 +85,16 @@ export function BookingActions({ bookingId, status, scheduledAt }: BookingAction
           <button
             onClick={() => handleAction(() => completeBooking(bookingId), 'セッションを完了しました')}
             disabled={loading}
-            className="h-12 w-full rounded-[6px] border-2 border-[#12C7BE] bg-[#12C7BE] text-sm font-black text-white disabled:opacity-40 active:scale-[0.97] transition-transform"
+            className="fitall-aqua-action disabled:opacity-40"
           >
             完了にする
           </button>
           <button
             onClick={() => setShowReschedule((v) => !v)}
             disabled={loading}
-            className="h-10 w-full rounded-[6px] border-2 border-[#DDE8E8] text-sm font-black text-[#555555] active:scale-[0.97] transition-transform"
+            className="fitall-secondary-action w-full disabled:opacity-40"
           >
-            {showReschedule ? '変更をキャンセル' : '日時変更を提案'}
+            {showReschedule ? '提案をやめる' : 'お客様に日時変更を提案'}
           </button>
         </div>
         {showReschedule && scheduledAt && (

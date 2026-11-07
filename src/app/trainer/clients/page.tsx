@@ -24,43 +24,43 @@ function ClientListScreen({
     <>
     <div className="fitall-mobile-ui fitall-page fitall-scroll">
       <div className="fitall-topbar">
-        <div className="w-10" />
-        <h1 className="flex-1 text-center text-[17px] font-black text-[#0A0A0A]">顧客</h1>
-        <Link href="/trainer/clients/new" className="w-10 text-right text-xs font-black text-[#087D78]">
+        <div className="w-14" />
+        <h1 className="flex-1 text-center text-[17px] font-black text-ink">お客様</h1>
+        <Link href="/trainer/clients/new" className="w-14 font-bold text-brand">
           追加
         </Link>
       </div>
 
       <div className="fitall-page-pad space-y-5">
         {preview && (
-          <div className="fitall-card bg-[#E8FBFA] px-4 py-3 text-xs font-black text-[#087D78]">
-            開発用UI確認モードです。顧客詳細への保存操作はありません。
+          <div className="fitall-card bg-accent-soft px-4 py-3 text-base font-bold text-brand">
+            開発用UI確認モードです。お客様詳細への保存操作はありません。
           </div>
         )}
 
         <section className="fitall-card-strong overflow-hidden">
-          <div className="grid grid-cols-2 divide-x divide-[#0A0A0A]">
+          <div className="grid grid-cols-2 divide-x divide-ink">
             <div className="p-4">
-              <p className="fitall-kicker">CLIENTS</p>
-              <p className="mt-2 text-[34px] font-black leading-none text-[#0A0A0A]">
-                {clients.length}<span className="ml-1 text-sm">名</span>
+              <p className="fitall-kicker">お客様</p>
+              <p className="mt-2 text-[34px] font-black leading-none text-ink">
+                {clients.length}<span className="ml-1 text-base">名</span>
               </p>
-              <p className="mt-2 text-xs font-bold text-[#555555]">管理中のお客様</p>
+              <p className="mt-2 text-base font-medium text-ink-muted">管理中のお客様</p>
             </div>
-            <div className="bg-[#12C7BE] p-4 text-white">
-              <p className="text-[10px] font-black tracking-[0.12em] text-white/80">ACTION</p>
+            <div className="bg-accent p-4 text-ink">
+              <p className="text-base font-bold text-ink/70">要フォロー</p>
               <p className="mt-2 text-[34px] font-black leading-none">
-                {lowCreditCount}<span className="ml-1 text-sm">名</span>
+                {lowCreditCount}<span className="ml-1 text-base">名</span>
               </p>
-              <p className="mt-2 text-xs font-black">残チケット少なめ</p>
+              <p className="mt-2 text-base font-bold">残チケット少なめ</p>
             </div>
           </div>
         </section>
 
         {!clients.length ? (
           <section className="fitall-card p-6 text-center">
-            <p className="text-sm font-black text-[#0A0A0A]">まだお客さんがいません</p>
-            <p className="mt-2 text-xs font-bold leading-relaxed text-[#555555]">
+            <p className="text-base font-bold text-ink">まだお客様がいません</p>
+            <p className="mt-2 text-base font-medium leading-relaxed text-ink-muted">
               お客様を仮登録して、LINEで登録リンクを送れます。
             </p>
             <Link href="/trainer/clients/new" className="fitall-aqua-action fitall-tap mt-4">
@@ -71,7 +71,7 @@ function ClientListScreen({
           <section>
             <div className="mb-3 flex items-center justify-between px-1">
               <h2 className="fitall-section-title">お客様一覧</h2>
-              <span className="text-xs font-black text-[#555555]">残チケットも確認</span>
+              <span className="text-base font-medium text-ink-muted">残チケットも確認</span>
             </div>
             <div className="space-y-2">
               {clients.map((client, index) => (
@@ -81,17 +81,17 @@ function ClientListScreen({
                   className="fitall-card fitall-card-pop fitall-tap grid grid-cols-[46px_1fr_auto] items-center gap-3 p-3"
                   style={{ animationDelay: `${index * 35}ms` }}
                 >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-[5px] bg-[#0A0A0A] text-base font-black text-white">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-chip bg-ink text-base font-black text-white">
                     {client.name[0] ?? '?'}
                   </div>
                   <div>
-                    <p className="text-sm font-black text-[#0A0A0A]">{client.name}</p>
-                    <p className="mt-0.5 text-[11px] font-bold text-[#555555]">最終: {client.last}</p>
+                    <p className="text-base font-bold text-ink">{client.name}</p>
+                    <p className="mt-0.5 text-base font-medium text-ink-muted">最終: {client.last}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-black text-[#0A0A0A]">今月{client.sessions}回</p>
-                    <p className={`mt-1 rounded-[4px] px-2 py-1 text-[11px] font-black ${
-                      client.credits <= 1 ? 'bg-[#0A0A0A] text-white' : 'bg-[#E8FBFA] text-[#087D78]'
+                    <p className="text-base font-bold text-ink">今月{client.sessions}回</p>
+                    <p className={`mt-1 rounded-chip px-2 py-1 text-base font-bold ${
+                      client.credits <= 1 ? 'bg-ink text-white' : 'bg-accent-soft text-brand'
                     }`}>
                       残{client.credits}回
                     </p>
@@ -107,9 +107,9 @@ function ClientListScreen({
       <div className="fitall-desktop-container">
         <header className="fitall-desktop-header">
           <div>
-            <p className="fitall-kicker">CLIENTS</p>
-            <h1 className="fitall-desktop-title">顧客管理</h1>
-            <p className="mt-2 text-sm font-bold text-[#555555]">
+            <p className="fitall-kicker">お客様</p>
+            <h1 className="fitall-desktop-title">お客様管理</h1>
+            <p className="mt-2 text-base font-medium text-ink-muted">
               PCでは残チケット、今月回数、最終記録を一覧で確認できます。
             </p>
           </div>
@@ -119,67 +119,67 @@ function ClientListScreen({
         </header>
 
         {preview && (
-          <div className="fitall-desktop-card mb-5 bg-[#E8FBFA] px-5 py-3 text-sm font-black text-[#087D78]">
-            開発用UI確認モードです。顧客詳細への保存操作はありません。
+          <div className="fitall-desktop-card mb-5 bg-accent-soft px-5 py-3 text-base font-bold text-brand">
+            開発用UI確認モードです。お客様詳細への保存操作はありません。
           </div>
         )}
 
         <section className="mb-5 grid grid-cols-3 gap-4">
-          <div className="fitall-desktop-card border-[#0A0A0A] p-5">
-            <p className="fitall-kicker">CLIENTS</p>
-            <p className="mt-3 text-5xl font-black text-[#0A0A0A]">{clients.length}<span className="ml-1 text-base">名</span></p>
-            <p className="mt-2 text-sm font-bold text-[#555555]">管理中のお客様</p>
+          <div className="fitall-desktop-card border-ink p-5">
+            <p className="fitall-kicker">お客様</p>
+            <p className="mt-3 text-5xl font-black text-ink">{clients.length}<span className="ml-1 text-base">名</span></p>
+            <p className="mt-2 text-base font-medium text-ink-muted">管理中のお客様</p>
           </div>
           <div className="fitall-desktop-card p-5 text-white" style={{ backgroundColor: '#12C7BE' }}>
-            <p className="text-[10px] font-black tracking-[0.12em] text-white/80">ACTION</p>
+            <p className="text-base font-bold text-white/80">要フォロー</p>
             <p className="mt-3 text-5xl font-black">{lowCreditCount}<span className="ml-1 text-base">名</span></p>
-            <p className="mt-2 text-sm font-black">残チケット少なめ</p>
+            <p className="mt-2 text-base font-bold">残チケット少なめ</p>
           </div>
           <div className="fitall-desktop-card p-5">
-            <p className="fitall-kicker">NEXT</p>
-            <p className="mt-3 text-xl font-black text-[#0A0A0A]">連絡・更新の確認</p>
-            <p className="mt-2 text-sm font-bold text-[#555555]">残1回以下のお客様に次回チケット案内</p>
+            <p className="fitall-kicker">次回</p>
+            <p className="mt-3 text-xl font-black text-ink">連絡・更新の確認</p>
+            <p className="mt-2 text-base font-medium text-ink-muted">残1回以下のお客様に次回チケット案内</p>
           </div>
         </section>
 
         {!clients.length ? (
           <section className="fitall-desktop-card p-10 text-center">
-            <p className="text-lg font-black text-[#0A0A0A]">まだお客さんがいません</p>
-            <p className="mt-2 text-sm font-bold text-[#555555]">お客様を仮登録して、LINEで登録リンクを送れます。</p>
+            <p className="text-lg font-black text-ink">まだお客様がいません</p>
+            <p className="mt-2 text-base font-medium text-ink-muted">お客様を仮登録して、LINEで登録リンクを送れます。</p>
             <Link href="/trainer/clients/new" className="fitall-aqua-action fitall-tap mx-auto mt-5 w-auto min-w-[220px]">
               お客様を追加
             </Link>
           </section>
         ) : (
           <section className="fitall-desktop-card overflow-hidden">
-            <div className="grid grid-cols-[1.4fr_.9fr_.8fr_.8fr_120px] border-b-2 border-[#0A0A0A] bg-[#0A0A0A] px-5 py-3 text-xs font-black text-white">
+            <div className="grid grid-cols-[1.4fr_.9fr_.8fr_.8fr_120px] border-b-2 border-ink bg-ink px-5 py-3 text-base font-bold text-white">
               <span>お客様</span>
               <span>最終</span>
               <span>今月</span>
               <span>残チケット</span>
               <span className="text-right">操作</span>
             </div>
-            <div className="divide-y divide-[#DDE8E8]">
+            <div className="divide-y divide-line">
               {clients.map((client) => (
                 <Link
                   key={client.id}
                   href={`/trainer/clients/${client.id}`}
-                  className="grid grid-cols-[1.4fr_.9fr_.8fr_.8fr_120px] items-center px-5 py-4 hover:bg-[#F7FBFB]"
+                  className="grid grid-cols-[1.4fr_.9fr_.8fr_.8fr_120px] items-center px-5 py-4 hover:bg-surface-soft"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-[5px] bg-[#0A0A0A] text-base font-black text-white">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-chip bg-ink text-base font-black text-white">
                       {client.name[0] ?? '?'}
                     </div>
-                    <p className="text-base font-black text-[#0A0A0A]">{client.name}</p>
+                    <p className="text-base font-black text-ink">{client.name}</p>
                   </div>
-                  <p className="text-sm font-bold text-[#555555]">{client.last}</p>
-                  <p className="text-sm font-black text-[#0A0A0A]">{client.sessions}回</p>
-                  <span className={`w-fit rounded-[4px] px-3 py-1 text-xs font-black ${
-                    client.credits <= 1 ? 'bg-[#0A0A0A] text-white' : 'bg-[#E8FBFA] text-[#087D78]'
+                  <p className="text-base font-medium text-ink-muted">{client.last}</p>
+                  <p className="text-base font-bold text-ink">{client.sessions}回</p>
+                  <span className={`w-fit rounded-chip px-3 py-1 text-base font-bold ${
+                    client.credits <= 1 ? 'bg-ink text-white' : 'bg-accent-soft text-brand'
                   }`}>
                     残{client.credits}回
                   </span>
-                  <span className="text-right text-sm font-black text-[#087D78]">詳細</span>
+                  <span className="text-right text-base font-bold text-brand">詳細</span>
                 </Link>
               ))}
             </div>
@@ -316,7 +316,7 @@ export default async function TrainerClientsPage() {
     const lastLog = lastLogMap[trainee.id]
     return {
       id: trainee.id,
-      name: trainee.name ?? 'お客さん',
+      name: trainee.name ?? 'お客様',
       last: lastLog ? new Date(lastLog).toLocaleDateString('ja-JP') : 'まだなし',
       sessions: sessionCounts[trainee.id] ?? 0,
       credits: creditCountByUserId[trainee.id] ?? 0,

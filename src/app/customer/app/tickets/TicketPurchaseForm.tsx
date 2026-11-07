@@ -25,8 +25,8 @@ export function TicketPurchaseForm({ planId, checkoutAction, preview = false }: 
     else submitting.current = true
   }}>
     <input type="hidden" name="plan_id" value={planId} />
-    {state && 'error' in state && <p role="alert" className="mb-3 bg-[#FEF2F2] p-3 text-sm text-[#A0102B]">{state.error}</p>}
-    <button type="submit" disabled={pending || redirecting} className="fitall-primary-action h-12 w-full text-sm disabled:opacity-40">
+    {state && 'error' in state && <p role="alert" className="mb-3 bg-danger-soft p-3 text-base text-danger">{state.error}</p>}
+    <button type="submit" disabled={pending || redirecting} className="fitall-primary-action h-12 w-full text-base disabled:opacity-40">
       {pending || redirecting ? '処理中…' : preview ? '購入を試す（プレビュー）' : 'このメニューを購入する'}
     </button>
   </form>

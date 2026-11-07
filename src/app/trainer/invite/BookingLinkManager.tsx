@@ -36,7 +36,7 @@ export function BookingLinkManager({ trainerProfileId }: { trainerProfileId: str
 
       <section className="fitall-card-strong overflow-hidden">
         <div className="fitall-table-head px-4 py-3">
-          <p className="text-[10px] font-black tracking-[0.12em] text-white/70">LINE INVITE</p>
+          <p className="text-base font-bold text-white/70">招待</p>
           <h2 className="mt-1 text-base font-black text-white">お客様アプリへ招待</h2>
         </div>
         <div className="space-y-3 p-4">
@@ -59,15 +59,15 @@ export function BookingLinkManager({ trainerProfileId }: { trainerProfileId: str
           <p className="fitall-section-title">アプリ入口</p>
           <span className="fitall-pill fitall-pill-aqua">LINE共有用</span>
         </div>
-        <p className="break-all rounded-[6px] bg-[#F4F7F7] px-3 py-3 font-mono text-xs font-bold leading-relaxed text-[#0A0A0A]">
+        <p className="break-all rounded-control bg-surface-soft px-3 py-3 font-mono text-base font-bold leading-relaxed text-ink">
           {bookingPath}
         </p>
       </section>
 
       <section className="fitall-card p-4">
         <p className="fitall-section-title">LINE用テンプレ</p>
-        <div className="mt-3 rounded-[6px] border border-[#DDE8E8] bg-white px-3 py-3">
-          <p className="whitespace-pre-line text-sm font-bold leading-relaxed text-[#0A0A0A]">
+        <div className="mt-3 rounded-control border border-line bg-white px-3 py-3">
+          <p className="whitespace-pre-line text-base font-bold leading-relaxed text-ink">
             Limitless Appでメニュー購入と予約ができます。{'\n'}
             購入後はLINE通知も連携できます。{'\n'}
             こちらから開いてください。{'\n'}

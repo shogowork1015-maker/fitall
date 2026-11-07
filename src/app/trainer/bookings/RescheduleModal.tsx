@@ -53,25 +53,25 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
   }
 
   return (
-    <div className="mt-3 space-y-4 rounded-[6px] border-2 border-[#DDE8E8] bg-[#F4F7F7] p-4">
+    <div className="fitall-fade mt-3 space-y-4 rounded-control bg-surface-soft p-3">
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
 
       <div className="flex items-center justify-between">
-        <p className="text-sm font-black text-[#0A0A0A]">新しい日時を選択</p>
+        <p className="text-base font-bold text-ink">新しい日時を選択</p>
         <button
           onClick={onClose}
-          className="text-sm font-black text-[#555555]"
+          className="text-base font-medium text-ink-muted"
         >
           キャンセル
         </button>
       </div>
 
-      <p className="text-xs text-[#6B7280]">
+      <p className="text-base text-ink-muted">
         現在: {currentDate.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'short' })} {currentDate.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
       </p>
 
       {error && (
-        <div className="rounded-[6px] border-2 border-[#D4183D] bg-[#FEF2F2] px-3 py-2 text-xs font-bold text-[#D4183D]">
+        <div className="rounded-control border border-danger bg-danger-soft px-3 py-2 text-base font-bold text-danger">
           {error}
         </div>
       )}
@@ -89,18 +89,18 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
               key={iso}
               type="button"
               onClick={() => { setSelectedDate(iso); setSelectedTime(null) }}
-              className={`flex flex-col items-center rounded-[6px] py-1.5 transition-colors ${
+              className={`flex min-h-16 flex-col items-center justify-center rounded-control leading-tight ${
                 isSelected
-                  ? 'bg-[#12C7BE] text-white'
+                  ? 'bg-accent text-ink'
                   : isSun
-                  ? 'bg-white text-[#0A0A0A] border border-[#DDE8E8]'
+                  ? 'bg-white text-ink border border-line'
                   : isSat
-                  ? 'bg-[#E8FBFA] text-[#087D78]'
-                  : 'bg-white text-[#0A0A0A] border border-[#DDE8E8]'
+                  ? 'bg-accent-soft text-brand'
+                  : 'bg-white text-ink border border-line'
               }`}
             >
-              <span className="text-[9px] font-medium">{WEEKDAYS[day]}</span>
-              <span className="text-xs font-bold">{d.getDate()}</span>
+              <span className="text-base font-medium">{WEEKDAYS[day]}</span>
+              <span className="text-base font-bold">{d.getDate()}</span>
             </button>
           )
         })}
@@ -108,16 +108,16 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
 
       {/* 時間スロット */}
       {selectedDate && (
-        <div className="grid grid-cols-4 gap-1.5">
+        <div className="grid grid-cols-3 gap-2">
           {TIME_SLOTS.map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => setSelectedTime(t)}
-              className={`h-10 rounded-[6px] text-sm font-black transition-colors ${
+              className={`rounded-control font-bold ${
                 selectedTime === t
-                  ? 'bg-[#12C7BE] text-white'
-                  : 'bg-white text-[#0A0A0A] border border-[#DDE8E8]'
+                  ? 'bg-accent text-ink'
+                  : 'bg-white text-ink border border-line'
               }`}
             >
               {t}
@@ -130,7 +130,7 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="h-12 w-full rounded-[6px] bg-[#0A0A0A] text-sm font-black text-white transition-transform active:scale-[0.97] disabled:opacity-40"
+          className="fitall-primary-action disabled:opacity-40"
         >
           {loading ? '送信中...' : `${new Date(selectedDate).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })} ${selectedTime} に変更提案`}
         </button>

@@ -52,26 +52,26 @@ export function TicketFlowPreview({ source, empty = false, fail = false }: { sou
     const target = anchor?.getAttribute('href')
     if (target && next[target]) { event.preventDefault(); setView(next[target]); setNotice(''); window.scrollTo({ top: 0 }) }
   }}>
-    <p className="bg-[#E8FBFA] p-3 text-center text-xs font-bold text-[#064F4B]">開発プレビュー · サンプル表示 · 保存・決済・通知なし</p>
+    <p className="bg-accent-soft p-3 text-center text-base font-bold text-brand">開発プレビュー · サンプル表示 · 保存・決済・通知なし</p>
     {view === 'home' && <CustomerHome data={data} />}
     {view === 'list' && <CustomerBookingList upcomingBookings={data.upcomingBookings} />}
     {view === 'booking' && <main className="pb-24">
-      <header className="px-4 pt-6"><h1 className="text-2xl font-black">チケットで予約</h1><p className="mt-3 text-sm">使えるチケット <strong>{remaining}枚</strong></p></header>
+      <header className="px-4 pt-6"><h1 className="text-2xl font-black">チケットで予約</h1><p className="mt-3 text-base">使えるチケット <strong>{remaining}枚</strong></p></header>
       <CustomerWeekCalendar availability={customerAvailability(available, formatJstDateKey(source.slots[0]?.value ?? new Date()))}
         availableTicketCount={remaining} bookingAction={book} preview />
     </main>}
     {view === 'tickets' && <main className="px-4 pt-6 pb-24">
-      <h1 className="text-2xl font-black">チケット</h1><p className="mt-3 text-sm">使えるチケット <strong>{remaining}枚</strong></p>
-      {notice && <p role="status" className="mt-4 bg-[#E8FBFA] p-3 text-sm">{notice}</p>}
+      <h1 className="text-2xl font-black">チケット</h1><p className="mt-3 text-base">使えるチケット <strong>{remaining}枚</strong></p>
+      {notice && <p role="status" className="mt-4 bg-accent-soft p-3 text-base">{notice}</p>}
       {remaining > 0 && <Link href="/customer/app/bookings" className="fitall-primary-action mt-4 h-12">チケットで予約する</Link>}
-      <section className="mt-7 border-t-2 border-[#0A0A0A] pt-5"><h2 className="text-base font-black">メニューを購入</h2>
-        <div className="my-4 flex items-center justify-between"><div><h3 className="font-bold">4回チケット</h3><p className="mt-2 text-xs text-[#555555]">購入後、好きな日時に予約できます</p></div><strong>¥28,000</strong></div>
+      <section className="mt-7 border-t-2 border-ink pt-5"><h2 className="text-base font-black">メニューを購入</h2>
+        <div className="my-4 flex items-center justify-between"><div><h3 className="font-bold">4回チケット</h3><p className="mt-2 text-base text-ink-muted">購入後、好きな日時に予約できます</p></div><strong>¥28,000</strong></div>
         <TicketPurchaseForm planId="preview-four" checkoutAction={purchase} preview />
       </section>
     </main>}
-    <nav className="fixed inset-x-0 bottom-0 mx-auto flex max-w-[430px] border-t border-[#DDE8E8] bg-white" aria-label="お客様メニュー">
+    <nav className="fixed inset-x-0 bottom-0 mx-auto flex max-w-[430px] border-t border-line bg-white" aria-label="お客様メニュー">
       {([['home', '/customer/app', 'ホーム'], ['list', '/customer/app/bookings/list', '予約'], ['tickets', '/customer/app/tickets', 'チケット']] as const).map(([key, href, label]) =>
-        <Link key={key} href={href} aria-current={(view === key || (key === 'list' && view === 'booking')) ? 'page' : undefined} className={`flex h-16 flex-1 items-center justify-center text-sm font-bold ${(view === key || (key === 'list' && view === 'booking')) ? 'text-[#087D78] bg-[#E8FBFA]' : 'text-[#555555]'}`}>{label}</Link>)}
+        <Link key={key} href={href} aria-current={(view === key || (key === 'list' && view === 'booking')) ? 'page' : undefined} className={`flex h-16 flex-1 items-center justify-center text-base font-medium ${(view === key || (key === 'list' && view === 'booking')) ? 'text-brand bg-accent-soft' : 'text-ink-muted'}`}>{label}</Link>)}
     </nav>
   </div>
 }

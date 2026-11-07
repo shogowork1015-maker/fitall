@@ -63,10 +63,10 @@ function hourToTime(hour: number): string {
 }
 
 function bookingBadgeClass(status: string): string {
-  if (status === 'confirmed') return 'bg-[#DCFCE7] text-[#166534]'
-  if (status === 'pending') return 'bg-[#FEF3C7] text-[#92400E]'
-  if (status === 'completed') return 'bg-[#EFF6FF] text-[#1E40AF]'
-  return 'bg-[#F3F4F6] text-[#6B7280]'
+  if (status === 'confirmed') return 'bg-accent-soft text-brand'
+  if (status === 'pending') return 'bg-accent-soft text-brand'
+  if (status === 'completed') return 'bg-accent-soft text-brand'
+  return 'bg-surface-soft text-ink-muted'
 }
 
 function viewTitle(view: ViewMode): string {
@@ -339,11 +339,11 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
   function renderMonthView() {
     const currentMonth = focusDate.getMonth()
     return (
-      <div className="grid grid-cols-7 border border-[#E5E7EB] rounded-[16px] overflow-hidden">
+      <div className="grid grid-cols-7 border border-line rounded-card overflow-hidden">
         {DAY_NAMES.map((name) => (
           <div
             key={`head-${name}`}
-            className="h-14 flex items-center justify-center text-xs font-bold text-[#6B7280] bg-[#F9FAFB] border-b border-[#E5E7EB]"
+            className="h-14 flex items-center justify-center text-base font-medium text-ink-muted bg-white border-b border-line"
           >
             {name}
           </div>
@@ -362,17 +362,17 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
                 setSelectedDateKey(key)
                 setFocusDate(date)
               }}
-              className={`min-h-[120px] p-2 border-b border-r border-[#E5E7EB] text-left align-top ${
-                isSelected ? 'bg-[#EFF6FF]' : 'bg-white'
-              } ${!isCurrentMonth ? 'text-[#D1D5DB]' : 'text-[#0A0A0A]'}`}
+              className={`min-h-[120px] p-2 border-b border-r border-line text-left align-top ${
+                isSelected ? 'bg-accent-soft' : 'bg-white'
+              } ${!isCurrentMonth ? 'text-ink-faint' : 'text-ink'}`}
             >
-              <p className="text-xs font-bold">{date.getDate()}</p>
-              <p className="mt-1 text-[11px] text-[#6B7280]">{slotText}</p>
+              <p className="text-base font-bold">{date.getDate()}</p>
+              <p className="mt-1 text-base text-ink-muted">{slotText}</p>
               <div className="mt-1 space-y-1">
                 {bookings.slice(0, 2).map((b) => (
                   <div
                     key={b.id}
-                    className={`px-1.5 py-0.5 rounded text-[10px] leading-tight font-semibold ${bookingBadgeClass(b.status)}`}
+                    className={`px-1.5 py-0.5 rounded text-base leading-tight font-semibold ${bookingBadgeClass(b.status)}`}
                   >
                     {new Date(b.scheduled_at).toLocaleTimeString('ja-JP', {
                       hour: '2-digit',
@@ -382,7 +382,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
                   </div>
                 ))}
                 {bookings.length > 2 && (
-                  <p className="text-[10px] text-[#6B7280]">+{bookings.length - 2}件</p>
+                  <p className="text-base text-ink-muted">+{bookings.length - 2}件</p>
                 )}
               </div>
             </button>
@@ -395,7 +395,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
   function renderWeekOrDayView(mode: 'week' | 'day') {
     const columnDates = mode === 'day' ? [focusDate] : weekDates
     return (
-      <div className="border border-[#E5E7EB] rounded-[16px] overflow-x-auto">
+      <div className="border border-line rounded-card overflow-x-auto">
         <div
           className={`grid min-w-[720px] ${
             mode === 'day'
@@ -403,7 +403,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
               : 'grid-cols-[72px_repeat(7,minmax(140px,1fr))]'
           }`}
         >
-          <div className="h-14 border-b border-[#E5E7EB] bg-[#F9FAFB]" />
+          <div className="h-14 border-b border-line bg-white" />
           {columnDates.map((date) => {
             const key = toDateKey(date)
             const isSelected = selectedDateKey === key
@@ -412,12 +412,12 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
                 key={`head-${key}`}
                 type="button"
                 onClick={() => setSelectedDateKey(key)}
-                className={`h-14 border-b border-l border-[#E5E7EB] text-center ${
-                  isSelected ? 'bg-[#EFF6FF]' : 'bg-[#F9FAFB]'
+                className={`h-14 border-b border-l border-line text-center ${
+                  isSelected ? 'bg-accent-soft' : 'bg-white'
                 }`}
               >
-                <p className="text-xs text-[#6B7280]">{DAY_NAMES[date.getDay()]}</p>
-                <p className="text-sm font-bold text-[#0A0A0A]">
+                <p className="text-base text-ink-muted">{DAY_NAMES[date.getDay()]}</p>
+                <p className="text-base font-bold text-ink">
                   {date.getMonth() + 1}/{date.getDate()}
                 </p>
               </button>
@@ -426,8 +426,8 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
 
           {GRID_HOURS.map((hour) => (
             <div key={`row-${hour}`} className="contents">
-              <div className="h-[72px] px-2 border-b border-[#E5E7EB] bg-[#F9FAFB]">
-                <p className="text-xs text-[#6B7280] mt-2">{String(hour).padStart(2, '0')}:00</p>
+              <div className="h-[72px] px-2 border-b border-line bg-white">
+                <p className="text-base text-ink-muted mt-2">{String(hour).padStart(2, '0')}:00</p>
               </div>
               {columnDates.map((date) => {
                 const key = toDateKey(date)
@@ -462,18 +462,18 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
                           }
                         : undefined
                     }
-                    className={`h-[72px] px-2 py-1 border-b border-l border-[#E5E7EB] select-none cursor-crosshair ${
+                    className={`h-[72px] px-2 py-1 border-b border-l border-line select-none cursor-crosshair ${
                       isDragSelected
-                        ? 'bg-[#DBEAFE]'
+                        ? 'bg-accent-soft'
                         : isOpen
-                          ? 'bg-[#ECFDF5]'
-                          : 'bg-[#F8FAFC]'
+                          ? 'bg-accent-soft'
+                          : 'bg-white'
                     }`}
                   >
                     <div className="space-y-1">
                       <p
-                        className={`text-[10px] font-bold uppercase tracking-[0.08em] ${
-                          isOpen ? 'text-[#166534]' : 'text-[#6B7280]'
+                        className={`text-base font-medium ${
+                          isOpen ? 'text-brand' : 'text-ink-muted'
                         }`}
                       >
                         {isOpen ? '空き' : 'ブロック'}
@@ -481,7 +481,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
                       {hourBookings.map((b) => (
                         <div
                           key={b.id}
-                          className={`px-2 py-1 rounded text-[11px] leading-tight font-semibold pointer-events-none ${bookingBadgeClass(b.status)}`}
+                          className={`px-2 py-1 rounded text-base leading-tight font-semibold pointer-events-none ${bookingBadgeClass(b.status)}`}
                         >
                           {new Date(b.scheduled_at).toLocaleTimeString('ja-JP', {
                             hour: '2-digit',
@@ -506,18 +506,18 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
 
       {error && (
-        <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-[14px] px-4 py-3 text-sm text-[#EF4444]">
+        <div className="bg-danger-soft border border-danger-line rounded-control px-4 py-3 text-base text-danger">
           {error}
         </div>
       )}
 
-      <div className="bg-white rounded-[16px] border border-[#E5E7EB] p-3">
+      <div className="bg-white rounded-card border border-line p-3">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6B7280]">
+            <p className="text-base font-medium text-ink-muted">
               {viewTitle(view)}
             </p>
-            <p className="text-lg font-bold text-[#0A0A0A]">
+            <p className="text-lg font-bold text-ink">
               {view === 'day' &&
                 focusDate.toLocaleDateString('ja-JP', {
                   year: 'numeric',
@@ -537,7 +537,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
 
           <div className="flex flex-wrap gap-2">
             {dirty && (
-              <span className="h-14 inline-flex items-center px-3 rounded-full text-xs font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
+              <span className="h-14 inline-flex items-center px-3 rounded-control text-base font-bold bg-accent-soft text-brand border border-line">
                 未保存の変更あり
               </span>
             )}
@@ -546,10 +546,10 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
                 key={m}
                 type="button"
                 onClick={() => setView(m)}
-                className={`h-14 px-4 rounded-full text-sm font-bold ${
+                className={`h-14 px-4 rounded-control text-base font-medium ${
                   view === m
-                    ? 'bg-[#0A0A0A] text-white'
-                    : 'bg-white text-[#6B7280] border border-[#E5E7EB]'
+                    ? 'bg-ink text-white'
+                    : 'bg-white text-ink-muted border border-line'
                 }`}
               >
                 {m === 'day' ? '1日' : m === 'week' ? '週' : '月'}
@@ -558,21 +558,21 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
             <button
               type="button"
               onClick={() => move('prev')}
-              className="h-14 w-14 rounded-full border border-[#E5E7EB] text-[#0A0A0A] text-xl font-bold"
+              className="h-14 w-14 rounded-control border border-line text-ink text-xl font-bold"
             >
               ‹
             </button>
             <button
               type="button"
               onClick={() => move('next')}
-              className="h-14 w-14 rounded-full border border-[#E5E7EB] text-[#0A0A0A] text-xl font-bold"
+              className="h-14 w-14 rounded-control border border-line text-ink text-xl font-bold"
             >
               ›
             </button>
             <button
               type="button"
               onClick={goToday}
-              className="h-14 px-5 rounded-full border border-[#E5E7EB] text-sm font-bold text-[#0A0A0A]"
+              className="h-14 px-5 rounded-control border border-line text-base font-bold text-ink"
             >
               今日
             </button>
@@ -581,14 +581,14 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
       </div>
 
       <div className="space-y-3">
-        <div className="bg-white rounded-[16px] border border-[#E5E7EB] p-3 space-y-3">
-          <p className="text-sm font-bold text-[#0A0A0A]">毎週の繰り返し設定</p>
-          <p className="text-xs text-[#6B7280]">指定曜日をまとめて設定します（今後約6ヶ月に反映）</p>
+        <div className="bg-white rounded-card border border-line p-3 space-y-3">
+          <p className="text-base font-bold text-ink">毎週の繰り返し設定</p>
+          <p className="text-base text-ink-muted">指定曜日をまとめて設定します（今後約6ヶ月に反映）</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
             <select
               value={weeklyPresetDay}
               onChange={(e) => setWeeklyPresetDay(Number(e.target.value))}
-              className="h-14 px-3 bg-white border border-[#E5E7EB] rounded-[12px] text-sm font-semibold text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
+              className="h-14 px-3 bg-white border border-line rounded-control text-base font-semibold text-ink focus:outline-none focus:border-ink"
             >
               {DAY_NAMES.map((name, idx) => (
                 <option key={name} value={idx}>
@@ -599,7 +599,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
             <select
               value={weeklyPresetStart}
               onChange={(e) => setWeeklyPresetStart(e.target.value)}
-              className="h-14 px-3 bg-white border border-[#E5E7EB] rounded-[12px] text-sm font-semibold text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
+              className="h-14 px-3 bg-white border border-line rounded-control text-base font-semibold text-ink focus:outline-none focus:border-ink"
             >
               {TIME_OPTIONS.map((t) => (
                 <option key={`preset-start-${t}`} value={t}>
@@ -610,7 +610,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
             <select
               value={weeklyPresetEnd}
               onChange={(e) => setWeeklyPresetEnd(e.target.value)}
-              className="h-14 px-3 bg-white border border-[#E5E7EB] rounded-[12px] text-sm font-semibold text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
+              className="h-14 px-3 bg-white border border-line rounded-control text-base font-semibold text-ink focus:outline-none focus:border-ink"
             >
               {TIME_OPTIONS.map((t) => (
                 <option key={`preset-end-${t}`} value={t}>
@@ -624,7 +624,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
               type="button"
               disabled={presetSaving}
               onClick={() => void handleApplyWeeklyPreset('open')}
-              className="h-12 px-4 rounded-full bg-[#0A0A0A] text-white text-sm font-bold disabled:opacity-40"
+              className="h-12 px-4 rounded-control bg-ink text-white text-base font-bold disabled:opacity-40"
             >
               毎週この時間を空きにする
             </button>
@@ -632,7 +632,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
               type="button"
               disabled={presetSaving}
               onClick={() => void handleApplyWeeklyPreset('block')}
-              className="h-12 px-4 rounded-full border border-[#E5E7EB] text-[#0A0A0A] bg-white text-sm font-bold disabled:opacity-40"
+              className="h-12 px-4 rounded-control border border-line text-ink bg-white text-base font-bold disabled:opacity-40"
             >
               毎週この曜日を休みにする
             </button>
@@ -640,35 +640,35 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
         </div>
 
         {(view === 'day' || view === 'week') && (
-          <div className="flex flex-wrap gap-2 text-xs font-semibold">
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#ECFDF5] text-[#166534] px-3 py-1 border border-[#BBF7D0]">
-              <span className="w-2 h-2 rounded-full bg-[#22C55E]" />
+          <div className="flex flex-wrap gap-2 text-base font-semibold">
+            <span className="inline-flex items-center gap-1 rounded-full bg-accent-soft text-brand px-3 py-1 border border-line">
+              <span className="w-2 h-2 rounded-full bg-accent" />
               空き時間
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#F8FAFC] text-[#64748B] px-3 py-1 border border-[#E2E8F0]">
-              <span className="w-2 h-2 rounded-full bg-[#94A3B8]" />
+            <span className="inline-flex items-center gap-1 rounded-full bg-white text-ink-muted px-3 py-1 border border-line">
+              <span className="w-2 h-2 rounded-full bg-line" />
               ブロック
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#FEF3C7] text-[#92400E] px-3 py-1 border border-[#FDE68A]">
+            <span className="inline-flex items-center gap-1 rounded-full bg-accent-soft text-brand px-3 py-1 border border-line">
               予約
             </span>
           </div>
         )}
 
         {(view === 'day' || view === 'week') && dragSelection && (
-          <div className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-[12px] p-3 flex flex-wrap items-center gap-2">
-            <p className="text-sm text-[#1E3A8A] font-semibold">
+          <div className="bg-accent-soft border border-line rounded-control p-3 flex flex-wrap items-center gap-2">
+            <p className="text-base text-brand font-semibold">
               選択: {DAY_NAMES[dragSelection.dayOfWeek]} {hourToTime(dragSelection.startHour)} -{' '}
               {hourToTime(dragSelection.endHour)}
             </p>
             <button
               type="button"
               onClick={() => setDragSelection(null)}
-              className="h-11 px-4 rounded-full border border-[#BFDBFE] text-[#1E3A8A] bg-white text-sm font-bold"
+              className="h-11 px-4 rounded-control border border-line text-brand bg-white text-base font-bold"
             >
               解除
             </button>
-            <p className="text-xs text-[#1E3A8A]">
+            <p className="text-base text-brand">
               ドラッグ終了後に予約/ブロックのメニューが開きます
             </p>
           </div>
@@ -677,7 +677,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
         {view === 'week' && renderWeekOrDayView('week')}
         {view === 'day' && renderWeekOrDayView('day')}
 
-        <div className="bg-white rounded-[16px] border border-[#E5E7EB] p-3 text-sm text-[#6B7280]">
+        <div className="bg-white rounded-card border border-line p-3 text-base text-ink-muted">
           日付をタップして、時間セルをドラッグすると空き時間/ブロックをその日付だけに設定できます。
         </div>
       </div>

@@ -56,17 +56,17 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
     <main className="min-h-screen bg-white px-4 py-5">
       <div className="mx-auto max-w-[430px] space-y-4">
         <section className="fitall-card-strong overflow-hidden">
-          <div className="bg-[#12C7BE] px-5 py-5 text-white">
-            <p className="text-[10px] font-black tracking-[0.12em] text-white/80">LIMITLESS APP</p>
+          <div className="bg-accent px-5 py-5 text-ink">
+            <p className="text-base font-bold text-ink/70">LIMITLESS APP</p>
             <h1 className="mt-2 text-2xl font-black leading-tight">お客様情報の登録</h1>
-            <p className="mt-2 text-sm font-bold leading-relaxed text-white/90">
+            <p className="mt-2 text-base font-bold leading-relaxed text-ink/70">
               {trainerUser?.name ?? 'トレーナー'}さんの予約・チケット管理アプリを使う準備をします。
             </p>
           </div>
         </section>
 
         {error && (
-          <div className="border-2 border-[#D4183D] bg-[#FEF2F2] px-3 py-3 text-sm font-black text-[#D4183D]">
+          <div className="border border-danger bg-danger-soft px-3 py-3 text-base font-bold text-danger">
             {error}
           </div>
         )}
@@ -74,76 +74,76 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
         <form action={completeCustomerOnboardingAction.bind(null, token)} className="fitall-card space-y-4 p-4">
           <div>
             <h2 className="fitall-section-title">基本情報</h2>
-            <p className="mt-1 text-xs font-bold leading-relaxed text-[#555555]">
+            <p className="mt-1 text-base font-medium leading-relaxed text-ink-muted">
               入力後、LINE通知連携に進みます。
             </p>
           </div>
 
           <label className="block">
-            <span className="text-xs font-black text-[#555555]">お名前</span>
+            <span className="text-base font-medium text-ink-muted">お名前</span>
             <input
               name="name"
               required
               defaultValue={customerUser?.name ?? ''}
               placeholder="山田 太郎"
-              className="fitall-focus-ring mt-1 h-12 w-full rounded-[6px] border-2 border-[#DDE8E8] px-3 text-sm font-bold outline-none focus:border-[#12C7BE]"
+              className="fitall-focus-ring mt-1 h-12 w-full rounded-control border border-line px-3 text-base font-bold outline-none focus:border-accent"
             />
           </label>
 
           <label className="block">
-            <span className="text-xs font-black text-[#555555]">メールアドレス</span>
+            <span className="text-base font-medium text-ink-muted">メールアドレス</span>
             <input
               name="email"
               type="email"
               required
               defaultValue={customerUser?.email ?? ''}
               placeholder="name@example.com"
-              className="fitall-focus-ring mt-1 h-12 w-full rounded-[6px] border-2 border-[#DDE8E8] px-3 text-sm font-bold outline-none focus:border-[#12C7BE]"
+              className="fitall-focus-ring mt-1 h-12 w-full rounded-control border border-line px-3 text-base font-bold outline-none focus:border-accent"
             />
           </label>
 
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
-              <span className="text-xs font-black text-[#555555]">身長 cm</span>
+              <span className="text-base font-medium text-ink-muted">身長 cm</span>
               <input
                 name="height"
                 type="number"
                 inputMode="decimal"
                 defaultValue={profile?.height ?? ''}
                 placeholder="170"
-                className="fitall-focus-ring mt-1 h-12 w-full rounded-[6px] border-2 border-[#DDE8E8] px-3 text-sm font-bold outline-none focus:border-[#12C7BE]"
+                className="fitall-focus-ring mt-1 h-12 w-full rounded-control border border-line px-3 text-base font-bold outline-none focus:border-accent"
               />
             </label>
             <label className="block">
-              <span className="text-xs font-black text-[#555555]">体重 kg</span>
+              <span className="text-base font-medium text-ink-muted">体重 kg</span>
               <input
                 name="weight"
                 type="number"
                 inputMode="decimal"
                 defaultValue={profile?.weight ?? ''}
                 placeholder="65"
-                className="fitall-focus-ring mt-1 h-12 w-full rounded-[6px] border-2 border-[#DDE8E8] px-3 text-sm font-bold outline-none focus:border-[#12C7BE]"
+                className="fitall-focus-ring mt-1 h-12 w-full rounded-control border border-line px-3 text-base font-bold outline-none focus:border-accent"
               />
             </label>
           </div>
 
           <label className="block">
-            <span className="text-xs font-black text-[#555555]">目的・相談したいこと</span>
+            <span className="text-base font-medium text-ink-muted">目的・相談したいこと</span>
             <textarea
               name="goal"
               rows={4}
               defaultValue={profile?.goal ?? ''}
               placeholder="ダイエット、姿勢改善、筋力アップなど"
-              className="fitall-focus-ring mt-1 w-full rounded-[6px] border-2 border-[#DDE8E8] px-3 py-3 text-sm font-bold outline-none focus:border-[#12C7BE]"
+              className="fitall-focus-ring mt-1 w-full rounded-control border border-line px-3 py-3 text-base font-bold outline-none focus:border-accent"
             />
           </label>
 
-          <SubmitButton className="fitall-primary-action fitall-tap h-12 w-full text-sm">
+          <SubmitButton className="fitall-primary-action fitall-tap h-12 w-full text-base">
             登録してLINE通知へ進む
           </SubmitButton>
         </form>
 
-        <Link href="/customer/app" className="block py-3 text-center text-xs font-black text-[#087D78]">
+        <Link href="/customer/app" className="block py-3 text-center text-base font-bold text-brand">
           登録済みの方はマイページへ
         </Link>
       </div>

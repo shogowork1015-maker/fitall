@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { BookingActions } from './BookingActions'
 import { MoveBookingForm } from './MoveBookingForm'
 import { QuickReservationModal } from './QuickReservationModal'
@@ -71,10 +72,10 @@ function startTimeLabel(value: string): string {
 }
 
 const statusBadge: Record<BookingStatus, string> = {
-  pending: 'bg-white text-[#0A0A0A] border border-[#0A0A0A]',
-  confirmed: 'bg-[#12C7BE] text-white',
-  completed: 'bg-[#0A0A0A] text-white',
-  cancelled: 'bg-[#E8EEEE] text-[#555555]',
+  pending: 'bg-white text-ink border border-ink',
+  confirmed: 'bg-accent text-ink',
+  completed: 'bg-ink text-white',
+  cancelled: 'bg-surface-soft text-ink-muted',
 }
 
 function statusLabel(status: BookingStatus): string {
@@ -95,6 +96,8 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
   const [focusDate, setFocusDate] = useState<Date>(new Date())
   const [selectedDateKey, setSelectedDateKey] = useState<string>(toDateKey(new Date()))
   const [modalSlot, setModalSlot] = useState<{ dateKey: string; startTime: string } | null>(null)
+  const [direction, setDirection] = useState<-1 | 0 | 1>(0)
+  const todayKey = toDateKey(new Date())
 
   const weekDates = useMemo(() => {
     const start = startOfWeek(focusDate)
@@ -124,20 +127,27 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
 
   const selectedBookings = bookingsByDate[selectedDateKey] ?? []
 
-  function move(direction: -1 | 1) {
-    if (view === 'day') setFocusDate((prev) => addDays(prev, direction))
-    if (view === 'week') setFocusDate((prev) => addDays(prev, direction * 7))
-    if (view === 'month') {
-      setFocusDate(
-        (prev) => new Date(prev.getFullYear(), prev.getMonth() + direction, Math.min(prev.getDate(), 28))
-      )
-    }
+  // 日付を選ぶと一覧も同じ日に揃える
+  function selectDate(date: Date) {
+    setSelectedDateKey(toDateKey(date))
+    setFocusDate(date)
+  }
+
+  function move(step: -1 | 1) {
+    const next =
+      view === 'day'
+        ? addDays(focusDate, step)
+        : view === 'week'
+          ? addDays(focusDate, step * 7)
+          : new Date(focusDate.getFullYear(), focusDate.getMonth() + step, Math.min(focusDate.getDate(), 28))
+    setDirection(step)
+    selectDate(next)
   }
 
   function goToday() {
     const now = new Date()
-    setFocusDate(now)
-    setSelectedDateKey(toDateKey(now))
+    setDirection(now.getTime() < focusDate.getTime() ? -1 : 1)
+    selectDate(now)
   }
 
   function openReservation(date: Date, hour?: number) {
@@ -165,16 +175,55 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
     return focusDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' })
   }
 
+  function renderBookingChips(dayBookings: BookingItem[], max: number) {
+    return (
+      <>
+        {dayBookings.slice(0, max).map((booking) => (
+          <div key={booking.id} className={`truncate rounded-chip px-2 py-1 leading-tight font-bold ${statusBadge[booking.status]}`}>
+            {startTimeLabel(booking.scheduled_at)} {booking.trainee_name}
+          </div>
+        ))}
+      </>
+    )
+  }
+
+  // スマホの週表示: 7日を1画面に収め、選んだ日の予約を下の一覧で見る
+  function renderWeekStrip() {
+    return (
+      <div role="group" aria-label="表示する日" className="grid grid-cols-7 gap-1 md:hidden">
+        {weekDates.map((date) => {
+          const key = toDateKey(date)
+          const count = bookingsByDate[key]?.length ?? 0
+          const selected = selectedDateKey === key
+          const today = key === todayKey
+          return (
+            <button
+              key={key}
+              type="button"
+              aria-pressed={selected}
+              aria-label={`${date.getMonth() + 1}月${date.getDate()}日 ${WEEKDAYS[date.getDay()]}曜日 予約${count}件`}
+              onClick={() => selectDate(date)}
+              className={`flex h-[84px] flex-col items-center justify-center gap-0.5 rounded-control border ${
+                selected ? 'border-ink bg-ink text-white' : 'border-line bg-white text-ink'
+              }`}
+            >
+              <span className={selected ? 'text-white/80' : 'text-ink-muted'}>{WEEKDAYS[date.getDay()]}</span>
+              <span className={`text-lg font-black leading-none ${today && !selected ? 'text-brand' : ''}`}>{date.getDate()}</span>
+              <span aria-hidden="true" className={`mt-1 h-1.5 w-1.5 rounded-full ${count ? 'bg-accent' : 'bg-transparent'}`} />
+            </button>
+          )
+        })}
+      </div>
+    )
+  }
+
   function renderMonthView() {
     const currentMonth = focusDate.getMonth()
     return (
-      <div className="overflow-hidden rounded-[10px] border-2 border-[#DDE8E8] bg-white">
-        <div className="grid grid-cols-7 bg-[#0A0A0A]">
+      <div className="overflow-hidden rounded-card border border-line bg-white">
+        <div className="grid grid-cols-7 bg-ink">
           {WEEKDAYS.map((day) => (
-            <div
-              key={day}
-              className="flex h-10 items-center justify-center border-b border-white/20 text-xs font-bold text-white"
-            >
+            <div key={day} className="flex h-10 items-center justify-center font-bold text-white">
               {day}
             </div>
           ))}
@@ -184,42 +233,28 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
             const key = toDateKey(date)
             const dayBookings = bookingsByDate[key] ?? []
             const isSelected = selectedDateKey === key
-            const isToday = key === toDateKey(new Date())
+            const isToday = key === todayKey
             return (
               <button
                 key={key}
                 type="button"
-                onClick={() => {
-                  setSelectedDateKey(key)
-                  setFocusDate(date)
-                }}
+                aria-pressed={isSelected}
+                aria-label={`${date.getMonth() + 1}月${date.getDate()}日 予約${dayBookings.length}件`}
+                onClick={() => selectDate(date)}
                 onDoubleClick={() => openReservation(date, 10)}
-                className={`min-h-[116px] border-b border-r border-[#DDE8E8] p-2 text-left align-top ${
-                  isSelected ? 'bg-[#E8FBFA]' : 'bg-white'
-                } ${date.getMonth() === currentMonth ? 'text-[#0A0A0A]' : 'text-[#CBD5E1]'}`}
+                className={`flex min-h-[64px] flex-col items-center gap-1 border-b border-r border-line p-1 md:min-h-[116px] md:items-stretch md:p-2 md:text-left ${
+                  isSelected ? 'bg-accent-soft' : 'bg-white'
+                } ${date.getMonth() === currentMonth ? 'text-ink' : 'text-ink-faint'}`}
               >
-                <div className="mb-1 flex items-center justify-between gap-1">
-                  <span
-                    className={`flex h-6 min-w-6 items-center justify-center rounded-full text-xs font-black ${
-                      isToday ? 'bg-[#12C7BE] px-1.5 text-white' : ''
-                    }`}
-                  >
-                    {date.getDate()}
-                  </span>
-                  <span className="text-[10px] font-black text-[#12C7BE]">+</span>
-                </div>
-                <div className="space-y-1">
-                  {dayBookings.slice(0, 3).map((booking) => (
-                    <div
-                      key={booking.id}
-                      className={`truncate rounded-[5px] px-2 py-1 text-[11px] font-black leading-tight ${statusBadge[booking.status]}`}
-                    >
-                      {startTimeLabel(booking.scheduled_at)} {booking.trainee_name}
-                    </div>
-                  ))}
-                  {dayBookings.length > 3 && (
-                    <p className="text-[10px] font-bold text-[#64748B]">+{dayBookings.length - 3}件</p>
-                  )}
+                <span className={`flex h-7 min-w-7 items-center justify-center self-center rounded-full font-bold md:self-start ${isToday ? 'bg-accent px-1 text-ink' : ''}`}>
+                  {date.getDate()}
+                </span>
+                {dayBookings.length > 0 && (
+                  <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand md:hidden" />
+                )}
+                <div className="hidden space-y-1 md:block">
+                  {renderBookingChips(dayBookings, 3)}
+                  {dayBookings.length > 3 && <p className="font-medium text-ink-muted">+{dayBookings.length - 3}件</p>}
                 </div>
               </button>
             )
@@ -232,15 +267,9 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
   function renderGrid(mode: 'week' | 'day') {
     const dates = mode === 'day' ? [focusDate] : weekDates
     return (
-      <div className="w-full max-w-full overflow-x-auto rounded-[10px] border-2 border-[#DDE8E8] bg-white">
-        <div
-          className={`grid min-w-[820px] ${
-            mode === 'day'
-              ? 'grid-cols-[70px_minmax(420px,1fr)]'
-              : 'grid-cols-[70px_repeat(7,minmax(140px,1fr))]'
-          }`}
-        >
-          <div className="h-12 border-b border-[#DDE8E8] bg-[#0A0A0A]" />
+      <div className={`${mode === 'week' ? 'hidden md:block' : ''} w-full max-w-full overflow-x-auto rounded-card border border-line bg-white`}>
+        <div className={`grid ${mode === 'day' ? 'grid-cols-[72px_minmax(0,1fr)]' : 'min-w-[900px] grid-cols-[72px_repeat(7,minmax(0,1fr))]'}`}>
+          <div className="h-14 border-b border-line bg-ink" />
           {dates.map((date) => {
             const key = toDateKey(date)
             const isSelected = selectedDateKey === key
@@ -248,23 +277,22 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
               <button
                 key={key}
                 type="button"
-                onClick={() => setSelectedDateKey(key)}
-                className={`h-12 border-b border-l border-[#DDE8E8] ${
-                  isSelected ? 'bg-[#12C7BE]' : 'bg-[#0A0A0A]'
+                aria-pressed={isSelected}
+                onClick={() => selectDate(date)}
+                className={`flex h-14 items-center justify-center gap-2 border-b border-l border-line font-bold ${
+                  isSelected ? 'bg-accent text-ink' : 'bg-ink text-white'
                 }`}
               >
-                <p className="text-[10px] font-bold text-white/70">{WEEKDAYS[date.getDay()]}</p>
-                <p className="text-sm font-black text-white">
-                  {date.getMonth() + 1}/{date.getDate()}
-                </p>
+                <span>{date.getMonth() + 1}/{date.getDate()}</span>
+                <span className="font-medium">{WEEKDAYS[date.getDay()]}</span>
               </button>
             )
           })}
 
           {HOURS.map((hour) => (
             <div key={`row-${hour}`} className="contents">
-              <div className="h-[76px] border-b border-[#DDE8E8] bg-white px-2">
-                <p className="mt-2 text-[10px] font-black text-[#555555]">{timeFromHour(hour)}</p>
+              <div className="h-[76px] border-b border-line bg-white px-2 pt-2 font-medium text-ink-muted">
+                {timeFromHour(hour)}
               </div>
               {dates.map((date) => {
                 const key = toDateKey(date)
@@ -275,22 +303,14 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
                   <button
                     key={`${key}-${hour}`}
                     type="button"
+                    aria-label={`${date.getMonth() + 1}月${date.getDate()}日 ${timeFromHour(hour)}に予約を入れる`}
                     onClick={() => openReservation(date, hour)}
-                    className="group h-[76px] border-b border-l border-[#DDE8E8] bg-white px-2 py-1.5 text-left transition-colors hover:bg-[#E8FBFA]"
+                    className="group h-[76px] border-b border-l border-line bg-white px-2 py-1.5 text-left hover:bg-accent-soft"
                   >
                     <div className="space-y-1">
-                      {hourBookings.slice(0, 2).map((booking) => (
-                        <div
-                          key={booking.id}
-                          className={`truncate rounded-[5px] px-2 py-1.5 text-[12px] font-black leading-tight ${statusBadge[booking.status]}`}
-                        >
-                          {startTimeLabel(booking.scheduled_at)} {booking.trainee_name}
-                        </div>
-                      ))}
+                      {renderBookingChips(hourBookings, 2)}
                       {!hourBookings.length && (
-                        <span className="inline-flex h-7 w-7 items-center justify-center rounded-[6px] border border-[#DDE8E8] bg-white text-[13px] font-black text-[#12C7BE]">
-                          ＋
-                        </span>
+                        <span aria-hidden="true" className="text-xl font-bold text-ink-faint opacity-0 transition-opacity group-hover:opacity-100">＋</span>
                       )}
                     </div>
                   </button>
@@ -303,143 +323,96 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
     )
   }
 
+  const slideClass = direction > 0 ? 'fitall-slide-next' : direction < 0 ? 'fitall-slide-prev' : 'fitall-fade'
+
   return (
-    <div className="min-w-0 space-y-5 overflow-hidden">
-      <div className="fitall-card-strong fitall-card-pop overflow-hidden">
-        <div className="bg-[#12C7BE] px-4 py-3 text-white">
-          <p className="text-[10px] font-black tracking-[0.12em] text-white/80">CALENDAR</p>
-          <h2 className="mt-1 text-lg font-black">{title()}</h2>
+    <div className="min-w-0 space-y-4 pb-20 md:pb-0">
+      <div className="fitall-card space-y-3 p-3">
+        <div className="flex items-center gap-2">
+          <button type="button" aria-label={`前の${viewTitle(view)}`} onClick={() => move(-1)} className="fitall-icon-button">‹</button>
+          <h2 aria-live="polite" className="min-w-0 flex-1 text-center text-lg font-black leading-tight text-ink">{title()}</h2>
+          <button type="button" aria-label={`次の${viewTitle(view)}`} onClick={() => move(1)} className="fitall-icon-button">›</button>
         </div>
-        <div className="p-3">
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              onClick={() => openReservation(focusDate, 10)}
-              className="fitall-primary-action fitall-tap col-span-2 h-11 text-xs"
-            >
-              予約を入れる
-            </button>
-            <button
-              type="button"
-              onClick={goToday}
-              className="fitall-secondary-action fitall-tap h-11 text-xs"
-            >
-              今日
-            </button>
-          </div>
+        <div className="grid grid-cols-[1fr_auto] items-center gap-2">
+          <SegmentedControl
+            label="カレンダーの表示"
+            value={view}
+            onChange={(next) => { setDirection(0); setView(next) }}
+            options={(['day', 'week', 'month'] as ViewMode[]).map((mode) => ({ value: mode, label: viewTitle(mode) }))}
+          />
+          <button type="button" onClick={goToday} className="fitall-secondary-action">今日</button>
         </div>
+        <button type="button" onClick={() => openReservation(focusDate, 10)} className="fitall-primary-action hidden md:inline-flex">
+          予約を入れる
+        </button>
       </div>
 
-      <div className="fitall-card rounded-[6px] p-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.12em] text-[#087D78]">
-              {viewTitle(view)}表示
-            </p>
-            <h2 className="mt-1 text-sm font-black text-[#0A0A0A]">表示を切り替え</h2>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {(['day', 'week', 'month'] as ViewMode[]).map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                onClick={() => setView(mode)}
-                className={`h-10 rounded-[8px] px-3 text-xs font-black ${
-                  view === mode
-                    ? 'bg-[#0A0A0A] text-white'
-                    : 'border border-[#DDE8E8] bg-white text-[#555555]'
-                }`}
-              >
-                {viewTitle(mode)}
-              </button>
-            ))}
-            <button
-              type="button"
-              onClick={() => move(-1)}
-              className="h-10 w-10 rounded-[8px] border border-[#DDE8E8] text-lg font-bold text-[#0A0A0A]"
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              onClick={() => move(1)}
-              className="h-10 w-10 rounded-[8px] border border-[#DDE8E8] text-lg font-bold text-[#0A0A0A]"
-            >
-              ›
-            </button>
-          </div>
-        </div>
+      <div className="hidden flex-wrap items-center gap-2 font-bold md:flex">
+        <span className="rounded-chip bg-accent px-3 py-1 text-ink">確定</span>
+        <span className="rounded-chip border border-ink bg-white px-3 py-1 text-ink">承認待ち</span>
+        <span className="rounded-chip bg-ink px-3 py-1 text-white">完了</span>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 text-[11px] font-black">
-        <span className="rounded-[6px] bg-[#12C7BE] px-3 py-1 text-white">確定</span>
-        <span className="rounded-[6px] border border-[#0A0A0A] bg-white px-3 py-1 text-[#0A0A0A]">承認待ち</span>
-        <span className="rounded-[6px] bg-[#0A0A0A] px-3 py-1 text-white">完了</span>
-        <span className="rounded-[6px] border border-[#DDE8E8] px-3 py-1 text-[#555555]">
-          ＋をタップして予約
-        </span>
-        {preview && (
-          <span className="rounded-[6px] bg-[#E8FBFA] px-3 py-1 text-[#087D78]">
-            UI確認モード
-          </span>
+      <div key={`${view}-${title()}`} className={slideClass}>
+        {view === 'month' ? renderMonthView() : (
+          <div className="space-y-3">
+            {view === 'week' && renderWeekStrip()}
+            {renderGrid(view)}
+          </div>
         )}
       </div>
 
-      {view === 'month' ? renderMonthView() : renderGrid(view)}
-
-      <div>
-        <h2 className="mb-3 px-1 text-xs font-bold uppercase tracking-wide text-[#666666]">
-          {new Date(`${selectedDateKey}T00:00:00`).toLocaleDateString('ja-JP', {
-            month: 'long',
-            day: 'numeric',
-            weekday: 'short',
-          })}
-          の予約
-        </h2>
+      <section aria-label="選択した日の予約">
+        <div className="mb-3 flex items-baseline justify-between gap-3 px-1">
+          <h2 className="font-bold text-ink">
+            {new Date(`${selectedDateKey}T00:00:00`).toLocaleDateString('ja-JP', {
+              month: 'long',
+              day: 'numeric',
+              weekday: 'short',
+            })}
+          </h2>
+          <span className="font-medium text-ink-muted">{selectedBookings.length}件</span>
+        </div>
 
         {!selectedBookings.length ? (
-          <div className="rounded-[10px] border-2 border-dashed border-[#DDE8E8] bg-white p-6 text-center text-sm font-bold text-[#555555]">
-            空きセルの＋から予約を入れられます
+          <div key={selectedDateKey} className="fitall-fade rounded-card border border-dashed border-line bg-white p-5 text-center">
+            <p className="font-medium text-ink-muted">この日の予約はありません</p>
+            <button
+              type="button"
+              onClick={() => openReservation(new Date(`${selectedDateKey}T00:00:00`), 10)}
+              className="fitall-secondary-action mt-3 w-full"
+            >
+              この日に予約を入れる
+            </button>
           </div>
         ) : (
-          <div className="space-y-3">
-            {selectedBookings.map((booking) => (
+          <div key={selectedDateKey} className="space-y-3">
+            {selectedBookings.map((booking, index) => (
               <div
                 key={booking.id}
-                className="fitall-card-pop relative overflow-hidden rounded-[10px] border-2 border-[#DDE8E8] bg-white p-4"
+                className="fitall-card fitall-card-pop relative overflow-hidden p-4"
+                style={{ animationDelay: `${index * 40}ms` }}
               >
                 <div
+                  aria-hidden="true"
                   className={`absolute bottom-0 left-0 top-0 w-1 ${
-                    booking.status === 'pending'
-                      ? 'bg-[#0A0A0A]'
-                      : booking.status === 'confirmed'
-                        ? 'bg-[#12C7BE]'
-                        : booking.status === 'completed'
-                          ? 'bg-[#0A0A0A]'
-                          : 'bg-gray-300'
+                    booking.status === 'confirmed' ? 'bg-accent' : booking.status === 'cancelled' ? 'bg-line' : 'bg-ink'
                   }`}
                 />
                 <div className="ml-1 flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-base font-black text-[#0A0A0A]">{booking.trainee_name}</p>
-                    <p className="mt-0.5 text-sm font-semibold text-gray-500">
-                      {startTimeLabel(booking.scheduled_at)} · ¥{booking.price.toLocaleString()}
+                    <p className="text-lg font-black leading-tight text-ink">{startTimeLabel(booking.scheduled_at)} {booking.trainee_name}</p>
+                    <p className="mt-1 font-medium text-ink-muted">
+                      ¥{booking.price.toLocaleString()}{booking.credit_status ? ' · チケット予約' : ''}
                     </p>
                   </div>
-                  <span className={`rounded-md px-2.5 py-1 text-[11px] font-bold ${statusBadge[booking.status]}`}>
+                  <span className={`shrink-0 rounded-chip px-2.5 py-1 font-bold ${statusBadge[booking.status]}`}>
                     {statusLabel(booking.status)}
                   </span>
                 </div>
-                {booking.credit_status && (
-                  <div className="ml-1 mt-2">
-                    <span className="inline-flex rounded-md bg-[#EFF6FF] px-2.5 py-1 text-[11px] font-bold text-[#1D4ED8]">
-                      チケット予約
-                    </span>
-                  </div>
-                )}
                 <div className="ml-1 mt-3">
                   {preview ? (
-                    <div className="rounded-[12px] border border-[#E5E7EB] bg-[#F8FAFC] px-3 py-2 text-xs font-bold text-[#64748B]">
+                    <div className="rounded-control bg-surface-soft px-3 py-2 font-medium text-ink-muted">
                       プレビュー中のため、承認・完了・移動は保存されません
                     </div>
                   ) : (
@@ -461,7 +434,16 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
             ))}
           </div>
         )}
-      </div>
+      </section>
+
+      <button
+        type="button"
+        aria-label="予約を入れる"
+        onClick={() => openReservation(new Date(`${selectedDateKey}T00:00:00`), 10)}
+        className="fitall-fab"
+      >
+        ＋
+      </button>
 
       {modalSlot && (
         <QuickReservationModal

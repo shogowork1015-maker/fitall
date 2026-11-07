@@ -65,7 +65,7 @@ export function SelectionPopover({
 
   async function onSaveReservation() {
     if (!clientId) {
-      setError('お客さんを選択してください')
+      setError('お客様を選択してください')
       return
     }
 
@@ -103,24 +103,24 @@ export function SelectionPopover({
   return (
     <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4">
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
-      <div className="w-full max-w-[520px] bg-white rounded-[24px] border border-[#E5E7EB] shadow-xl p-4">
+      <div className="w-full max-w-[520px] bg-white rounded-card border border-line shadow-xl p-4">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-lg font-bold text-[#0A0A0A]">予定を作成</p>
+          <p className="text-lg font-bold text-ink">予定を作成</p>
           <button
             type="button"
             onClick={onClose}
-            className="h-10 w-10 rounded-full border border-[#E5E7EB] text-[#6B7280] text-xl leading-none"
+            className="h-10 w-10 rounded-control border border-line text-ink-muted text-xl leading-none"
           >
             ×
           </button>
         </div>
 
-        <p className="text-sm text-[#6B7280] mb-3">
+        <p className="text-base text-ink-muted mb-3">
           {dateLabel} {startTime} - {endTime}
         </p>
 
         {error && (
-          <div className="mb-3 bg-[#FEF2F2] border border-[#FECACA] rounded-[12px] px-3 py-2 text-sm text-[#EF4444]">
+          <div className="mb-3 bg-danger-soft border border-danger-line rounded-control px-3 py-2 text-base text-danger">
             {error}
           </div>
         )}
@@ -129,10 +129,10 @@ export function SelectionPopover({
           <button
             type="button"
             onClick={() => setTab('reservation')}
-            className={`h-11 px-4 rounded-[12px] text-sm font-bold ${
+            className={`h-11 px-4 rounded-control text-base font-medium ${
               tab === 'reservation'
-                ? 'bg-[#0A0A0A] text-white'
-                : 'bg-[#F3F4F6] text-[#6B7280]'
+                ? 'bg-ink text-white'
+                : 'bg-surface-soft text-ink-muted'
             }`}
           >
             予約
@@ -140,8 +140,8 @@ export function SelectionPopover({
           <button
             type="button"
             onClick={() => setTab('block')}
-            className={`h-11 px-4 rounded-[12px] text-sm font-bold ${
-              tab === 'block' ? 'bg-[#0A0A0A] text-white' : 'bg-[#F3F4F6] text-[#6B7280]'
+            className={`h-11 px-4 rounded-control text-base font-medium ${
+              tab === 'block' ? 'bg-ink text-white' : 'bg-surface-soft text-ink-muted'
             }`}
           >
             ブロック
@@ -153,9 +153,9 @@ export function SelectionPopover({
             <select
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
-              className="w-full h-14 px-3 rounded-[12px] border border-[#E5E7EB] text-sm font-semibold"
+              className="w-full h-14 px-3 rounded-control border border-line text-base font-semibold"
             >
-              <option value="">お客さんを選択</option>
+              <option value="">お客様を選択</option>
               {clients.map((c) => (
                 <option key={c.trainee_id} value={c.trainee_id}>
                   {c.name}
@@ -165,7 +165,7 @@ export function SelectionPopover({
             <select
               value={menuId}
               onChange={(e) => setMenuId(e.target.value)}
-              className="w-full h-14 px-3 rounded-[12px] border border-[#E5E7EB] text-sm font-semibold"
+              className="w-full h-14 px-3 rounded-control border border-line text-base font-semibold"
             >
               {menus.map((m) => (
                 <option key={m.id} value={m.id}>
@@ -178,19 +178,19 @@ export function SelectionPopover({
               step={300}
               value={time}
               onChange={(e) => setTime(e.target.value)}
-              className="w-full h-14 px-3 rounded-[12px] border border-[#E5E7EB] text-sm font-semibold"
+              className="w-full h-14 px-3 rounded-control border border-line text-base font-semibold"
             />
           </div>
         )}
 
         {tab === 'block' && (
-          <div className="text-sm text-[#6B7280] bg-[#F9FAFB] border border-[#E5E7EB] rounded-[12px] p-3">
+          <div className="text-base text-ink-muted bg-white border border-line rounded-control p-3">
             この時間帯を予約不可（ブロック）にします。
           </div>
         )}
 
         <div className="mt-3 space-y-2">
-          <label className="flex items-center gap-2 text-sm font-semibold text-[#0A0A0A]">
+          <label className="flex items-center gap-2 text-base font-semibold text-ink">
             <input
               type="checkbox"
               checked={repeatEnabled}
@@ -204,13 +204,13 @@ export function SelectionPopover({
                 type="date"
                 value={repeatStart}
                 onChange={(e) => setRepeatStart(e.target.value)}
-                className="h-12 px-3 rounded-[12px] border border-[#E5E7EB] text-sm font-semibold"
+                className="h-12 px-3 rounded-control border border-line text-base font-semibold"
               />
               <input
                 type="date"
                 value={repeatUntil}
                 onChange={(e) => setRepeatUntil(e.target.value)}
-                className="h-12 px-3 rounded-[12px] border border-[#E5E7EB] text-sm font-semibold"
+                className="h-12 px-3 rounded-control border border-line text-base font-semibold"
               />
             </div>
           )}
@@ -220,7 +220,7 @@ export function SelectionPopover({
           <button
             type="button"
             onClick={onClose}
-            className="h-12 px-4 rounded-full border border-[#E5E7EB] text-sm font-bold text-[#6B7280]"
+            className="h-12 px-4 rounded-control border border-line text-base font-medium text-ink-muted"
           >
             キャンセル
           </button>
@@ -228,7 +228,7 @@ export function SelectionPopover({
             type="button"
             disabled={saving}
             onClick={() => void (tab === 'reservation' ? onSaveReservation() : onSaveBlock())}
-            className="h-12 px-5 rounded-full bg-[#0A0A0A] text-white text-sm font-bold disabled:opacity-40"
+            className="h-12 px-5 rounded-control bg-ink text-white text-base font-bold disabled:opacity-40"
           >
             保存
           </button>

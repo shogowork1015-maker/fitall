@@ -1,4 +1,6 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
+import { signOutAction } from '@/app/auth/login/actions'
 import { getProductionReadinessItems } from '@/lib/production-readiness'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
 import { createAdminSupabaseClient } from '@/lib/supabase-admin'
@@ -36,8 +38,8 @@ export default async function TrainerSettingsPage() {
   if (!profile) {
     return (
       <div className="fitall-page fitall-scroll px-4 pt-6 pb-4">
-        <h1 className="text-2xl font-black text-[#0A0A0A]">設定</h1>
-        <div className="fitall-card mt-4 p-6 text-center text-sm font-bold text-[#555555]">
+        <h1 className="text-2xl font-black text-ink">設定</h1>
+        <div className="fitall-card mt-4 p-6 text-center text-base font-medium text-ink-muted">
           トレーナープロフィールが見つかりません
         </div>
       </div>
@@ -64,90 +66,96 @@ export default async function TrainerSettingsPage() {
 
   return (
     <div className="fitall-page fitall-scroll">
-      <div className="fitall-topbar">
-        <h1 className="text-[17px] font-black text-[#0A0A0A] flex-1 text-center">設定</h1>
+      <div className="fitall-topbar md:hidden">
+        <Link href="/trainer/dashboard" aria-label="ホームへ戻る" className="w-14 text-2xl text-ink-muted">‹</Link>
+        <h1 className="flex-1 text-center text-[17px] font-black text-ink">設定</h1>
+        <div className="w-14" />
       </div>
-      <div className="px-4 py-6 space-y-4">
-        <section className="fitall-card p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="fitall-section-title">本番準備チェック</p>
-              <p className="mt-1 text-xs font-bold text-[#555555]">
-                Stripe、LINE、通知、DB設定の抜け漏れを確認します
-              </p>
-            </div>
+      <div className="mx-auto max-w-[640px] space-y-4 px-4 py-4">
+        <TrainerSettingsForm
+          initialSettings={settings}
+          initialMenus={(plans ?? []).map((p) => ({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            sessions: p.sessions ?? 1,
+            ...getPlanSettings(planSettings, p.id),
+          }))}
+        />
+        <details className="fitall-details">
+          <summary>
+            <span className="flex flex-1 items-center justify-between gap-3">
+              <span>接続の確認（管理者向け）</span>
             <span
-              className={`rounded-[6px] px-2.5 py-1 text-xs font-black ${
+              className={`rounded-control px-2.5 py-1 text-base font-bold ${
                 missingCount
-                  ? 'bg-[#FEF2F2] text-[#D4183D]'
+                  ? 'bg-danger-soft text-danger'
                   : warnCount
-                    ? 'bg-[#FEF3C7] text-[#92400E]'
-                    : 'bg-[#E8FBFA] text-[#087D78]'
+                    ? 'bg-accent-soft text-brand'
+                    : 'bg-accent-soft text-brand'
               }`}
             >
               {missingCount ? `${missingCount}件不足` : warnCount ? `${warnCount}件確認` : '準備OK'}
             </span>
-          </div>
-          <div className="mt-4 grid gap-2 md:grid-cols-2">
+            </span>
+          </summary>
+          <div className="grid gap-2 p-4 pt-0 md:grid-cols-2">
             {readinessItems.map((item) => (
               <div
                 key={item.label}
-                className="rounded-[8px] border-2 border-[#DDE8E8] bg-white px-3 py-3"
+                className="rounded-control border border-line bg-white px-3 py-3"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-black text-[#0A0A0A]">{item.label}</p>
+                  <p className="text-base font-bold text-ink">{item.label}</p>
                   <span
-                    className={`rounded-[5px] px-2 py-0.5 text-[10px] font-black ${
+                    className={`rounded-chip px-2 py-0.5 text-base font-bold ${
                       item.level === 'ok'
-                        ? 'bg-[#E8FBFA] text-[#087D78]'
+                        ? 'bg-accent-soft text-brand'
                         : item.level === 'warn'
-                          ? 'bg-[#FEF3C7] text-[#92400E]'
-                          : 'bg-[#FEF2F2] text-[#D4183D]'
+                          ? 'bg-accent-soft text-brand'
+                          : 'bg-danger-soft text-danger'
                     }`}
                   >
                     {item.level === 'ok' ? 'OK' : item.level === 'warn' ? '確認' : '不足'}
                   </span>
                 </div>
-                <p className="mt-1 text-xs font-bold leading-relaxed text-[#555555]">
+                <p className="mt-1 text-base font-medium leading-relaxed text-ink-muted">
                   {item.detail}
                 </p>
               </div>
             ))}
           </div>
-        </section>
-        <section className="fitall-card-strong overflow-hidden">
-          <div className="bg-[#12C7BE] px-4 py-4 text-white">
-            <p className="text-[10px] font-black tracking-[0.12em] text-white/80">LINE SETUP</p>
-            <h2 className="mt-1 text-lg font-black">LINE連携</h2>
-          </div>
-          <div className="space-y-4 p-4">
-            <p className="text-sm font-bold leading-relaxed text-[#555555]">
+        </details>
+        <details className="fitall-details">
+          <summary>LINE連携</summary>
+          <div className="space-y-4 p-4 pt-0">
+            <p className="text-base font-medium leading-relaxed text-ink-muted">
               お客様はLINEログインでアプリに入り、予約確認・チケット残数・通知を受け取る設計にします。
             </p>
             <div className="grid gap-2 md:grid-cols-3">
               {lineItems.map((item) => {
                 const ready = !!process.env[item.env]?.trim()
                 return (
-                  <div key={item.env} className="border-2 border-[#DDE8E8] bg-white px-3 py-3">
-                    <p className="text-[10px] font-black text-[#087D78]">{item.label}</p>
-                    <p className="mt-1 text-sm font-black text-[#0A0A0A]">
+                  <div key={item.env} className="rounded-control border border-line bg-white px-3 py-3">
+                    <p className="text-base font-bold text-brand">{item.label}</p>
+                    <p className="mt-1 text-base font-bold text-ink">
                       {ready ? '設定済み' : '未設定'}
                     </p>
-                    <p className="mt-1 font-mono text-[10px] font-bold text-[#555555]">{item.env}</p>
+                    <p className="mt-1 font-mono text-base font-medium text-ink-muted">{item.env}</p>
                   </div>
                 )
               })}
             </div>
-            <div className="border-2 border-[#DDE8E8] bg-[#F4F7F7] px-3 py-3">
-              <p className="text-[10px] font-black text-[#087D78]">LINE Login Callback URLs</p>
+            <div className="rounded-control border border-line bg-surface-soft px-3 py-3">
+              <p className="text-base font-bold text-brand">LINE Login Callback URLs</p>
               <div className="mt-2 space-y-2">
-                <p className="break-all font-mono text-xs font-black text-[#0A0A0A]">
+                <p className="break-all font-mono text-base font-bold text-ink">
                   {appUrl}/api/line/connect/callback
                 </p>
-                <p className="break-all font-mono text-xs font-black text-[#0A0A0A]">
+                <p className="break-all font-mono text-base font-bold text-ink">
                   {appUrl}/api/line/customer-connect/callback
                 </p>
-                <p className="break-all font-mono text-xs font-black text-[#0A0A0A]">
+                <p className="break-all font-mono text-base font-bold text-ink">
                   {appUrl}/api/line/app/callback
                 </p>
               </div>
@@ -169,17 +177,10 @@ export default async function TrainerSettingsPage() {
               </a>
             </div>
           </div>
-        </section>
-        <TrainerSettingsForm
-          initialSettings={settings}
-          initialMenus={(plans ?? []).map((p) => ({
-            id: p.id,
-            name: p.name,
-            price: p.price,
-            sessions: p.sessions ?? 1,
-            ...getPlanSettings(planSettings, p.id),
-          }))}
-        />
+        </details>
+        <form action={signOutAction}>
+          <button type="submit" className="fitall-secondary-action w-full text-danger">ログアウト</button>
+        </form>
       </div>
     </div>
   )

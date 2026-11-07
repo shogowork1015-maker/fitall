@@ -38,26 +38,27 @@ export function BookingManagement({ booking, loadSlots = loadBookingChangeSlots,
       if (result.status === 'success') { onSuccess?.(result.message); setDone(true); setMode('closed'); router.refresh() }
     })
   }
-  return <div className="mt-4 text-sm">
-    {withinDeadline ? <p className="text-[#555555]">変更・キャンセル期限：{format(deadline)}</p>
-      : <p className="text-[#555555]">開始24時間前を過ぎています。変更・キャンセルはトレーナーへご連絡ください。</p>}
-    {withinDeadline && !done && mode === 'closed' && <div className="mt-3 flex gap-3">
-      <button type="button" className="min-h-11 rounded-lg border border-[#087D78] px-4 font-bold text-[#087D78]" onClick={move}>日時を変更</button>
-      <button type="button" className="min-h-11 rounded-lg border border-[#DDE8E8] px-4" onClick={() => { setMode('cancel'); setMessage('') }}>キャンセル</button>
+  return <div className="mt-3">
+    {withinDeadline ? <p className="text-ink-muted">変更・キャンセルは {format(deadline)} まで</p>
+      : <p className="text-ink-muted">開始24時間前を過ぎています。変更・キャンセルはトレーナーへご連絡ください。</p>}
+    {withinDeadline && !done && mode === 'closed' && <div className="mt-3 grid grid-cols-2 gap-2">
+      <button type="button" className="fitall-secondary-action" onClick={move}>日時を変更</button>
+      <button type="button" className="fitall-secondary-action text-danger" onClick={() => { setMode('cancel'); setMessage('') }}>キャンセル</button>
     </div>}
-    {mode !== 'closed' && <div className="mt-4 border-l-2 border-[#087D78] pl-3" aria-busy={pending}>
+    {mode !== 'closed' && <div className="fitall-fade mt-3 rounded-control bg-surface-soft p-3" aria-busy={pending}>
       <h3 className="font-bold">{mode === 'move' ? '変更先を選ぶ' : 'この予約をキャンセルしますか？'}</h3>
       {mode === 'move' ? <>
         <p className="mt-2">開始まで24時間以上ある空き枠に変更できます。チケットの追加消費はありません。</p>
-        {pending && !slots.length ? <p className="py-4" role="status">空き時間を確認中…</p>
+        {pending && !slots.length ? <p className="flex items-center gap-2 py-4" role="status"><span aria-hidden="true" className="fitall-spinner" />空き時間を確認中…</p>
           : <BookingSlotPicker slots={slots} value={selected} onChange={setSelected} disabled={pending} />}
         {selected && <p className="mt-3 font-bold">変更後：{format(selected)}</p>}
       </> : <p className="mt-2 leading-relaxed">チケット1枚を返却します。有効期限は延長されません。購入代金の返金は行いません。</p>}
-      <div className="mt-4 flex flex-wrap gap-3">
-        <button type="button" className="fitall-primary-action min-h-11 px-4 disabled:opacity-50" disabled={pending || (mode === 'move' && !selected)} onClick={submit}>
+      <div className="mt-4 space-y-2">
+        <button type="button" className={`${mode === 'move' ? 'fitall-primary-action' : 'fitall-danger-action w-full'} gap-2 disabled:opacity-50`} disabled={pending || (mode === 'move' && !selected)} onClick={submit}>
+          {pending && <span aria-hidden="true" className="fitall-spinner" />}
           {pending ? '処理中…' : mode === 'move' ? 'この日時に変更する' : 'キャンセルを確定する'}
         </button>
-        <button type="button" className="min-h-11 px-4" disabled={pending} onClick={() => { setMode('closed'); setMessage('') }}>戻る</button>
+        <button type="button" className="fitall-secondary-action w-full" disabled={pending} onClick={() => { setMode('closed'); setMessage('') }}>戻る</button>
       </div>
     </div>}
     {message && <p role="status" className="mt-3 leading-relaxed">{message}</p>}

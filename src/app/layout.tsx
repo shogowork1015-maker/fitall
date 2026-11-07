@@ -15,8 +15,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  viewportFit: 'cover',
   themeColor: '#12C7BE',
 }
 
@@ -33,9 +32,9 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className="min-h-full bg-white font-sans antialiased overscroll-none select-none touch-manipulation"
+        className="min-h-full bg-background font-sans antialiased overscroll-none touch-manipulation"
       >
-        <div className="fitall-device flex min-h-dvh w-full flex-col bg-white">
+        <div className="fitall-device flex w-full flex-col">
           {children}
         </div>
       </body>

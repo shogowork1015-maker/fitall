@@ -60,6 +60,8 @@ export function QuickReservationModal({
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
 
+  const [closing, setClosing] = useState(false)
+
   const dialogRef = useRef<HTMLDialogElement>(null)
   const submittingRef = useRef(false)
 
@@ -77,10 +79,22 @@ export function QuickReservationModal({
 
   if (!open) return null
 
+  // シートを閉じる動きが終わってから親へ通知する
+  function requestClose() {
+    if (saving || closing) return
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced) {
+      onClose()
+      return
+    }
+    setClosing(true)
+    setTimeout(onClose, 260)
+  }
+
   async function submit() {
     if (submittingRef.current) return
     if (!clientId) {
-      setError('お客さんを選択してください')
+      setError('お客様を選択してください')
       return
     }
 
@@ -126,25 +140,27 @@ export function QuickReservationModal({
     <dialog
       ref={dialogRef}
       aria-labelledby="reservation-title"
-      onCancel={(event) => { event.preventDefault(); if (!saving) onClose() }}
-      className="fitall-reservation-dialog"
+      data-closing={closing}
+      onCancel={(event) => { event.preventDefault(); requestClose() }}
+      onClick={(event) => { if (event.target === dialogRef.current) requestClose() }}
+      className="fitall-sheet"
     >
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       <form onSubmit={(event) => { event.preventDefault(); void submit() }} aria-busy={saving}>
         <fieldset disabled={saving} className="min-w-0 border-0 p-0">
           <div className="mb-4 flex items-start justify-between gap-3">
             <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.12em] text-[#087D78]">
+              <p className="fitall-kicker">
                 {preview ? '予約作成プレビュー' : '予約作成'}
               </p>
-              <h2 id="reservation-title" className="mt-1 text-xl font-black text-[#0A0A0A]">
+              <h2 id="reservation-title" className="mt-1 text-xl font-black text-ink">
                 {formatDate(dateKey)} {time}
               </h2>
             </div>
             <button
               type="button"
-              onClick={onClose}
-              className="h-10 w-10 rounded-[8px] border border-[#DDE8E8] text-xl font-bold leading-none text-[#555555]"
+              onClick={requestClose}
+              className="fitall-icon-button"
               aria-label="閉じる"
             >
               ×
@@ -152,37 +168,37 @@ export function QuickReservationModal({
           </div>
 
           {error && (
-            <div role="alert" className="mb-3 rounded-[12px] border border-[#FECACA] bg-[#FEF2F2] px-3 py-2 text-sm font-semibold text-[#D4183D]">
+            <div role="alert" className="mb-3 rounded-control border border-danger-line bg-danger-soft px-3 py-2 text-base font-semibold text-danger">
               {error}
             </div>
           )}
 
           {preview && (
-            <div className="mb-3 rounded-[8px] border border-[#12C7BE] bg-[#E8FBFA] px-3 py-2 text-xs font-bold text-[#087D78]">
+            <div className="mb-3 rounded-control border border-accent bg-accent-soft px-3 py-2 text-base font-bold text-brand">
               プレビューのため、予約は保存されません。
             </div>
           )}
 
           {!clients.length ? (
-            <div className="rounded-[10px] border-2 border-dashed border-[#DDE8E8] bg-white p-5 text-center">
-              <p className="text-sm font-bold text-[#0A0A0A]">先にお客さんを登録してください</p>
+            <div className="rounded-control border-2 border-dashed border-line bg-white p-5 text-center">
+              <p className="text-base font-bold text-ink">先にお客様を登録してください</p>
               <Link
                 href="/trainer/invite"
-                className="mt-3 inline-flex h-11 items-center rounded-[8px] bg-[#0A0A0A] px-4 text-sm font-bold text-white"
+                className="fitall-primary-action mt-3"
               >
                 登録リンクを共有する
               </Link>
             </div>
           ) : (
             <div className="space-y-3">
-              <label htmlFor="reservation-client" className="block text-sm font-bold">お客さん</label>
+              <label htmlFor="reservation-client" className="block text-base font-bold">お客様</label>
               <select
                 id="reservation-client"
                 autoFocus
                 required
                 value={clientId}
                 onChange={(event) => setClientId(event.target.value)}
-                className="h-14 w-full rounded-[8px] border-2 border-[#DDE8E8] bg-white px-3 text-sm font-bold text-[#0A0A0A] outline-none focus:border-[#12C7BE]"
+                className="h-14 w-full rounded-control border border-line bg-white px-3 text-base font-bold text-ink outline-none focus:border-accent"
               >
                 {clients.map((client) => (
                   <option key={client.trainee_id} value={client.trainee_id}>
@@ -191,12 +207,12 @@ export function QuickReservationModal({
                 ))}
               </select>
 
-              <label htmlFor="reservation-menu" className="block text-sm font-bold">メニュー</label>
+              <label htmlFor="reservation-menu" className="block text-base font-bold">メニュー</label>
               <select
                 id="reservation-menu"
                 value={menuId}
                 onChange={(event) => setMenuId(event.target.value)}
-                className="h-14 w-full rounded-[8px] border-2 border-[#DDE8E8] bg-white px-3 text-sm font-bold text-[#0A0A0A] outline-none focus:border-[#12C7BE]"
+                className="h-14 w-full rounded-control border border-line bg-white px-3 text-base font-bold text-ink outline-none focus:border-accent"
               >
                 {!menus.length && <option value="">メニューなし</option>}
                 {menus.map((menu) => (
@@ -207,7 +223,7 @@ export function QuickReservationModal({
               </select>
 
               <div>
-                <label htmlFor="reservation-time" className="mb-1 block text-xs font-black text-[#555555]">
+                <label htmlFor="reservation-time" className="mb-1 block text-base font-medium text-ink-muted">
                   開始時間（5分刻みで変更可）
                 </label>
                 <input
@@ -217,26 +233,26 @@ export function QuickReservationModal({
                   step={300}
                   value={time}
                   onChange={(event) => setTime(event.target.value)}
-                  className="h-14 w-full rounded-[8px] border-2 border-[#DDE8E8] bg-white px-3 text-sm font-bold text-[#0A0A0A] outline-none focus:border-[#12C7BE]"
+                  className="h-14 w-full rounded-control border border-line bg-white px-3 text-base font-bold text-ink outline-none focus:border-accent"
                 />
               </div>
 
-              <label className="flex items-center justify-between rounded-[8px] border-2 border-[#DDE8E8] px-4 py-3 has-[:checked]:border-[#12C7BE] has-[:checked]:bg-[#E8FBFA]">
+              <label className="flex min-h-14 items-center justify-between gap-3 rounded-control border border-line px-4 py-3 has-[:checked]:border-accent has-[:checked]:bg-accent-soft">
                 <span>
-                  <span className="block text-sm font-bold text-[#0A0A0A]">毎週固定で予約</span>
-                  <span className="text-xs font-semibold text-[#6B7280]">同じ曜日・同じ時間でまとめて作成</span>
+                  <span className="block text-base font-bold text-ink">毎週固定で予約</span>
+                  <span className="text-base font-medium text-ink-muted">同じ曜日・同じ時間でまとめて作成</span>
                 </span>
                 <input
                   type="checkbox"
                   checked={repeatEnabled}
                   onChange={(event) => setRepeatEnabled(event.target.checked)}
-                  className="h-5 w-5 accent-[#12C7BE]"
+                  className="h-6 w-6 shrink-0 accent-accent"
                 />
               </label>
 
               {repeatEnabled && (
                 <div>
-                  <label htmlFor="reservation-until" className="mb-1 block text-xs font-bold text-[#6B7280]">固定予約の終了日</label>
+                  <label htmlFor="reservation-until" className="mb-1 block text-base font-medium text-ink-muted">固定予約の終了日</label>
                   <input
                     id="reservation-until"
                     required
@@ -244,7 +260,7 @@ export function QuickReservationModal({
                     type="date"
                     value={repeatUntil}
                     onChange={(event) => setRepeatUntil(event.target.value)}
-                  className="h-12 w-full rounded-[8px] border-2 border-[#DDE8E8] px-3 text-sm font-bold text-[#0A0A0A]"
+                  className="h-14 w-full rounded-control border border-line bg-white px-3 text-base font-bold text-ink"
                   />
                 </div>
               )}
@@ -252,20 +268,21 @@ export function QuickReservationModal({
           )}
 
         </fieldset>
-        <div className="sticky bottom-0 mt-5 flex justify-end gap-2 border-t border-[#DDE8E8] bg-white pt-3 pb-1">
+        <div className="sticky bottom-0 mt-5 grid grid-cols-[auto_1fr] gap-2 border-t border-line bg-white pt-3">
           <button
             type="button"
-            onClick={onClose}
+            onClick={requestClose}
             disabled={saving}
-            className="h-12 rounded-[8px] border border-[#DDE8E8] px-5 text-sm font-bold text-[#555555]"
+            className="h-12 rounded-control border border-line px-5 text-base font-medium text-ink-muted"
           >
             キャンセル
           </button>
           <button
             type="submit"
             disabled={saving || !clients.length}
-            className="h-12 rounded-[8px] bg-[#12C7BE] px-5 text-sm font-black text-white disabled:opacity-40"
+            className="fitall-aqua-action gap-2 disabled:opacity-40"
           >
+            {saving && <span aria-hidden="true" className="fitall-spinner" />}
             {saving ? '保存中…' : preview ? '入力を確認する' : '予約する'}
           </button>
         </div>

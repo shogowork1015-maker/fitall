@@ -95,12 +95,12 @@ function NumericStepper({
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <label className="text-xs font-semibold text-[#9CA3AF]">{label}</label>
+      <label className="text-base font-medium text-ink-faint">{label}</label>
       <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={dec}
-          className="w-14 h-16 flex items-center justify-center bg-[#F5F5F5] border border-gray-200 rounded-[14px] text-2xl font-bold text-[#666666] active:scale-[0.97] transition-transform"
+          className="w-14 h-16 flex items-center justify-center bg-white border border-line rounded-control text-2xl font-bold text-ink-muted active:scale-[0.97] transition-transform"
         >
           −
         </button>
@@ -109,17 +109,17 @@ function NumericStepper({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           inputMode="decimal"
-          className="w-24 h-16 text-center text-3xl font-black bg-[#F5F5F5] rounded-[14px] focus:outline-none focus:ring-2 focus:ring-[#0A0A0A]"
+          className="w-24 h-16 text-center text-3xl font-black bg-white rounded-control focus:outline-none focus:ring-2 focus:ring-accent"
         />
         <button
           type="button"
           onClick={inc}
-          className="w-14 h-16 flex items-center justify-center bg-[#0066FF] text-white rounded-[14px] text-2xl font-bold active:scale-[0.97] transition-transform"
+          className="w-14 h-16 flex items-center justify-center bg-accent-soft text-white rounded-control text-2xl font-bold active:scale-[0.97] transition-transform"
         >
           +
         </button>
       </div>
-      <p className="text-xs text-[#9CA3AF]">{unit}</p>
+      <p className="text-base text-ink-faint">{unit}</p>
     </div>
   )
 }
@@ -429,7 +429,7 @@ export function WorkoutLogger({
 
       {view === 'exercise' ? (
         /* ─── 種目選択ビュー (フルスクリーン人体模型) ──────────────────────────────── */
-        <div className="fixed inset-0 bg-[#F8F9FA] z-30 flex flex-col">
+        <div className="fixed inset-0 bg-surface-soft z-30 flex flex-col">
 
           {/* Header placeholder if needed or relying on HumanBodySelector */}
           <div className="flex-1 overflow-hidden relative">
@@ -446,18 +446,18 @@ export function WorkoutLogger({
                       key={ex.id}
                       type="button"
                       onClick={() => selectExercise(ex)}
-                      className="w-full min-h-16 bg-white rounded-[1.25rem] px-5 py-3 border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-between text-left active:scale-[0.98] transition-transform"
+                      className="w-full min-h-16 bg-white rounded-card px-5 py-3 border border-line shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-between text-left active:scale-[0.98] transition-transform"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className="text-base font-bold text-[#0A0A0A] truncate">{ex.name}</span>
+                        <span className="text-base font-bold text-ink truncate">{ex.name}</span>
                         {doneSets > 0 && (
-                          <span className="flex-shrink-0 text-xs bg-[#DCFCE7] text-[#166534] px-2 py-0.5 rounded-full font-bold">
+                          <span className="flex-shrink-0 text-base bg-accent-soft text-brand px-2 py-0.5 rounded-full font-bold">
                             {doneSets}set済
                           </span>
                         )}
                       </div>
                       {pr && (
-                        <span className="flex-shrink-0 text-xs text-[#9CA3AF] font-medium ml-2">
+                        <span className="flex-shrink-0 text-base text-ink-faint font-medium ml-2">
                           PR {pr}kg
                         </span>
                       )}
@@ -473,17 +473,17 @@ export function WorkoutLogger({
 
       ) : (
         /* ─── セット入力ビュー (フルスクリーン記録画面) ──────────────────────────────── */
-        <div className="fixed inset-0 bg-[#F8F9FA] z-50 overflow-y-auto pb-safe flex flex-col">
+        <div className="fixed inset-0 bg-surface-soft z-50 overflow-y-auto pb-safe flex flex-col">
           {/* Header */}
-          <div className="sticky top-0 z-40 bg-white px-4 py-4 flex items-center justify-between shadow-sm border-b border-gray-100">
+          <div className="sticky top-0 z-40 bg-white px-4 py-4 flex items-center justify-between shadow-sm border-b border-line">
             <button
               type="button"
               onClick={() => setView('exercise')}
-              className="text-2xl font-bold text-[#0066FF] active:scale-95 transition-transform"
+              className="text-2xl font-bold text-brand active:scale-95 transition-transform"
             >
               ‹
             </button>
-            <h2 className="text-lg font-black tracking-[-0.02em] text-[#0A0A0A] truncate px-2">
+            <h2 className="text-lg font-black tracking-[-0.02em] text-ink truncate px-2">
               {selectedExercise?.name}
             </h2>
             <div className="w-8"></div>
@@ -492,27 +492,27 @@ export function WorkoutLogger({
           <div className="p-4 space-y-6 flex-1 flex flex-col">
 
             {/* PR & Session Stopwatch */}
-            <div className="flex items-center justify-between bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between bg-white rounded-card p-4 shadow-sm border border-line">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-[#EBF3FF] text-[#0066FF] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-accent-soft text-brand flex items-center justify-center">
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Elapsed Time</p>
-                  <p className="text-xl font-black tabular-nums text-[#0A0A0A]">
+                  <p className="text-base text-ink-faint font-medium">Elapsed Time</p>
+                  <p className="text-xl font-black tabular-nums text-ink">
                     {formatTime(sessionSeconds)}
                   </p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">PR (Max)</p>
-                <p className="text-xl font-black tabular-nums text-[#0A0A0A]">
+                <p className="text-base text-ink-faint font-medium">PR (Max)</p>
+                <p className="text-xl font-black tabular-nums text-ink">
                   {currentPrForSelected > 0 ? `${currentPrForSelected}kg` : '-'}
                 </p>
                 {sessionActive && (
-                  <p className="mt-1 text-[11px] font-bold text-[#0066FF]">
+                  <p className="mt-1 text-base font-bold text-brand">
                     VOL {formatVolume(totalVolume)}
                   </p>
                 )}
@@ -521,19 +521,19 @@ export function WorkoutLogger({
 
             {/* 前回の記録 + コピーボタン */}
             {prevSets.length > 0 && (
-              <div className="rounded-[1.5rem] border border-gray-200 bg-white p-5 shadow-sm">
+              <div className="rounded-card border border-line bg-white p-5 shadow-sm">
                 <div className="flex items-center justify-between gap-3 mb-2">
                   <div className="min-w-0">
-                    <p className="text-[10px] font-bold text-[#0066FF] uppercase tracking-wider mb-1">Last Time</p>
-                    <p className="text-xl font-black text-[#0A0A0A] tracking-tight">
+                    <p className="text-base font-bold text-brand mb-1">Last Time</p>
+                    <p className="text-xl font-black text-ink tracking-tight">
                       {prevSets[0]!.weight_kg}kg × {prevSets[0]!.reps}rep
-                      <span className="text-sm font-semibold text-gray-400 ml-1">× {prevSets.length}sets</span>
+                      <span className="text-base font-medium text-ink-faint ml-1">× {prevSets.length}sets</span>
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={copyPrevSet}
-                    className="flex-shrink-0 px-5 h-12 bg-gray-100 text-[#0A0A0A] text-sm font-bold rounded-xl active:scale-[0.96] transition-transform"
+                    className="flex-shrink-0 px-5 h-12 bg-gray-100 text-ink text-base font-bold rounded-control active:scale-[0.96] transition-transform"
                   >
                     コピー
                   </button>
@@ -544,7 +544,7 @@ export function WorkoutLogger({
             {/* 今日のセット一覧 */}
             {todaySetsForExercise.length > 0 && (
               <div>
-                <p className="text-sm font-bold text-gray-400 mb-3 ml-2">
+                <p className="text-base font-medium text-ink-faint mb-3 ml-2">
                   Today ({todaySetsForExercise.length} sets)
                 </p>
                 <div className="space-y-2">
@@ -553,13 +553,13 @@ export function WorkoutLogger({
                     return (
                       <div
                         key={s.set_number}
-                        className="flex items-center justify-between bg-white rounded-2xl px-5 py-4 border border-gray-100 shadow-sm"
+                        className="flex items-center justify-between bg-white rounded-card px-5 py-4 border border-line shadow-sm"
                       >
-                        <span className="text-base font-bold text-gray-400">
+                        <span className="text-base font-bold text-ink-faint">
                           Set {s.set_number}
                         </span>
                         <div className="flex items-center gap-2">
-                          <span className="text-xl font-black text-[#0A0A0A] tabular-nums">
+                          <span className="text-xl font-black text-ink tabular-nums">
                             {s.weight_kg}kg × {s.reps}reps
                           </span>
                           {isPrSet && (
@@ -574,8 +574,8 @@ export function WorkoutLogger({
             )}
 
             {/* セット入力 (最下部に固定するか、そのまま並べるか) */}
-            <div className="mt-auto bg-white rounded-[2rem] p-6 shadow-[0_-4px_24px_rgba(0,0,0,0.04)] border border-gray-100">
-              <p className="text-center text-sm font-bold text-[#0066FF] uppercase tracking-[0.2em] mb-6">
+            <div className="mt-auto bg-white rounded-[2rem] p-6 shadow-[0_-4px_24px_rgba(0,0,0,0.04)] border border-line">
+              <p className="text-center text-base font-bold text-brand mb-6">
                 Next: Set {todaySetsForExercise.length + 1}
               </p>
 
@@ -600,7 +600,7 @@ export function WorkoutLogger({
               </div>
 
               {error && (
-                <div className="mb-4 bg-[#FEF2F2] border border-[#FECACA] rounded-xl px-4 py-3 text-sm font-medium text-[#D4183D] text-center">
+                <div className="mb-4 bg-danger-soft border border-danger-line rounded-control px-4 py-3 text-base font-medium text-danger text-center">
                   {error}
                 </div>
               )}
@@ -609,7 +609,7 @@ export function WorkoutLogger({
                 type="button"
                 onClick={addSet}
                 disabled={saving || !weight || !reps || Number(reps) <= 0}
-                className="w-full h-16 bg-[#0066FF] text-white text-lg font-black tracking-widest rounded-2xl disabled:opacity-40 active:scale-[0.98] transition-all shadow-lg shadow-[#0066FF]/30"
+                className="w-full h-16 bg-accent-soft text-white text-lg font-black tracking-widest rounded-card disabled:opacity-40 active:scale-[0.98] transition-all shadow-lg shadow-[#0066FF]/30"
               >
                 {saving
                   ? 'SAVING...'

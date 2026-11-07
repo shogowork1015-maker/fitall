@@ -15,12 +15,11 @@ export function SubmitButton({ children, className, disabled = false }: SubmitBu
     <button
       type="submit"
       disabled={pending || disabled}
-      className={
-        className ??
-        'w-full h-14 bg-[#0A0A0A] text-white text-sm font-bold rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.97] transition-transform'
-      }
+      aria-busy={pending}
+      className={`${className ?? 'fitall-primary-action'} gap-2 disabled:opacity-50`}
     >
-      {pending ? '処理中...' : children}
+      {pending && <span aria-hidden="true" className="fitall-spinner" />}
+      {pending ? '処理中…' : children}
     </button>
   )
 }

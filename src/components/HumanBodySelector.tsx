@@ -50,9 +50,9 @@ export function HumanBodySelector({
 
       {/* Trainee Name / Header */}
       <div className="absolute top-4 left-4 z-10 drop-shadow-sm">
-        <p className="text-[10px] font-bold text-gray-400 tracking-[0.2em] uppercase mb-1">Session Target</p>
-        <h2 className="text-3xl font-black text-[#0A0A0A] tracking-tighter">
-          {traineeName ?? 'Personal'} <span className="text-[#0066FF]">.</span>
+        <p className="text-base font-medium text-ink-faint mb-1">Session Target</p>
+        <h2 className="text-3xl font-black text-ink tracking-tighter">
+          {traineeName ?? 'Personal'} <span className="text-brand">.</span>
         </h2>
       </div>
 
@@ -61,8 +61,8 @@ export function HumanBodySelector({
         <button
           type="button"
           onClick={() => { setIsBack(false); onSelectPart('胸') }}
-          className={`w-12 h-12 flex items-center justify-center rounded-full text-xs font-bold transition-all shadow-sm ${
-            !isBack ? 'bg-[#0A0A0A] text-white scale-110 shadow-lg' : 'bg-white text-gray-400 border border-gray-100'
+          className={`w-12 h-12 flex items-center justify-center rounded-full text-base font-medium transition-all shadow-sm ${
+            !isBack ? 'bg-ink text-white scale-110 shadow-lg' : 'bg-white text-ink-faint border border-line'
           }`}
         >
           前
@@ -70,8 +70,8 @@ export function HumanBodySelector({
         <button
           type="button"
           onClick={() => { setIsBack(true); onSelectPart('背中') }}
-          className={`w-12 h-12 flex items-center justify-center rounded-full text-xs font-bold transition-all shadow-sm ${
-            isBack ? 'bg-[#0A0A0A] text-white scale-110 shadow-lg' : 'bg-white text-gray-400 border border-gray-100'
+          className={`w-12 h-12 flex items-center justify-center rounded-full text-base font-medium transition-all shadow-sm ${
+            isBack ? 'bg-ink text-white scale-110 shadow-lg' : 'bg-white text-ink-faint border border-line'
           }`}
         >
           後
@@ -167,10 +167,10 @@ export function HumanBodySelector({
             {/* Pointing triangle to connect visually with the line ending at x=100 (center) */}
             <div className="w-0 h-0 border-l-[8px] border-r-[8px] border-b-[10px] border-l-transparent border-r-transparent border-b-white mx-auto drop-shadow-sm mb-[-1px]"></div>
 
-            <div className="w-full bg-white/90 backdrop-blur-xl rounded-[1.5rem] border border-gray-100 shadow-[0_12px_40px_rgba(0,0,0,0.08)] px-4 py-4 mb-10 overflow-hidden">
+            <div className="w-full bg-white/90 backdrop-blur-xl rounded-card border border-line shadow-[0_12px_40px_rgba(0,0,0,0.08)] px-4 py-4 mb-10 overflow-hidden">
               <div className="flex items-center gap-2 mb-3 px-2">
-                <span className="w-2 h-2 rounded-full bg-[#0066FF] animate-pulse"></span>
-                <span className="text-sm font-bold tracking-widest text-[#0066FF] uppercase">{selectedPart}</span>
+                <span className="w-2 h-2 rounded-full bg-accent-soft animate-pulse"></span>
+                <span className="text-base font-bold text-brand">{selectedPart}</span>
               </div>
               <div className="max-h-[35vh] overflow-y-auto scrollbar-hide space-y-2">
                 {exerciseMenu}

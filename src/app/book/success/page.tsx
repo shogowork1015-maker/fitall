@@ -23,28 +23,28 @@ export default async function PublicBookingSuccessPage({ searchParams }: PagePro
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white px-4">
-      <div className="w-full max-w-[390px] border-2 border-[#0A0A0A] bg-white p-5 text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center border-2 border-[#0A0A0A] bg-[#12C7BE] text-white">
+      <div className="w-full max-w-[390px] border border-ink bg-white p-5 text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center border border-ink bg-accent text-ink">
           <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 6 9 17l-5-5" />
           </svg>
         </div>
-        <p className="mt-5 text-[10px] font-black tracking-[0.16em] text-[#087D78]">TICKETS</p>
-        <h1 className="mt-2 text-2xl font-black tracking-tight text-[#0A0A0A]">
+        <p className="mt-5 text-base font-bold text-brand">チケット</p>
+        <h1 className="mt-2 text-2xl font-black tracking-tight text-ink">
           チケットの購入手続き
         </h1>
-        <p className="mt-3 text-sm font-medium leading-relaxed text-[#666666]">
+        <p className="mt-3 text-base font-medium leading-relaxed text-ink-muted">
           決済完了後にチケットが反映されます。LINEを連携してマイページを開き、残りチケットを確認してから予約日時を選んでください。
         </p>
         {lineStatus && (
-          <p className="mt-4 border-2 border-[#DDE8E8] bg-[#F4F7F7] px-3 py-2 text-xs font-bold text-[#0A0A0A]">
+          <p className="mt-4 border border-line bg-surface-soft px-3 py-2 text-base font-bold text-ink">
             {lineStatus}
           </p>
         )}
         {sessionId && params?.line !== 'connected' && params?.line !== 'not-paid' && (
           <Link
             href={`/api/line/connect/start?session_id=${encodeURIComponent(sessionId)}`}
-            className="mt-5 inline-flex h-[52px] w-full items-center justify-center border-2 border-[#12C7BE] bg-[#12C7BE] px-6 text-sm font-black text-white"
+            className="mt-5 inline-flex h-[52px] w-full items-center justify-center border border-accent bg-accent px-6 text-base font-bold text-ink"
           >
             LINEを連携してマイページへ
           </Link>
@@ -52,14 +52,14 @@ export default async function PublicBookingSuccessPage({ searchParams }: PagePro
         {params?.line === 'connected' ? (
           <Link
             href="/customer/app"
-            className="mt-3 inline-flex h-12 w-full items-center justify-center border-2 border-[#0A0A0A] bg-[#0A0A0A] px-6 text-sm font-bold text-white"
+            className="mt-3 inline-flex h-12 w-full items-center justify-center border border-ink bg-ink px-6 text-base font-bold text-white"
           >
             お客様アプリを開く
           </Link>
         ) : (
           <Link
             href="/auth/login"
-            className="mt-3 inline-flex h-12 w-full items-center justify-center border-2 border-[#0A0A0A] bg-white px-6 text-sm font-bold text-[#0A0A0A]"
+            className="mt-3 inline-flex h-12 w-full items-center justify-center border border-ink bg-white px-6 text-base font-bold text-ink"
           >
             閉じる
           </Link>

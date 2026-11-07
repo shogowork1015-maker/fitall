@@ -15,7 +15,7 @@ export type BodyWeightData = { date: string; weight: number; bodyFat?: number | 
 export function BodyWeightChart({ data }: { data: BodyWeightData[] }) {
   if (!data.length) {
     return (
-      <div className="p-4 text-center text-sm text-[#A0A0A0]">
+      <div className="p-4 text-center text-base text-ink-faint">
         体重記録がありません
       </div>
     )

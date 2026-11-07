@@ -1,520 +1,898 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   デザイントークン
+   色・角丸・影・動きはここだけで定義する。デザイン差し替え時はこのブロックを変更する。
+   ========================================================================== */
 :root {
-  --fitall-bg:       #FFFFFF;
-  --fitall-surface:  #FFFFFF;
-  --fitall-dark:     #0A0A0A;
-  --fitall-dark-2:   #444444;
-  --fitall-accent:   #12C7BE;
-  --fitall-accent-2: #12C7BE;
-  --fitall-text:     #0A0A0A;
-  --fitall-muted:    #555555;
-  --fitall-tertiary: #A8B2B2;
-  --fitall-border:   rgba(10,10,10,0.12);
-  --fitall-success:  #12C7BE;
-  --fitall-error:    #D4183D;
-  --fitall-aqua-soft: #E8FBFA;
-  --fitall-grid: #DDE8E8;
-  --fitall-ink-soft: #F4F7F7;
+  /* 面 */
+  --fitall-bg: #F4F7F7;
+  --fitall-surface: #FFFFFF;
+  --fitall-surface-soft: #EEF3F3;
+
+  /* 文字 */
+  --fitall-ink: #0A0A0A;
+  --fitall-ink-muted: #4F5B5B;
+  --fitall-ink-faint: #6B7878; /* 非アクティブなタブなど。白地で4.5:1以上を保つ */
+
+  /* ブランド。アクアは塗り専用、文字にはコントラストの取れる brand を使う */
+  --fitall-accent: #12C7BE;
+  --fitall-accent-soft: #E3F8F6;
+  --fitall-brand: #087D78;
+
+  /* 線 */
+  --fitall-line: #DCE6E6;
+
+  /* 状態 */
+  --fitall-danger: #C8102E;
+  --fitall-danger-soft: #FDEEF0;
+  --fitall-danger-line: #F6C5CD;
+
+  /* 形 */
+  --fitall-radius-chip: 8px;
+  --fitall-radius-control: 12px;
+  --fitall-radius-card: 16px;
+
+  /* 影 */
+  --fitall-shadow-card: 0 1px 2px rgb(10 10 10 / 4%), 0 2px 8px rgb(10 10 10 / 4%);
+  --fitall-shadow-raised: 0 8px 24px rgb(10 10 10 / 14%);
+
+  /* 寸法 */
+  --fitall-tap: 56px;
+  --fitall-tabbar: 72px;
+  --fitall-safe-top: env(safe-area-inset-top, 0px);
+  --fitall-safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* 動き */
+  --fitall-motion-fast: 120ms;
+  --fitall-motion-base: 220ms;
+  --fitall-motion-slow: 320ms;
+  --fitall-ease-out: cubic-bezier(.2, .8, .2, 1);
+  --fitall-ease-spring: cubic-bezier(.34, 1.4, .64, 1);
 }
 
 @theme inline {
   --color-background: var(--fitall-bg);
-  --color-foreground: var(--fitall-text);
-  --font-sans: "Yu Gothic", "YuGothic", "游ゴシック体",
-               "Hiragino Kaku Gothic ProN", "Hiragino Sans",
-               "Meiryo", sans-serif;
+  --color-foreground: var(--fitall-ink);
+  --color-ink: var(--fitall-ink);
+  --color-ink-muted: var(--fitall-ink-muted);
+  --color-ink-faint: var(--fitall-ink-faint);
+  --color-accent: var(--fitall-accent);
+  --color-accent-soft: var(--fitall-accent-soft);
+  --color-brand: var(--fitall-brand);
+  --color-line: var(--fitall-line);
+  --color-surface-soft: var(--fitall-surface-soft);
+  --color-danger: var(--fitall-danger);
+  --color-danger-soft: var(--fitall-danger-soft);
+  --color-danger-line: var(--fitall-danger-line);
+
+  --radius-chip: var(--fitall-radius-chip);
+  --radius-control: var(--fitall-radius-control);
+  --radius-card: var(--fitall-radius-card);
+
+  /* 900は英数字が横に広がりすぎるため、もっとも太い字を800に抑える */
+  --font-weight-black: 800;
+
+  --font-sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "YuGothic",
+               "Yu Gothic", "Meiryo", system-ui, sans-serif;
 }
 
-body {
-  background: var(--fitall-bg);
-  color: var(--fitall-text);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: geometricPrecision;
+/* ==========================================================================
+   土台
+   ========================================================================== */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--fitall-bg);
+    color: var(--fitall-ink);
+    font-feature-settings: "palt";
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .02em;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* タップ領域は全画面で56px以上を保証する（プロジェクトルール） */
+  button,
+  select,
+  summary,
+  input:not([type="checkbox"], [type="radio"], [type="range"], [type="hidden"]) {
+    font-size: 16px;
+    min-height: var(--fitall-tap);
+  }
+
+  textarea {
+    font-size: 16px;
+  }
+
+  input:not([type="checkbox"], [type="radio"], [type="range"]),
+  select,
+  textarea {
+    background-color: var(--fitall-surface);
+    border-radius: var(--fitall-radius-control);
+  }
+
+  button,
+  summary,
+  [role="button"] {
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--fitall-brand);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: rgb(18 199 190 / 24%);
+  }
 }
 
-::selection {
-  background: rgba(18, 199, 190, 0.24);
-}
-
-.fitall-device {
-  background:
-    linear-gradient(180deg, rgba(18, 199, 190, 0.10), transparent 220px),
-    #ffffff;
-  max-width: 100vw;
-  overflow-x: hidden;
-  width: 100%;
-}
-
-.fitall-trainer-shell {
-  background: #ffffff;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-}
-
-.fitall-trainer-main {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-}
-
-.fitall-mobile-ui {
-  display: block;
-}
-
-.fitall-desktop-ui {
-  display: none;
-}
-
-.fitall-device *,
-.fitall-device *::before,
-.fitall-device *::after {
-  box-sizing: border-box;
-  min-width: 0;
-}
-
-.fitall-device [class*="bg-[#F5F5F5]"],
-.fitall-device [class*="bg-gray-50"],
-.fitall-device [class*="bg-[#F8FAFC]"] {
-  background-color: #ffffff !important;
-}
-
-.fitall-device [class*="bg-[#0066FF]"],
-.fitall-device [class*="bg-[#EFF6FF]"],
-.fitall-device [class*="bg-[#DCFCE7]"],
-.fitall-device [class*="bg-[#E5E5FF]"],
-.fitall-device [class*="bg-[#06C755]"],
-.fitall-device [class*="bg-[#FEF3C7]"],
-.fitall-device [class*="bg-[#FFF7ED]"],
-.fitall-device [class*="bg-[#FFF9F5]"],
-.fitall-device [class*="bg-[#FF6B35]"] {
-  background-color: var(--fitall-aqua-soft) !important;
-}
-
-.fitall-device [class*="text-[#0066FF]"],
-.fitall-device [class*="text-[#1D4ED8]"],
-.fitall-device [class*="text-[#166534]"],
-.fitall-device [class*="text-[#06C755]"],
-.fitall-device [class*="text-[#92400E]"],
-.fitall-device [class*="text-[#FF6B35]"],
-.fitall-device [class*="text-[#E55B25]"] {
-  color: #087D78 !important;
-}
-
-.fitall-device [class*="border-[#BFDBFE]"],
-.fitall-device [class*="border-[#E5E7EB]"],
-.fitall-device [class*="border-[#FDE68A]"],
-.fitall-device [class*="border-[#FED7AA]"],
-.fitall-device [class*="border-gray-100"],
-.fitall-device [class*="border-gray-200"] {
-  border-color: var(--fitall-grid) !important;
-}
-
-.fitall-device [class*="bg-[#1A1A2E]"],
-.fitall-device [class*="bg-[#2A2A4A]"] {
-  background-color: #0A0A0A !important;
-}
-
-.fitall-device [class*="text-[#1A1A2E]"],
-.fitall-device [class*="text-[#2A2A4A]"] {
-  color: #0A0A0A !important;
-}
-
-.fitall-device [class*="rounded-[1.25rem]"],
-.fitall-device [class*="rounded-[1.5rem]"],
-.fitall-device [class*="rounded-[20px]"],
-.fitall-device [class*="rounded-[24px]"],
-.fitall-device [class*="rounded-[28px]"],
-.fitall-device .rounded-2xl,
-.fitall-device .rounded-xl {
-  border-radius: 6px !important;
-}
-
-.fitall-device [class*="shadow-"],
-.fitall-device [class*="shadow_"],
-.fitall-device [class*="shadow-["] {
-  box-shadow: none !important;
-}
-
-.fitall-device button,
-.fitall-device a {
-  transition:
-    transform 160ms ease,
-    background-color 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease,
-    opacity 160ms ease;
-}
-
-.fitall-device button:active,
-.fitall-device a:active {
-  transform: translateY(1px) scale(0.99);
-}
-
-.fitall-device nav {
-  border-top: 2px solid var(--fitall-grid) !important;
-}
-
-.fitall-device input,
-.fitall-device select,
-.fitall-device textarea {
-  border-radius: 8px !important;
-}
-
-.fitall-page {
-  background: #ffffff;
-  color: var(--fitall-dark);
-  min-height: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-  width: 100%;
-}
-
-.fitall-scroll {
-  height: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  width: 100%;
-}
-
-.fitall-topbar {
-  align-items: center;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px);
-  border-bottom: 2px solid var(--fitall-grid);
-  display: flex;
-  height: 60px;
-  justify-content: space-between;
-  padding: 12px 16px;
-  position: sticky;
-  top: 0;
-  z-index: 40;
-}
-
-.fitall-page-pad {
-  margin-left: 16px;
-  margin-right: 16px;
-  max-width: 100%;
-  overflow-x: hidden;
-  padding: 18px 0 112px;
-}
-
-.fitall-card {
-  background: #ffffff;
-  border: 2px solid var(--fitall-grid);
-  border-radius: 6px;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
-
-.fitall-card-strong {
-  background: #ffffff;
-  border: 2px solid var(--fitall-dark);
-  border-radius: 6px;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
-
-.fitall-kicker {
-  color: #087D78;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-}
-
-.fitall-section-title {
-  color: var(--fitall-dark);
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
-.fitall-muted {
-  color: var(--fitall-muted);
-  font-weight: 700;
-}
-
-.fitall-pill {
-  align-items: center;
-  border: 1px solid var(--fitall-grid);
-  border-radius: 999px;
-  display: inline-flex;
-  font-size: 11px;
-  font-weight: 900;
-  min-height: 28px;
-  padding: 0 10px;
-}
-
-.fitall-pill-aqua {
-  background: var(--fitall-aqua-soft);
-  border-color: rgba(18, 199, 190, .35);
-  color: #087D78;
-}
-
-.fitall-primary-action {
-  align-items: center;
-  background: var(--fitall-dark);
-  border: 2px solid var(--fitall-dark);
-  border-radius: 6px;
-  color: #ffffff;
-  display: inline-flex;
-  font-size: 14px;
-  font-weight: 900;
-  height: 52px;
-  justify-content: center;
-  padding: 0 18px;
-  width: 100%;
-}
-
-.fitall-secondary-action {
-  align-items: center;
-  background: #ffffff;
-  border: 2px solid var(--fitall-grid);
-  border-radius: 6px;
-  color: var(--fitall-dark);
-  display: inline-flex;
-  font-size: 13px;
-  font-weight: 900;
-  height: 48px;
-  justify-content: center;
-  padding: 0 14px;
-}
-
-.fitall-aqua-action {
-  align-items: center;
-  background: var(--fitall-accent);
-  border: 2px solid var(--fitall-accent);
-  border-radius: 6px;
-  color: #ffffff;
-  display: inline-flex;
-  font-size: 14px;
-  font-weight: 900;
-  height: 52px;
-  justify-content: center;
-  padding: 0 18px;
-  width: 100%;
-}
-
-.fitall-tap {
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
-.fitall-tap:hover {
-  border-color: var(--fitall-dark);
-}
-
-.fitall-tap:active {
-  transform: translateY(1px) scale(.99);
-}
-
-.fitall-table-head {
-  background: var(--fitall-dark);
-  color: #ffffff;
-}
-
-.fitall-rail {
-  background: linear-gradient(90deg, var(--fitall-accent), var(--fitall-accent)) left bottom / 0 3px no-repeat;
-  transition: background-size 420ms ease;
-}
-
-.fitall-rail:hover {
-  background-size: 100% 3px;
-}
-
-.fitall-focus-ring:focus-visible {
-  outline: 3px solid rgba(18, 199, 190, .32);
-  outline-offset: 2px;
-}
-
-.fitall-step {
-  align-items: center;
-  border-top: 1px solid var(--fitall-grid);
-  display: grid;
-  gap: 12px;
-  grid-template-columns: 34px 1fr;
-  padding: 14px 0;
-}
-
-.fitall-step:first-child {
-  border-top: 0;
-  padding-top: 0;
-}
-
-.fitall-step-num {
-  align-items: center;
-  background: var(--fitall-dark);
-  border-radius: 4px;
-  color: #ffffff;
-  display: flex;
-  font-size: 12px;
-  font-weight: 900;
-  height: 34px;
-  justify-content: center;
-  width: 34px;
-}
-
-@media (min-width: 768px) {
+/* 部品はcomponentsレイヤーに置き、Tailwindのユーティリティで上書きできるようにする */
+@layer components {
+  /* ==========================================================================
+     画面の骨格
+     ========================================================================== */
   .fitall-device {
-    background: #F7FBFB;
-  }
-
-  .fitall-trainer-shell {
-    background: #F7FBFB;
-    display: block;
-    height: 100vh;
-  }
-
-  .fitall-trainer-main {
-    height: 100vh;
-    margin-left: 260px;
-    overflow-y: auto;
-  }
-
-  .fitall-mobile-ui {
-    display: none !important;
-  }
-
-  .fitall-desktop-ui {
-    display: block;
-  }
-
-  .fitall-desktop-page {
-    min-height: 100vh;
-    padding: 32px;
-  }
-
-  .fitall-desktop-container {
-    margin: 0 auto;
-    max-width: 1180px;
+    max-width: 100vw;
+    min-height: 100dvh;
+    overflow-x: hidden;
     width: 100%;
   }
 
-  .fitall-desktop-header {
-    align-items: end;
+  .fitall-device *,
+  .fitall-device *::before,
+  .fitall-device *::after {
+    box-sizing: border-box;
+    min-width: 0;
+  }
+
+  /* トレーナー画面: 高さを画面に固定し、main だけをスクロールさせてタブを常に見せる */
+  .fitall-trainer-shell {
     display: flex;
-    gap: 24px;
+    flex-direction: column;
+    height: 100dvh;
+    width: 100%;
+  }
+
+  .fitall-trainer-main {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* お客様画面: 中央カラムを画面の高さまで伸ばし、タブ分の余白を確保する */
+  .fitall-customer-main {
+    margin: 0 auto;
+    max-width: 480px;
+    min-height: 100dvh;
+    padding-bottom: calc(var(--fitall-tabbar) + var(--fitall-safe-bottom));
+    width: 100%;
+  }
+
+  .fitall-mobile-ui {
+    display: block;
+  }
+
+  .fitall-desktop-ui {
+    display: none;
+  }
+
+  .fitall-page {
+    color: var(--fitall-ink);
+    max-width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  .fitall-scroll {
+    height: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    width: 100%;
+  }
+
+  .fitall-topbar {
+    align-items: center;
+    backdrop-filter: blur(16px);
+    background: rgb(255 255 255 / 92%);
+    border-bottom: 1px solid var(--fitall-line);
+    display: flex;
+    min-height: calc(64px + var(--fitall-safe-top));
     justify-content: space-between;
-    margin-bottom: 24px;
+    padding: var(--fitall-safe-top) 8px 0;
+    position: sticky;
+    top: 0;
+    z-index: 40;
   }
 
-  .fitall-desktop-title {
-    color: var(--fitall-dark);
-    font-size: 34px;
-    font-weight: 900;
-    letter-spacing: 0;
-    line-height: 1.1;
+  .fitall-topbar a,
+  .fitall-topbar button {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    min-height: var(--fitall-tap);
   }
 
-  .fitall-desktop-grid {
+  .fitall-page-pad {
+    max-width: 100%;
+    padding: 16px 16px 32px;
+  }
+
+  /* ==========================================================================
+     カード・文字
+     ========================================================================== */
+  .fitall-card,
+  .fitall-card-strong {
+    background: var(--fitall-surface);
+    border: 1px solid var(--fitall-line);
+    border-radius: var(--fitall-radius-card);
+    box-shadow: var(--fitall-shadow-card);
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .fitall-kicker {
+    color: var(--fitall-brand);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .fitall-section-title {
+    color: var(--fitall-ink);
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .fitall-muted {
+    color: var(--fitall-ink-muted);
+    font-weight: 500;
+  }
+
+  .fitall-pill {
+    align-items: center;
+    border: 1px solid var(--fitall-line);
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 16px;
+    font-weight: 700;
+    min-height: 32px;
+    padding: 0 12px;
+  }
+
+  .fitall-pill-aqua {
+    background: var(--fitall-accent-soft);
+    border-color: rgb(18 199 190 / 35%);
+    color: var(--fitall-brand);
+  }
+
+  .fitall-table-head {
+    background: var(--fitall-ink);
+    color: #ffffff;
+  }
+
+  .fitall-step {
+    align-items: center;
+    border-top: 1px solid var(--fitall-line);
     display: grid;
-    gap: 16px;
+    gap: 12px;
+    grid-template-columns: 36px 1fr;
+    padding: 14px 0;
   }
 
-  .fitall-desktop-card {
-    background: #ffffff;
-    border: 2px solid var(--fitall-grid);
-    border-radius: 6px;
+  .fitall-step:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .fitall-step-num {
+    align-items: center;
+    background: var(--fitall-ink);
+    border-radius: 999px;
+    color: #ffffff;
+    display: flex;
+    font-size: 16px;
+    font-weight: 800;
+    height: 36px;
+    justify-content: center;
+    width: 36px;
+  }
+
+  /* ==========================================================================
+     ボタン
+     ========================================================================== */
+  .fitall-primary-action,
+  .fitall-aqua-action,
+  .fitall-secondary-action,
+  .fitall-danger-action {
+    align-items: center;
+    border-radius: var(--fitall-radius-control);
+    display: inline-flex;
+    font-size: 16px;
+    font-weight: 700;
+    justify-content: center;
+    min-height: var(--fitall-tap);
+    padding: 8px 18px;
+    text-align: center;
+  }
+
+  .fitall-primary-action,
+  .fitall-aqua-action {
+    width: 100%;
+  }
+
+  .fitall-primary-action {
+    background: var(--fitall-ink);
+    color: #ffffff;
+  }
+
+  /* アクアの上は白文字だと読みにくいため黒文字にする */
+  .fitall-aqua-action {
+    background: var(--fitall-accent);
+    color: var(--fitall-ink);
+  }
+
+  .fitall-secondary-action {
+    background: var(--fitall-surface);
+    border: 1px solid var(--fitall-line);
+    color: var(--fitall-ink);
+  }
+
+  .fitall-danger-action {
+    background: var(--fitall-danger);
+    color: #ffffff;
+  }
+
+  .fitall-tap {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .fitall-icon-button {
+    align-items: center;
+    background: var(--fitall-surface);
+    border: 1px solid var(--fitall-line);
+    border-radius: var(--fitall-radius-control);
+    color: var(--fitall-ink);
+    display: inline-flex;
+    flex: none;
+    font-size: 24px;
+    font-weight: 700;
+    height: var(--fitall-tap);
+    justify-content: center;
+    line-height: 1;
+    width: var(--fitall-tap);
+  }
+
+  /* カレンダー等の主要操作。親指の届く右下に固定する */
+  .fitall-fab {
+    align-items: center;
+    background: var(--fitall-ink);
+    border-radius: 999px;
+    bottom: calc(var(--fitall-tabbar) + var(--fitall-safe-bottom) + 16px);
+    box-shadow: var(--fitall-shadow-raised);
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 32px;
+    font-weight: 500;
+    height: 64px;
+    justify-content: center;
+    line-height: 1;
+    position: fixed;
+    right: 16px;
+    width: 64px;
+    z-index: 30;
+  }
+
+  @media (min-width: 768px) {
+    .fitall-fab {
+      display: none;
+    }
+  }
+
+  .fitall-spinner {
+    animation: fitall-spin 700ms linear infinite;
+    border: 2px solid currentcolor;
+    border-radius: 999px;
+    border-right-color: transparent;
+    display: inline-block;
+    flex: none;
+    height: 18px;
+    width: 18px;
+  }
+
+  /* ==========================================================================
+     セグメント切替（日／週／月）
+     ========================================================================== */
+  .fitall-segmented {
+    background: var(--fitall-surface-soft);
+    border-radius: var(--fitall-radius-control);
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    padding: 4px;
+    position: relative;
+  }
+
+  .fitall-segmented-thumb {
+    background: var(--fitall-surface);
+    border-radius: 9px;
+    bottom: 4px;
+    box-shadow: 0 1px 3px rgb(10 10 10 / 14%);
+    left: 4px;
+    position: absolute;
+    top: 4px;
+    transition: transform var(--fitall-motion-base) var(--fitall-ease-out);
+    width: calc((100% - 8px) / var(--fitall-segment-count));
+  }
+
+  .fitall-segmented button {
+    background: transparent;
+    border-radius: 9px;
+    color: var(--fitall-ink-muted);
+    font-weight: 700;
+    min-height: 48px;
+    position: relative;
+    transition: color var(--fitall-motion-fast) ease;
+    z-index: 1;
+  }
+
+  .fitall-segmented button[aria-pressed="true"] {
+    color: var(--fitall-ink);
+  }
+
+  /* ==========================================================================
+     下部タブ
+     ========================================================================== */
+  .fitall-tabbar {
+    background: rgb(255 255 255 / 96%);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--fitall-line);
+    display: grid;
+    grid-template-columns: repeat(var(--fitall-tab-count), minmax(0, 1fr));
+    height: calc(var(--fitall-tabbar) + var(--fitall-safe-bottom));
+    padding-bottom: var(--fitall-safe-bottom);
+    position: relative;
+    width: 100%;
+    z-index: 50;
+  }
+
+  .fitall-tabbar-fixed {
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+  }
+
+  .fitall-tabbar-indicator {
+    display: flex;
+    justify-content: center;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    top: -1px;
+    transition: transform var(--fitall-motion-base) var(--fitall-ease-out);
+    width: calc(100% / var(--fitall-tab-count));
+  }
+
+  .fitall-tabbar-indicator::before {
+    background: var(--fitall-accent);
+    border-radius: 0 0 4px 4px;
+    content: "";
+    height: 3px;
+    width: 36px;
+  }
+
+  .fitall-tab {
+    align-items: center;
+    color: var(--fitall-ink-faint);
+    display: flex;
+    flex-direction: column;
+    font-size: 16px;
+    font-weight: 700;
+    gap: 2px;
+    height: var(--fitall-tabbar);
+    justify-content: center;
+    line-height: 1.1;
+    transition: color var(--fitall-motion-fast) ease;
+  }
+
+  .fitall-tab[aria-current="page"] {
+    color: var(--fitall-ink);
+  }
+
+  .fitall-tab[aria-current="page"] svg {
+    animation: fitall-tab-pop var(--fitall-motion-slow) var(--fitall-ease-spring);
+  }
+
+  /* ==========================================================================
+     開閉パネル・シート
+     ========================================================================== */
+  .fitall-details {
+    background: var(--fitall-surface);
+    border: 1px solid var(--fitall-line);
+    border-radius: var(--fitall-radius-card);
+    box-shadow: var(--fitall-shadow-card);
     overflow: hidden;
   }
+
+  .fitall-details > summary {
+    align-items: center;
+    display: flex;
+    font-weight: 700;
+    gap: 12px;
+    justify-content: space-between;
+    list-style: none;
+    padding: 8px 16px;
+  }
+
+  .fitall-details > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .fitall-details > summary::after {
+    color: var(--fitall-ink-faint);
+    content: "›";
+    flex: none;
+    font-size: 24px;
+    line-height: 1;
+    transition: transform var(--fitall-motion-base) var(--fitall-ease-out);
+  }
+
+  .fitall-details[open] > summary::after {
+    transform: rotate(90deg);
+  }
+
+  .fitall-details[open] > :not(summary) {
+    animation: fitall-rise var(--fitall-motion-base) var(--fitall-ease-out) backwards;
+  }
+
+  /* スマホでは親指で操作できる下からのシート、PCでは中央のダイアログにする */
+  .fitall-sheet {
+    background: var(--fitall-surface);
+    border: 0;
+    border-radius: 20px 20px 0 0;
+    color: var(--fitall-ink);
+    margin: auto auto 0;
+    max-height: calc(100dvh - 24px - var(--fitall-safe-top));
+    max-width: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 20px 16px calc(12px + var(--fitall-safe-bottom));
+    transition:
+      transform var(--fitall-motion-slow) var(--fitall-ease-out),
+      opacity var(--fitall-motion-base) ease,
+      overlay var(--fitall-motion-slow) allow-discrete,
+      display var(--fitall-motion-slow) allow-discrete;
+    width: 100%;
+  }
+
+  @starting-style {
+    .fitall-sheet[open] {
+      transform: translateY(100%);
+    }
+  }
+
+  .fitall-sheet[data-closing="true"] {
+    transform: translateY(100%);
+  }
+
+  .fitall-sheet::backdrop {
+    background: rgb(10 10 10 / 45%);
+    transition: opacity var(--fitall-motion-slow) ease;
+  }
+
+  @starting-style {
+    .fitall-sheet[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  .fitall-sheet[data-closing="true"]::backdrop {
+    opacity: 0;
+  }
+
+  /* ==========================================================================
+     読み込み中の骨組み
+     ========================================================================== */
+  .fitall-skeleton {
+    animation: fitall-shimmer 1.3s ease-in-out infinite;
+    background: linear-gradient(100deg,
+      var(--fitall-surface-soft) 30%, #FFFFFF 50%, var(--fitall-surface-soft) 70%);
+    background-size: 220% 100%;
+    border-radius: var(--fitall-radius-chip);
+  }
+
+  /* ==========================================================================
+     トースト
+     ========================================================================== */
+  .fitall-toast {
+    align-items: center;
+    animation: fitall-toast-in var(--fitall-motion-slow) var(--fitall-ease-spring) backwards;
+    background: var(--fitall-ink);
+    border-radius: var(--fitall-radius-control);
+    box-shadow: var(--fitall-shadow-raised);
+    color: #ffffff;
+    display: flex;
+    font-size: 16px;
+    font-weight: 700;
+    gap: 10px;
+    left: 16px;
+    margin: 0 auto;
+    max-width: 480px;
+    padding: 14px 16px;
+    position: fixed;
+    right: 16px;
+    top: calc(var(--fitall-safe-top) + 12px);
+    z-index: 100;
+  }
+
+  .fitall-toast[data-leaving="true"] {
+    opacity: 0;
+    transform: translateY(-8px);
+    transition:
+      opacity var(--fitall-motion-base) ease,
+      transform var(--fitall-motion-base) ease;
+  }
+
+  .fitall-toast-check {
+    align-items: center;
+    animation: fitall-pop var(--fitall-motion-slow) var(--fitall-ease-spring) 80ms backwards;
+    background: var(--fitall-accent);
+    border-radius: 999px;
+    color: var(--fitall-ink);
+    display: flex;
+    flex: none;
+    font-size: 16px;
+    height: 24px;
+    justify-content: center;
+    width: 24px;
+  }
+
+  /* ==========================================================================
+     動き
+     新しい画面の中身が現れるときだけ動かす。読み込み骨組みは待たせないよう動かさない。
+     ========================================================================== */
+  .fitall-trainer-main > :not(.fitall-loading-screen),
+  .fitall-customer-main > :not(.fitall-loading-screen) {
+    animation: fitall-rise var(--fitall-motion-base) var(--fitall-ease-out) backwards;
+  }
+
+  /* 一覧の項目を順番に出す。遅延はstyleのanimationDelayで指定する */
+  .fitall-card-pop {
+    animation: fitall-rise var(--fitall-motion-slow) var(--fitall-ease-out) backwards;
+  }
+
+  /* カレンダーの期間移動は進む方向へ動かす */
+  .fitall-slide-next {
+    animation: fitall-slide-next var(--fitall-motion-base) var(--fitall-ease-out) backwards;
+  }
+
+  .fitall-slide-prev {
+    animation: fitall-slide-prev var(--fitall-motion-base) var(--fitall-ease-out) backwards;
+  }
+
+  .fitall-fade {
+    animation: fitall-fade var(--fitall-motion-base) ease backwards;
+  }
+
+  /* 進捗バーは表示時に左から伸ばす */
+  .fitall-grow-x {
+    animation: fitall-grow-x 700ms var(--fitall-ease-out) 120ms backwards;
+    transform-origin: left center;
+  }
+
+  /* 一度だけ注意を引く印（承認待ちの点など） */
+  .fitall-pop {
+    animation: fitall-pop var(--fitall-motion-slow) var(--fitall-ease-spring) 240ms backwards;
+  }
+
+  /* 押した瞬間に反応を返す */
+  .fitall-device button,
+  .fitall-device a,
+  .fitall-sheet button,
+  .fitall-sheet a {
+    transition:
+      transform var(--fitall-motion-fast) var(--fitall-ease-out),
+      background-color var(--fitall-motion-fast) ease,
+      border-color var(--fitall-motion-fast) ease,
+      color var(--fitall-motion-fast) ease,
+      opacity var(--fitall-motion-fast) ease;
+  }
+
+  .fitall-device button:active:not(:disabled),
+  .fitall-device a:active,
+  .fitall-sheet button:active:not(:disabled) {
+    transform: scale(.97);
+  }
+
+  .fitall-device .fitall-card:active,
+  .fitall-device .fitall-desktop-card:active {
+    transform: scale(.985);
+  }
+
+  @media (hover: hover) {
+    .fitall-tap:hover,
+    .fitall-secondary-action:hover {
+      border-color: var(--fitall-ink);
+    }
+
+    .fitall-primary-action:hover {
+      background: #262626;
+    }
+
+    .fitall-aqua-action:hover {
+      background: #0FB5AD;
+    }
+  }
+
+  @keyframes fitall-rise {
+    from { opacity: 0; transform: translateY(8px); }
+  }
+
+  @keyframes fitall-fade {
+    from { opacity: 0; }
+  }
+
+  @keyframes fitall-slide-next {
+    from { opacity: 0; transform: translateX(16px); }
+  }
+
+  @keyframes fitall-slide-prev {
+    from { opacity: 0; transform: translateX(-16px); }
+  }
+
+  @keyframes fitall-grow-x {
+    from { transform: scaleX(0); }
+  }
+
+  @keyframes fitall-pop {
+    from { opacity: 0; transform: scale(.4); }
+  }
+
+  @keyframes fitall-tab-pop {
+    from { transform: scale(.82); }
+  }
+
+  @keyframes fitall-toast-in {
+    from { opacity: 0; transform: translateY(-16px); }
+  }
+
+  @keyframes fitall-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes fitall-shimmer {
+    from { background-position: 120% 0; }
+    to { background-position: -120% 0; }
+  }
+
+  /* ==========================================================================
+     PC
+     ========================================================================== */
+  @media (min-width: 768px) {
+    .fitall-trainer-shell {
+      display: block;
+      height: 100vh;
+    }
+
+    .fitall-trainer-main {
+      height: 100vh;
+      margin-left: 260px;
+    }
+
+    .fitall-mobile-ui {
+      display: none !important;
+    }
+
+    .fitall-desktop-ui {
+      display: block;
+    }
+
+    .fitall-desktop-page {
+      min-height: 100vh;
+      padding: 32px;
+    }
+
+    .fitall-desktop-container {
+      margin: 0 auto;
+      max-width: 1180px;
+      width: 100%;
+    }
+
+    .fitall-desktop-header {
+      align-items: end;
+      display: flex;
+      gap: 24px;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .fitall-desktop-title {
+      color: var(--fitall-ink);
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: 0;
+      line-height: 1.15;
+    }
+
+    .fitall-desktop-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .fitall-desktop-card {
+      background: var(--fitall-surface);
+      border: 1px solid var(--fitall-line);
+      border-radius: var(--fitall-radius-card);
+      box-shadow: var(--fitall-shadow-card);
+      overflow: hidden;
+    }
+
+    .fitall-sheet {
+      border-radius: var(--fitall-radius-card);
+      margin: auto;
+      max-height: calc(100dvh - 48px);
+      padding: 24px;
+      width: 520px;
+    }
+
+    @starting-style {
+      .fitall-sheet[open] {
+        opacity: 0;
+        transform: translateY(12px) scale(.98);
+      }
+    }
+
+    .fitall-sheet[data-closing="true"] {
+      opacity: 0;
+      transform: translateY(12px) scale(.98);
+    }
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-.fitall-card-pop {
-  animation: fitall-card-pop 360ms cubic-bezier(.2, .8, .2, 1) both;
-}
-
-.fitall-pulse-dot {
-  position: relative;
-}
-
-.fitall-pulse-dot::after {
-  animation: fitall-pulse 1.8s ease-out infinite;
-  border: 2px solid rgba(18, 199, 190, .55);
-  border-radius: 999px;
-  content: "";
-  inset: -4px;
-  position: absolute;
-}
-
-.fitall-add-beat {
-  animation: fitall-add-beat 1.4s ease-in-out infinite;
-}
-
-.fitall-money-flash {
-  animation: fitall-money-flash 2.4s ease-in-out infinite;
-}
-
-@keyframes fade-in {
-  from { opacity: 0; transform: translate(-50%, -8px); }
-  to   { opacity: 1; transform: translate(-50%, 0); }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.2s ease-out;
-}
-
-@keyframes fitall-card-pop {
-  from { opacity: 0; transform: translateY(10px) scale(.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes fitall-pulse {
-  from { opacity: .8; transform: scale(.85); }
-  to { opacity: 0; transform: scale(1.55); }
-}
-
-@keyframes fitall-add-beat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
-}
-
-@keyframes fitall-money-flash {
-  0%, 100% { box-shadow: inset 0 0 0 0 rgba(18, 199, 190, 0); }
-  50% { box-shadow: inset 0 -8px 0 0 rgba(18, 199, 190, 0.35); }
-}
-
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* Native modal keeps keyboard focus and background interaction inside the form. */
-.fitall-reservation-dialog {
-  margin: auto;
-  width: min(520px, calc(100% - 24px));
-  max-height: calc(100dvh - 24px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  border: 2px solid var(--fitall-accent);
-  border-radius: 10px;
-  padding: 16px;
-  background: #fff;
-  color: var(--fitall-dark);
-}
-.fitall-reservation-dialog::backdrop {
-  background: rgb(0 0 0 / 35%);
-  backdrop-filter: blur(2px);
-}
-.fitall-reservation-dialog :focus-visible {
-  outline: 2px solid #087D78;
-  outline-offset: 2px;
-}
-
+/* 動きを減らす設定の人には移動を止める。状態の変化だけ即座に反映する */
 @media (prefers-reduced-motion: reduce) {
-  .fitall-device *, .fitall-device *::before, .fitall-device *::after,
-  .fitall-reservation-dialog * {
-    animation: none !important;
-    transition: none !important;
+  *, *::before, *::after {
+    animation-delay: 0ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
+    transition-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+
+  .fitall-skeleton {
+    animation: none !important;
+  }
+
+  .fitall-spinner {
+    animation-duration: 1.5s !important;
+    animation-iteration-count: infinite !important;
   }
 }
