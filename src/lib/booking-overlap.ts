@@ -1,3 +1,4 @@
+import { readBookingInterval } from './booking-interval'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { readTrainerSettingsFromBio } from './trainer-settings'
 
@@ -25,30 +26,32 @@ export async function findTrainerBookingOverlap(input: {
   }
 
   const settings = readTrainerSettingsFromBio(input.trainerBio)
-  const sessionMs = settings.session_duration_minutes * 60 * 1000
+  let sessionMs = settings.session_duration_minutes * 60 * 1000
+  if (input.excludeBookingId) {
+    const { data, error } = await input.supabase.from('bookings')
+      .select('occupied_range').eq('trainer_id', input.trainerId).eq('id', input.excludeBookingId).maybeSingle()
+    if (error || !data) throw new Error('Booking duration lookup failed')
+    const interval = readBookingInterval(data.occupied_range)
+    sessionMs = interval.end.getTime() - interval.start.getTime()
+  }
   const scheduledStart = scheduledDate.getTime()
   const scheduledEnd = scheduledStart + sessionMs
-  const rangeStart = new Date(scheduledStart - sessionMs)
-  const rangeEnd = new Date(scheduledEnd + sessionMs)
 
   let query = input.supabase
     .from('bookings')
     .select('id, scheduled_at')
     .eq('trainer_id', input.trainerId)
     .in('status', ['pending', 'confirmed', 'completed'])
-    .gte('scheduled_at', rangeStart.toISOString())
-    .lte('scheduled_at', rangeEnd.toISOString())
+    .overlaps('occupied_range', `[${new Date(scheduledStart).toISOString()},${new Date(scheduledEnd).toISOString()})`)
+    .limit(1)
 
   if (input.excludeBookingId) {
     query = query.neq('id', input.excludeBookingId)
   }
 
-  const { data } = await query
-  const overlap = (data ?? []).find((booking) => {
-    const existingStart = new Date(booking.scheduled_at).getTime()
-    const existingEnd = existingStart + sessionMs
-    return scheduledStart < existingEnd && scheduledEnd > existingStart
-  })
+  const { data, error } = await query
+  if (error) throw new Error('Booking overlap lookup failed')
+  const overlap = data?.[0]
 
   return overlap
     ? { overlaps: true, bookingId: overlap.id, scheduledAt: overlap.scheduled_at, sessionMs }

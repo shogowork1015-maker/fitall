@@ -1,3 +1,4 @@
+import { readBookingInterval } from './booking-interval'
 import { createAdminSupabaseClient } from './supabase-admin'
 import { loadActiveBookingHoldIntervals } from './booking-holds'
 import {
@@ -72,7 +73,7 @@ function inferBillingType(name: string, sessions: number): TrainerPlanBillingTyp
   return sessions > 1 ? 'ticket' : 'ticket'
 }
 
-export async function getPublicBookingData(trainerProfileId: string): Promise<PublicBookingData | null> {
+export async function getPublicBookingData(trainerProfileId: string, moveBookingId?: string): Promise<PublicBookingData | null> {
   const supabase = createAdminSupabaseClient()
 
   const { data: profile } = await supabase
@@ -168,20 +169,23 @@ export async function getPublicBookingData(trainerProfileId: string): Promise<Pu
     }
   }
 
-  const sessionMs = settings.session_duration_minutes * 60 * 1000
-  const { data: bookings } = await supabase
+  let sessionMs = settings.session_duration_minutes * 60 * 1000
+  if (moveBookingId) {
+    const { data: original, error } = await supabase.from('bookings').select('occupied_range')
+      .eq('trainer_id', profile.id).eq('id', moveBookingId).maybeSingle()
+    if (error || !original) throw new Error('Booking duration lookup failed')
+    const interval = readBookingInterval(original.occupied_range)
+    sessionMs = interval.end.getTime() - interval.start.getTime()
+  }
+  const { data: bookings, error: bookingsError } = await supabase
     .from('bookings')
-    .select('scheduled_at')
+    .select('id, scheduled_at, occupied_range')
     .eq('trainer_id', profile.id)
     .in('status', ['pending', 'confirmed', 'completed'])
-    .gte('scheduled_at', now.toISOString())
-    .lte('scheduled_at', rangeEnd.toISOString())
+    .overlaps('occupied_range', `[${now.toISOString()},${rangeEnd.toISOString()})`)
 
-  const bookedIntervals = (bookings ?? []).map((booking) => {
-    const start = new Date(booking.scheduled_at)
-    const end = new Date(start.getTime() + sessionMs)
-    return { start, end }
-  })
+  if (bookingsError) throw new Error('Booking availability lookup failed')
+  const bookedIntervals = (bookings ?? []).filter(booking => booking.id !== moveBookingId).map(booking => readBookingInterval(booking.occupied_range))
   const holdIntervals = await loadActiveBookingHoldIntervals({
     supabase,
     trainerId: profile.id,
@@ -197,12 +201,12 @@ export async function getPublicBookingData(trainerProfileId: string): Promise<Pu
     const end = Math.min(timeToMinutes(row.end_time), timeToMinutes(settings.business_close))
     for (
       let minute = start;
-      minute + settings.session_duration_minutes <= end;
+      minute + sessionMs / 60000 <= end;
       minute += PUBLIC_BOOKING_SLOT_INTERVAL_MINUTES
     ) {
       const slotDate = parseJstDateTime(row.slot_date, minutesToTime(minute))
       if (slotDate <= now) continue
-      const slotEnd = new Date(slotDate.getTime() + settings.session_duration_minutes * 60 * 1000)
+      const slotEnd = new Date(slotDate.getTime() + sessionMs)
       const value = slotDate.toISOString()
       const overlaps = unavailableIntervals.some(
         (booking) => slotDate < booking.end && slotEnd > booking.start

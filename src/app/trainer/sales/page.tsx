@@ -1,3 +1,4 @@
+import { loadTrainerRevenue, trainerRevenueErrorMessage } from '@/lib/trainer-revenue'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import { SalesBarChart, type MonthlySales } from '@/components/charts/SalesBarChart'
@@ -316,68 +317,37 @@ export default async function TrainerSalesPage() {
   const { start: monthStart } = jstMonthBounds(currentMonthKey)
   const { start: prevMonthStart, end: prevMonthEnd } = jstMonthBounds(prevMonthKey)
 
-  const { data: currentRecords } = await supabase
-    .from('sales_records')
-    .select('id, amount, paid_at, booking_id')
-    .in('trainer_id', trainerIdsForQuery)
-    .gte('paid_at', monthStart.toISOString())
-    .order('paid_at', { ascending: false })
-
-  const { data: prevRecords } = await supabase
-    .from('sales_records')
-    .select('amount')
-    .in('trainer_id', trainerIdsForQuery)
-    .gte('paid_at', prevMonthStart.toISOString())
-    .lte('paid_at', prevMonthEnd.toISOString())
-
-  const currentTotal = (currentRecords ?? []).reduce((sum, r) => sum + r.amount, 0)
-  const prevTotal = (prevRecords ?? []).reduce((sum, r) => sum + r.amount, 0)
-
-  const bookingIds = (currentRecords ?? []).map((r) => r.booking_id)
-  const { data: bookings } = bookingIds.length
-    ? await supabase
-        .from('bookings')
-        .select('id, trainee_id, scheduled_at')
-        .in('id', bookingIds)
-    : { data: [] }
-
-  const traineeMap = await loadTraineeNameMap(
-    supabase,
-    (bookings ?? []).map((b) => b.trainee_id)
-  )
-  const bookingMap = Object.fromEntries((bookings ?? []).map((b) => [b.id, b]))
-
-  const { data: saleCredits } = bookingIds.length
-    ? await supabase
-        .from('session_credits')
-        .select('booking_id, purchase_id')
-        .in('booking_id', bookingIds)
-    : { data: [] }
-  const purchaseIds = [...new Set((saleCredits ?? []).map((c) => c.purchase_id).filter(Boolean))]
-  const { data: purchases } = purchaseIds.length
-    ? await supabase
-        .from('session_credit_purchases')
-        .select('id, quantity')
-        .in('id', purchaseIds)
-    : { data: [] }
-  const purchaseQuantityById = Object.fromEntries(
-    (purchases ?? []).map((p) => [p.id, p.quantity ?? 1])
-  )
-  const purchaseIdByBookingId = Object.fromEntries(
-    (saleCredits ?? []).map((c) => [c.booking_id, c.purchase_id])
-  )
-  const currentSoldSessions = (currentRecords ?? []).reduce((sum, record) => {
-    const purchaseId = purchaseIdByBookingId[record.booking_id]
-    return sum + (purchaseQuantityById[purchaseId] ?? 1)
-  }, 0)
-
   const sixMonthsAgoKey = addMonthsToDateKey(todayKey, -5)
   const { start: sixMonthsAgo } = jstMonthBounds(sixMonthsAgoKey)
-  const { data: allRecords } = await supabase
-    .from('sales_records')
-    .select('amount, paid_at')
-    .in('trainer_id', trainerIdsForQuery)
-    .gte('paid_at', sixMonthsAgo.toISOString())
+  const { end: monthEnd } = jstMonthBounds(currentMonthKey)
+  let revenue
+  try {
+    revenue = await loadTrainerRevenue(supabase, trainerIdsForQuery, sixMonthsAgo.toISOString(), monthEnd.toISOString())
+  } catch (error) {
+    return (
+      <div className="fitall-page fitall-page-pad space-y-4 py-5">
+        <h1 className="text-[17px] font-black text-[#0A0A0A]">売上管理</h1>
+        <p role="status" className="fitall-card p-4 text-sm leading-relaxed">{trainerRevenueErrorMessage(error)}</p>
+      </div>
+    )
+  }
+  const allRecords = revenue.filter(r => Date.parse(r.paid_at) <= monthEnd.getTime())
+  const currentRecords = allRecords.filter(r => Date.parse(r.paid_at) >= monthStart.getTime())
+  const prevRecords = allRecords.filter(r => Date.parse(r.paid_at) >= prevMonthStart.getTime()
+    && Date.parse(r.paid_at) <= prevMonthEnd.getTime())
+  const currentTotal = currentRecords.reduce((sum, r) => sum + r.amount, 0)
+  const prevTotal = prevRecords.reduce((sum, r) => sum + r.amount, 0)
+  const currentSoldSessions = currentRecords.reduce((sum, r) => sum + r.quantity, 0)
+
+  const bookingIds = currentRecords.map(r => r.booking_id).filter((id): id is string => !!id)
+  const { data: bookings } = bookingIds.length
+    ? await supabase.from('bookings').select('id, trainee_id').in('id', bookingIds)
+    : { data: [] }
+  const bookingMap = Object.fromEntries((bookings ?? []).map(b => [b.id, b]))
+  const traineeMap = await loadTraineeNameMap(supabase, [
+    ...currentRecords.map(r => r.trainee_id).filter((id): id is string => !!id),
+    ...(bookings ?? []).map(b => b.trainee_id),
+  ])
 
   const monthlyMap: Record<string, number> = {}
   for (let i = 5; i >= 0; i--) {
@@ -393,15 +363,14 @@ export default async function TrainerSalesPage() {
     ([month, amount]) => ({ month, amount })
   )
 
-  const recordViews: SalesRecordView[] = (currentRecords ?? []).map((record) => {
-    const booking = bookingMap[record.booking_id]
-    const purchaseId = purchaseIdByBookingId[record.booking_id]
+  const recordViews: SalesRecordView[] = currentRecords.map(record => {
+    const traineeId = record.trainee_id ?? (record.booking_id ? bookingMap[record.booking_id]?.trainee_id : null)
     return {
       id: record.id,
-      name: booking ? traineeMap[booking.trainee_id] : '不明',
+      name: traineeId ? traineeMap[traineeId] ?? '不明' : '不明',
       amount: record.amount,
       date: record.paid_at,
-      quantity: purchaseQuantityById[purchaseId] ?? 1,
+      quantity: record.quantity,
     }
   })
 

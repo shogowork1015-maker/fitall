@@ -2,12 +2,13 @@ import { createAdminSupabaseClient } from './supabase-admin'
 import { createServerSupabaseClient } from './supabase-server'
 import { getCustomerSessionUserId } from './customer-session'
 import { isDevAuthBypassEnabled } from './dev-preview'
-import { addDaysToDateKey, formatJstDate, formatJstDateKey, formatJstTime } from './datetime'
+import { formatJstDate, formatJstDateKey } from './datetime'
 import {
   getPlanSettings,
   readTrainerPlanSettingsFromBio,
   type TrainerPlanBillingType,
 } from './trainer-settings'
+import { customerAvailability } from './customer-availability'
 import { getPublicBookingData } from './public-booking'
 
 export interface CustomerTicket {
@@ -127,13 +128,9 @@ function formatDateLabel(value: string | Date) {
   })
 }
 
-function dateKey(value: Date) {
-  return formatJstDateKey(value)
-}
 
-function timeLabel(value: Date) {
-  return formatJstTime(value)
-}
+
+
 
 function statusTitle(status: string) {
   if (status === 'pending') return '承認待ち'
@@ -369,38 +366,7 @@ async function loadCreditTickets(input: {
 
 async function loadAvailability(trainerProfileId: string): Promise<CustomerAvailabilityDay[]> {
   const bookingData = await getPublicBookingData(trainerProfileId)
-  const availableSlots = bookingData?.slots ?? []
-  const byDate = new Map<string, { label: string; value: string }[]>()
-
-  for (const slot of availableSlots) {
-    const slotDate = new Date(slot.value)
-    const key = dateKey(slotDate)
-    byDate.set(key, [...(byDate.get(key) ?? []), { label: timeLabel(slotDate), value: slot.value }])
-  }
-
-  const displayTimes = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00']
-  return Array.from({ length: 14 }, (_, index) => {
-    const key = addDaysToDateKey(formatJstDateKey(), index)
-    const times = byDate.get(key) ?? []
-    const cells = displayTimes.map((time) => {
-      const hour = time.slice(0, 2)
-      const availableInHour = times.find((candidate) => candidate.label.startsWith(`${hour}:`))
-      return {
-        time,
-        status: availableInHour ? 'open' : 'closed',
-        value: availableInHour?.value,
-        availableLabel: availableInHour?.label,
-      } satisfies CustomerAvailabilityCell
-    })
-
-    return {
-      dateKey: key,
-      dateLabel: formatJstDate(`${key}T00:00:00+09:00`, { month: 'numeric', day: 'numeric' }),
-      weekday: formatJstDate(`${key}T00:00:00+09:00`, { weekday: 'short' }),
-      openCount: cells.filter((cell) => cell.status === 'open').length,
-      cells,
-    }
-  })
+  return customerAvailability(bookingData?.slots ?? [], formatJstDateKey())
 }
 
 export async function loadCustomerAppData(): Promise<CustomerAppData | null> {

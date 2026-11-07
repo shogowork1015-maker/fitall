@@ -29,12 +29,12 @@ export default async function PublicBookingSuccessPage({ searchParams }: PagePro
             <path d="M20 6 9 17l-5-5" />
           </svg>
         </div>
-        <p className="mt-5 text-[10px] font-black tracking-[0.16em] text-[#087D78]">PAYMENT COMPLETE</p>
+        <p className="mt-5 text-[10px] font-black tracking-[0.16em] text-[#087D78]">TICKETS</p>
         <h1 className="mt-2 text-2xl font-black tracking-tight text-[#0A0A0A]">
-          予約を受け付けました
+          チケットの購入手続き
         </h1>
         <p className="mt-3 text-sm font-medium leading-relaxed text-[#666666]">
-          トレーナーの管理画面に予約が反映されます。LINE通知を連携すると、予約確認やリマインドを受け取れます。
+          決済完了後にチケットが反映されます。LINEを連携してマイページを開き、残りチケットを確認してから予約日時を選んでください。
         </p>
         {lineStatus && (
           <p className="mt-4 border-2 border-[#DDE8E8] bg-[#F4F7F7] px-3 py-2 text-xs font-bold text-[#0A0A0A]">
@@ -46,7 +46,7 @@ export default async function PublicBookingSuccessPage({ searchParams }: PagePro
             href={`/api/line/connect/start?session_id=${encodeURIComponent(sessionId)}`}
             className="mt-5 inline-flex h-[52px] w-full items-center justify-center border-2 border-[#12C7BE] bg-[#12C7BE] px-6 text-sm font-black text-white"
           >
-            LINE通知を受け取る
+            LINEを連携してマイページへ
           </Link>
         )}
         {params?.line === 'connected' ? (

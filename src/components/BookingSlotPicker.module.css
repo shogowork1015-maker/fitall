@@ -1,0 +1,19 @@
+.period { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 14px; font-weight: 800; }
+.period button { width: 44px; height: 44px; border: 1px solid #dde8e8; border-radius: 6px; font-size: 24px; }
+.days { display: flex; gap: 4px; overflow-x: auto; padding: 4px; margin: -4px; }
+.days button { flex: 1 0 44px; display: grid; gap: 5px; min-height: 84px; padding: 8px 0; border: 2px solid #dde8e8; border-radius: 6px; }
+.days strong { font-size: 12px; }
+.days small { font-size: 10px; }
+.dateTitle { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px; font-size: 13px; font-weight: 700; }
+.dateTitle small { font-size: 11px; font-weight: 400; color: #555; }
+.times { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; animation: show-times 160ms ease-out; }
+.times button { min-height: 48px; border: 2px solid #dde8e8; border-radius: 6px; font-size: 16px; font-weight: 700; }
+@keyframes show-times { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.picker { border: 0; padding: 0; margin: 0; min-width: 0; }
+.picker button { cursor: pointer; transition: background-color 150ms, border-color 150ms, transform 100ms; }
+.picker button[aria-pressed="true"] { border-color: #087d78; background: #e8fbfa; color: #064f4b; }
+.picker button:disabled { opacity: .45; cursor: not-allowed; }
+.picker button:active:not(:disabled) { transform: scale(.98); }
+.picker button:focus-visible { outline: 3px solid #087d78; outline-offset: 2px; }
+.empty { background: #f4f7f7; padding: 16px; font-size: 13px; }
+@media (prefers-reduced-motion: reduce) { .times { animation: none; } .picker button { transition: none; } .picker button:active:not(:disabled) { transform: none; } }

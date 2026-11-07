@@ -4,7 +4,7 @@ import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ trainerOnly?: string }> | { trainerOnly?: string }
+  searchParams: Promise<{ trainerOnly?: string }>
 }) {
   const resolvedSearchParams = await searchParams
   return (

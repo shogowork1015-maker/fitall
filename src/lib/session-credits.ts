@@ -1,8 +1,8 @@
-import { randomUUID } from 'crypto'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 type SupabaseAdminLike = {
   from: SupabaseClient['from']
+  rpc: SupabaseClient['rpc']
 }
 
 export interface EnsureCreditPurchaseInput {
@@ -19,11 +19,12 @@ export interface EnsureCreditPurchaseInput {
 export async function ensureCreditPurchase(input: EnsureCreditPurchaseInput) {
   const { supabase } = input
 
-  const { data: existingPurchaseRaw } = await supabase
+  const { data: existingPurchaseRaw, error: lookupError } = await supabase
     .from('session_credit_purchases')
     .select('id')
     .eq('stripe_checkout_session_id', input.stripeCheckoutSessionId)
     .maybeSingle()
+  if (lookupError) throw new Error(`purchase lookup failed: ${lookupError.message}`)
   const existingPurchase = existingPurchaseRaw as { id?: string } | null
 
   if (existingPurchase?.id) {
@@ -47,6 +48,12 @@ export async function ensureCreditPurchase(input: EnsureCreditPurchaseInput) {
     .maybeSingle()
   const purchase = purchaseRaw as { id?: string } | null
 
+  // Another delivery may have inserted the same checkout session concurrently.
+  if (purchaseError?.code === '23505') {
+    const { data, error } = await supabase.from('session_credit_purchases')
+      .select('id').eq('stripe_checkout_session_id', input.stripeCheckoutSessionId).maybeSingle()
+    if (!error && data?.id) return data.id as string
+  }
   if (purchaseError || !purchase) {
     throw new Error(`session_credit_purchases insert failed: ${purchaseError?.message ?? 'unknown'}`)
   }
@@ -61,38 +68,16 @@ export async function ensureCreditsForPurchase(input: {
   traineeId: string
   quantity: number
 }) {
-  const { supabase } = input
-  const { data: existingCreditsRaw } = await supabase
-    .from('session_credits')
-    .select('id, booking_id, status')
-    .eq('purchase_id', input.purchaseId)
-    .order('created_at')
-
-  const existing = Array.isArray(existingCreditsRaw) ? existingCreditsRaw : []
-  if (existing.length >= input.quantity) {
-    return existing
+  const { data, error } = await input.supabase.rpc('fitall_ensure_purchase_credits', {
+    p_purchase_id: input.purchaseId,
+    p_trainer_id: input.trainerId,
+    p_trainee_id: input.traineeId,
+    p_quantity: input.quantity,
+  })
+  if (error || !Array.isArray(data) || data.length !== input.quantity) {
+    throw new Error(`session_credits issuance failed: ${error?.message ?? 'invalid result'}`)
   }
-
-  const rows = Array.from({ length: input.quantity - existing.length }, () => ({
-    id: randomUUID(),
-    purchase_id: input.purchaseId,
-    trainer_id: input.trainerId,
-    trainee_id: input.traineeId,
-    status: 'available',
-  }))
-
-  const { error } = await supabase.from('session_credits').insert(rows)
-  if (error) {
-    throw new Error(`session_credits insert failed: ${error.message}`)
-  }
-
-  const { data: creditsRaw } = await supabase
-    .from('session_credits')
-    .select('id, booking_id, status')
-    .eq('purchase_id', input.purchaseId)
-    .order('created_at')
-
-  return Array.isArray(creditsRaw) ? creditsRaw : []
+  return data
 }
 
 export async function attachFirstAvailableCreditToBooking(input: {
@@ -117,7 +102,7 @@ export async function attachFirstAvailableCreditToBooking(input: {
     .select('id')
     .eq('purchase_id', input.purchaseId)
     .is('booking_id', null)
-    .in('status', ['available', 'scheduled'])
+    .eq('status', 'available')
     .order('created_at')
     .limit(1)
     .maybeSingle()
@@ -127,16 +112,20 @@ export async function attachFirstAvailableCreditToBooking(input: {
     throw new Error('予約に紐づけられるチケットがありません')
   }
 
-  const { error } = await supabase
+  const { data: attached, error } = await supabase
     .from('session_credits')
     .update({
       booking_id: input.bookingId,
       status: 'scheduled',
     })
     .eq('id', credit.id)
+    .eq('status', 'available')
+    .is('booking_id', null)
+    .select('id')
+    .maybeSingle()
 
-  if (error) {
-    throw new Error(`session_credits update failed: ${error.message}`)
+  if (error || !attached?.id) {
+    throw new Error(`session_credits update failed: ${error?.message ?? 'ticket already reserved'}`)
   }
 
   return credit.id as string
@@ -176,16 +165,20 @@ export async function attachFirstAvailableCreditForCustomerToBooking(input: {
     return null
   }
 
-  const { error } = await supabase
+  const { data: attached, error } = await supabase
     .from('session_credits')
     .update({
       booking_id: input.bookingId,
       status: 'scheduled',
     })
     .eq('id', credit.id)
+    .eq('status', 'available')
+    .is('booking_id', null)
+    .select('id')
+    .maybeSingle()
 
-  if (error) {
-    throw new Error(`session_credits update failed: ${error.message}`)
+  if (error || !attached?.id) {
+    throw new Error(`session_credits update failed: ${error?.message ?? 'ticket already reserved'}`)
   }
 
   return credit.id

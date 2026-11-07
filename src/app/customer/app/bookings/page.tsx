@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { loadCustomerAppData, loadCustomerAppEntryData } from '@/lib/customer-app'
 import { formatJstDate, formatJstTime } from '@/lib/datetime'
+import { createCustomerBookingAction } from './actions'
 import { CustomerWeekCalendar } from './CustomerWeekCalendar'
 
 interface PageProps {
@@ -54,9 +55,9 @@ export default async function CustomerBookingsPage({ searchParams }: PageProps) 
           <div className="fitall-card-strong overflow-hidden">
             <div className="bg-[#12C7BE] px-4 py-5 text-white">
               <p className="text-[10px] font-black tracking-[0.12em] text-white/80">FIRST TIME</p>
-              <h2 className="mt-1 text-2xl font-black">はじめての予約</h2>
+              <h2 className="mt-1 text-2xl font-black">チケットを購入して予約</h2>
               <p className="mt-2 text-sm font-bold leading-relaxed text-white/90">
-                まだお客様情報がないため、初回予約からチケット購入と登録を行います。
+                まだお客様情報がないため、メニューを購入してチケットを追加します。予約日時は購入後に選べます。
               </p>
             </div>
             <div className="space-y-3 p-4">
@@ -72,7 +73,7 @@ export default async function CustomerBookingsPage({ searchParams }: PageProps) 
                     href={`/book/${entryData.trainer.profileId}`}
                     className="fitall-primary-action fitall-tap h-12 text-sm"
                   >
-                    初回予約へ進む
+                    チケットを購入する
                   </Link>
                 </>
               ) : (
@@ -139,17 +140,18 @@ export default async function CustomerBookingsPage({ searchParams }: PageProps) 
             <div className="bg-[#12C7BE] px-4 py-4 text-white">
               <p className="text-[10px] font-black tracking-[0.12em] text-white/80">OPEN CALENDAR</p>
               <h2 className="mt-1 text-xl font-black">
-                {availableTicketCount > 0 ? '○の時間を選んで予約' : '空き時間を確認'}
+                {availableTicketCount > 0 ? 'チケットで予約する' : '空き時間を確認'}
               </h2>
               <p className="mt-1 text-sm font-bold text-white/90">
                 {availableTicketCount > 0
-                  ? '1週間分を時間ごとに確認できます'
+                  ? '日時を選んで、チケットを1枚使用します'
                   : 'チケット購入後にこの画面から予約できます'}
               </p>
             </div>
             <CustomerWeekCalendar
               availability={data.availability}
               availableTicketCount={availableTicketCount}
+              bookingAction={data.preview ? undefined : createCustomerBookingAction}
             />
           </section>
 
@@ -165,7 +167,6 @@ export default async function CustomerBookingsPage({ searchParams }: PageProps) 
                     </div>
                     <div>
                       <p className="text-sm font-black text-[#0A0A0A]">{formatTime(booking.scheduled_at)} セッション</p>
-                      <p className="mt-0.5 text-xs font-bold text-[#555555]">チケット1枚使用予定</p>
                     </div>
                     <span className="bg-[#E8FBFA] px-2 py-1 text-[10px] font-black text-[#087D78]">
                       {statusLabel(booking.status)}
@@ -199,7 +200,7 @@ export default async function CustomerBookingsPage({ searchParams }: PageProps) 
                     <p className="text-sm font-black text-[#0A0A0A]">{formatDate(booking.scheduled_at)} {formatTime(booking.scheduled_at)}</p>
                     <p className="mt-0.5 text-xs font-bold text-[#555555]">{statusLabel(booking.status)}</p>
                   </div>
-                  <p className="text-sm font-black text-[#0A0A0A]">¥{booking.price.toLocaleString()}</p>
+                  <p className="text-sm font-black text-[#0A0A0A]">{booking.price > 0 ? `¥${booking.price.toLocaleString()}` : ''}</p>
                 </div>
               ))}
               {!data.pastBookings.length && (

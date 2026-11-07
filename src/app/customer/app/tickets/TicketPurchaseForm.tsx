@@ -1,35 +1,33 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
-import { SubmitButton } from '@/components/SubmitButton'
-import {
-  createCustomerTicketCheckoutAction,
-  type CustomerTicketCheckoutState,
-} from './actions'
+import { useActionState, useEffect, useRef } from 'react'
+import type { CustomerTicketCheckoutState } from './actions'
 
-export function TicketPurchaseForm({ planId }: { planId: string }) {
-  const [state, action] = useActionState<CustomerTicketCheckoutState, FormData>(
-    createCustomerTicketCheckoutAction,
-    null
-  )
-
-  useEffect(() => {
-    if (state && 'checkoutUrl' in state) {
-      window.location.href = state.checkoutUrl
+export type TicketCheckoutAction = (state: CustomerTicketCheckoutState, data: FormData) => Promise<CustomerTicketCheckoutState>
+export function TicketPurchaseForm({ planId, checkoutAction, preview = false }: {
+  planId: string; checkoutAction: TicketCheckoutAction; preview?: boolean
+}) {
+  const submitting = useRef(false)
+  const [state, action, pending] = useActionState<CustomerTicketCheckoutState, FormData>(async (previous, data) => {
+    try {
+      const result = await checkoutAction(previous, data)
+      if (!result || !('checkoutUrl' in result)) submitting.current = false
+      return result
+    } catch {
+      submitting.current = false
+      return { error: '決済画面を開けませんでした。もう一度お試しください。' }
     }
-  }, [state])
-
-  return (
-    <form action={action} className="mt-3">
-      <input type="hidden" name="plan_id" value={planId} />
-      {state && 'error' in state && (
-        <div className="mb-2 border-2 border-[#D4183D] bg-[#FEF2F2] px-3 py-2 text-xs font-black text-[#D4183D]">
-          {state.error}
-        </div>
-      )}
-      <SubmitButton className="fitall-primary-action fitall-tap h-11 w-full text-xs">
-        このメニューを購入
-      </SubmitButton>
-    </form>
-  )
+  }, null)
+  const redirecting = Boolean(state && 'checkoutUrl' in state)
+  useEffect(() => { if (state && 'checkoutUrl' in state) window.location.assign(state.checkoutUrl) }, [state])
+  return <form action={action} className="mt-3" onSubmit={event => {
+    if (submitting.current) event.preventDefault()
+    else submitting.current = true
+  }}>
+    <input type="hidden" name="plan_id" value={planId} />
+    {state && 'error' in state && <p role="alert" className="mb-3 bg-[#FEF2F2] p-3 text-sm text-[#A0102B]">{state.error}</p>}
+    <button type="submit" disabled={pending || redirecting} className="fitall-primary-action h-12 w-full text-sm disabled:opacity-40">
+      {pending || redirecting ? '処理中…' : preview ? '購入を試す（プレビュー）' : 'このメニューを購入する'}
+    </button>
+  </form>
 }

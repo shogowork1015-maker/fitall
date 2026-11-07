@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { loadCustomerAppData, loadCustomerAppEntryData } from '@/lib/customer-app'
+import { createCustomerTicketCheckoutAction } from './actions'
 import { TicketPurchaseForm } from './TicketPurchaseForm'
 
 interface PageProps {
@@ -44,7 +45,7 @@ export default async function CustomerTicketsPage({ searchParams }: PageProps) {
               <p className="text-[10px] font-black tracking-[0.12em] text-white/80">FIRST TIME</p>
               <h2 className="mt-1 text-2xl font-black">チケット登録が必要です</h2>
               <p className="mt-2 text-sm font-bold leading-relaxed text-white/90">
-                まだお客様情報がないため、初回予約からチケット購入と登録を行います。
+                まだお客様情報がないため、メニューを購入してチケットを追加します。予約日時は購入後に選べます。
               </p>
             </div>
             <div className="space-y-3 p-4">
@@ -60,7 +61,7 @@ export default async function CustomerTicketsPage({ searchParams }: PageProps) {
                     href={`/book/${entryData.trainer.profileId}`}
                     className="fitall-primary-action fitall-tap h-12 text-sm"
                   >
-                    初回予約へ進む
+                    チケットを購入する
                   </Link>
                 </>
               ) : (
@@ -182,7 +183,7 @@ export default async function CustomerTicketsPage({ searchParams }: PageProps) {
                       )}
                     </p>
                   </div>
-                  <TicketPurchaseForm planId={menu.id} />
+                  <TicketPurchaseForm planId={menu.id} checkoutAction={createCustomerTicketCheckoutAction} />
                 </div>
               ))}
             </div>

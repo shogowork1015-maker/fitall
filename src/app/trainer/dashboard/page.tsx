@@ -1,3 +1,4 @@
+import { loadTrainerRevenue, trainerRevenueErrorMessage } from '@/lib/trainer-revenue'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
@@ -51,6 +52,7 @@ function DashboardScreen({
   monthLabel,
   todayLabel,
   totalSales,
+  salesError,
   clientCount,
   pendingCount,
   todayBookings,
@@ -59,7 +61,8 @@ function DashboardScreen({
   name: string
   monthLabel: string
   todayLabel: string
-  totalSales: number
+  totalSales: number | null
+  salesError?: string
   clientCount: number
   pendingCount: number
   todayBookings: DashboardBooking[]
@@ -133,8 +136,9 @@ function DashboardScreen({
         <section className="grid grid-cols-2 gap-2">
           <Link href="/trainer/sales" className="fitall-card fitall-tap fitall-rail col-span-2 p-3">
             <p className="text-[10px] font-black text-[#555555]">今月売上</p>
-            <p className="mt-2 text-3xl font-black leading-none text-[#0A0A0A]">{yen(totalSales)}</p>
+            <p className="mt-2 text-3xl font-black leading-none text-[#0A0A0A]">{totalSales === null ? '—' : yen(totalSales)}</p>
             <p className="mt-1 text-[10px] font-bold text-[#087D78]">{monthLabel}</p>
+            {salesError && <p role="status" className="mt-2 text-xs leading-relaxed text-[#555555]">{salesError}</p>}
           </Link>
           <Link href="/trainer/clients" className="fitall-card fitall-tap fitall-rail p-3">
             <p className="text-[10px] font-black text-[#555555]">顧客</p>
@@ -200,7 +204,7 @@ function DashboardScreen({
     </div>
     <div className="fitall-desktop-ui fitall-desktop-page">
       <div className="fitall-desktop-container">
-        <header className="fitall-desktop-header">
+        <header className="fitall-desktop-header flex-wrap">
           <div>
             <p className="fitall-kicker">{todayLabel}</p>
             <h1 className="fitall-desktop-title">ホーム</h1>
@@ -208,11 +212,11 @@ function DashboardScreen({
               今日の予約、売上、承認待ちをまとめて確認できます。
             </p>
           </div>
-          <div className="flex gap-3">
-            <Link href="/trainer/invite" className="fitall-aqua-action fitall-tap w-auto min-w-[180px]">
+          <div className="flex flex-wrap gap-3">
+            <Link href="/trainer/invite" className="fitall-aqua-action fitall-tap !w-auto shrink-0 whitespace-nowrap">
               登録リンクを送る
             </Link>
-            <Link href="/trainer/bookings" className="fitall-secondary-action fitall-tap min-w-[150px]">
+            <Link href="/trainer/bookings" className="fitall-secondary-action fitall-tap shrink-0 whitespace-nowrap">
               カレンダー
             </Link>
           </div>
@@ -261,8 +265,9 @@ function DashboardScreen({
 
           <Link href="/trainer/sales" className="fitall-desktop-card fitall-tap p-5">
             <p className="fitall-kicker">SALES</p>
-            <p className="mt-5 text-4xl font-black text-[#0A0A0A]">{yen(totalSales)}</p>
+            <p className="mt-5 text-4xl font-black text-[#0A0A0A]">{totalSales === null ? '—' : yen(totalSales)}</p>
             <p className="mt-2 text-sm font-black text-[#087D78]">{monthLabel}の売上</p>
+            {salesError && <p role="status" className="mt-2 text-sm leading-relaxed text-[#555555]">{salesError}</p>}
           </Link>
 
           <div className="grid gap-4">
@@ -418,13 +423,15 @@ export default async function TrainerDashboardPage() {
     (todayBookings ?? []).map((b) => b.trainee_id)
   )
 
-  const { data: salesData } = await supabase
-    .from('sales_records')
-    .select('amount')
-    .in('trainer_id', trainerIdsForQuery)
-    .gte('paid_at', monthStart.toISOString())
-
-  const totalSales = (salesData ?? []).reduce((sum, r) => sum + r.amount, 0)
+  const { end: monthEnd } = jstMonthBounds(todayKey)
+  let totalSales: number | null = null
+  let salesError: string | undefined
+  try {
+    const salesData = await loadTrainerRevenue(supabase, trainerIdsForQuery, monthStart.toISOString(), monthEnd.toISOString())
+    totalSales = salesData.reduce((sum, r) => sum + r.amount, 0)
+  } catch (error) {
+    salesError = trainerRevenueErrorMessage(error)
+  }
 
   const { count: clientCount } = myTrainerProfile
     ? await supabase
@@ -446,6 +453,7 @@ export default async function TrainerDashboardPage() {
       monthLabel={monthLabel}
       todayLabel={todayLabel}
       totalSales={totalSales}
+      salesError={salesError}
       clientCount={clientCount ?? 0}
       pendingCount={pendingCount ?? 0}
       todayBookings={(todayBookings ?? []).map((booking) => ({

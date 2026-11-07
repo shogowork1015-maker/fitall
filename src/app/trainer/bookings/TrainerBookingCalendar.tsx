@@ -201,7 +201,7 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
                 <div className="mb-1 flex items-center justify-between gap-1">
                   <span
                     className={`flex h-6 min-w-6 items-center justify-center rounded-full text-xs font-black ${
-                      isToday ? 'bg-[#12C7BE] px-1.5 text-white fitall-pulse-dot' : ''
+                      isToday ? 'bg-[#12C7BE] px-1.5 text-white' : ''
                     }`}
                   >
                     {date.getDate()}
@@ -288,7 +288,7 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
                         </div>
                       ))}
                       {!hourBookings.length && (
-                        <span className="fitall-add-beat inline-flex h-7 w-7 items-center justify-center rounded-[6px] border border-[#DDE8E8] bg-white text-[13px] font-black text-[#12C7BE] group-hover:animate-bounce">
+                        <span className="inline-flex h-7 w-7 items-center justify-center rounded-[6px] border border-[#DDE8E8] bg-white text-[13px] font-black text-[#12C7BE]">
                           ＋
                         </span>
                       )}

@@ -1,7 +1,6 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 import { sendTicketBookingConfirmationNotifications } from '@/lib/booking-notifications'
 import { findTrainerBookingOverlap } from '@/lib/booking-overlap'
 import { loadCustomerAppMutationContext } from '@/lib/customer-app'
@@ -41,25 +40,6 @@ export async function createCustomerBookingAction(
   }
 
   const { supabase, customerUser, traineeProfile, trainerProfile, trainerUser } = context
-  const { data: credit } = await supabase
-    .from('session_credits')
-    .select('id')
-    .eq('trainer_id', trainerProfile.id)
-    .eq('trainee_id', traineeProfile.id)
-    .eq('status', 'available')
-    .is('booking_id', null)
-    .order('created_at')
-    .limit(1)
-    .maybeSingle()
-
-  if (!credit?.id) {
-    return {
-      status: 'error',
-      needsPurchase: true,
-      message: '使えるチケットがありません。先にチケットを購入してください。',
-    }
-  }
-
   const available = await isPublicSlotAvailable(trainerProfile.id, scheduledAt)
   if (!available) {
     return { status: 'error', message: 'この日時はすでに埋まっているか、受付時間外です' }
@@ -75,59 +55,39 @@ export async function createCustomerBookingAction(
     return { status: 'error', message: 'この日時はすでに予約が入っています。別の日時を選んでください。' }
   }
 
-  const { data: booking, error: bookingError } = await supabase
-    .from('bookings')
-    .insert({
-      trainer_id: trainerProfile.id,
-      trainee_id: traineeProfile.id,
-      scheduled_at: scheduledAt,
-      status: 'confirmed',
-      price: 0,
+  // Context supplies trusted identities; never take trainer/customer IDs from the form.
+  // One DB transaction creates the booking and reserves its ticket. No unsafe fallback
+  // is allowed when the migration/RPC is missing.
+  const { data: bookingId, error: bookingError } = await supabase.rpc('fitall_book_customer_ticket', {
+      p_trainer_id: trainerProfile.id,
+      p_trainee_id: traineeProfile.id,
+      p_scheduled_at: scheduledAt,
     })
-    .select('id')
-    .maybeSingle()
 
-  if (bookingError || !booking?.id) {
-    return {
-      status: 'error',
-      message:
-        bookingError?.code === '23505'
-          ? 'この日時は直前に埋まりました。別の日時を選んでください。'
-          : '予約の作成に失敗しました。少し時間をおいて再度お試しください。',
+  if (bookingError || !bookingId) {
+    if (bookingError?.code === 'P0002') {
+      return { status: 'error', needsPurchase: true, message: '使えるチケットがありません。残数を確認して再度お試しください。' }
     }
+    return { status: 'error', message: ['23505', '23P01'].includes(bookingError?.code ?? '')
+      ? 'この日時は直前に埋まりました。別の日時を選んでください。'
+      : '予約の作成に失敗しました。少し時間をおいて再度お試しください。' }
   }
 
-  const { data: attachedCredit, error: creditError } = await supabase
-    .from('session_credits')
-    .update({
-      booking_id: booking.id,
-      status: 'scheduled',
-    })
-    .eq('id', credit.id)
-    .eq('status', 'available')
-    .is('booking_id', null)
-    .select('id')
-    .maybeSingle()
-
-  if (creditError || !attachedCredit?.id) {
-    await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', booking.id)
-    return {
-      status: 'error',
-      message: 'チケットの紐づけに失敗しました。もう一度お試しください。',
-    }
+  let notificationFailed = false
+  try {
+    await sendTicketBookingConfirmationNotifications({ scheduledAt, customer: customerUser, trainer: trainerUser })
+  } catch {
+    notificationFailed = true
   }
-
-  await sendTicketBookingConfirmationNotifications({
-    scheduledAt,
-    customer: customerUser,
-    trainer: trainerUser,
-  })
 
   revalidatePath('/customer/app')
   revalidatePath('/customer/app/bookings')
+  revalidatePath('/customer/app/bookings/list')
   revalidatePath('/customer/app/tickets')
   revalidatePath('/trainer/bookings')
   revalidatePath('/trainer/dashboard')
 
-  redirect('/customer/app/bookings?booked=1')
+  return { status: 'success', message: notificationFailed
+    ? '予約は確定しました。通知を送信できなかったため、予約一覧で内容をご確認ください。'
+    : '予約が確定しました。' }
 }

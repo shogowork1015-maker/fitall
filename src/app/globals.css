@@ -487,3 +487,34 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Native modal keeps keyboard focus and background interaction inside the form. */
+.fitall-reservation-dialog {
+  margin: auto;
+  width: min(520px, calc(100% - 24px));
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 2px solid var(--fitall-accent);
+  border-radius: 10px;
+  padding: 16px;
+  background: #fff;
+  color: var(--fitall-dark);
+}
+.fitall-reservation-dialog::backdrop {
+  background: rgb(0 0 0 / 35%);
+  backdrop-filter: blur(2px);
+}
+.fitall-reservation-dialog :focus-visible {
+  outline: 2px solid #087D78;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fitall-device *, .fitall-device *::before, .fitall-device *::after,
+  .fitall-reservation-dialog * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
