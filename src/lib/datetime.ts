@@ -100,3 +100,9 @@ export function formatJstDateTime(value: Date | string, options: Intl.DateTimeFo
     ...options,
   })
 }
+
+// 基準日（日本時間）の翌日から count 日分の日付キーを返す。端末のタイムゾーンに左右されない
+export function upcomingJstDateKeys(count: number, from: Date = new Date()) {
+  const todayKey = formatJstDateKey(from)
+  return Array.from({ length: count }, (_, index) => addDaysToDateKey(todayKey, index + 1))
+}

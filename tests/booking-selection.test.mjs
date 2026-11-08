@@ -52,3 +52,15 @@ test('empty, invalid and identical duplicate slots do not generate phantom avail
   assert.equal(bookingDays([slot('invalid')]).length, 0)
   assert.equal(bookingDays([slots[0], slots[0]])[0].slots.length, 1)
 })
+test('日時変更の候補日は日本時間の翌日から始まり、朝9時前でも1日前にずれない', () => {
+  // 日本時間 2026-11-09 08:30（UTCではまだ11/8）
+  const keys = datetime.upcomingJstDateKeys(14, new Date('2026-11-08T23:30:00Z'))
+  assert.equal(keys.length, 14)
+  assert.equal(keys[0], '2026-11-10')
+  assert.equal(keys[13], '2026-11-23')
+  assert.equal(datetime.dayOfWeekForDateKey(keys[0]), 2)
+})
+test('日時変更の候補日は月末・年末をまたいでも連続する', () => {
+  const keys = datetime.upcomingJstDateKeys(3, new Date('2026-12-30T15:30:00Z'))
+  assert.deepEqual([...keys], ['2027-01-01', '2027-01-02', '2027-01-03'])
+})

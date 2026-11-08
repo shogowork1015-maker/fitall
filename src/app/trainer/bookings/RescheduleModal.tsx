@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { proposeRescheduleAction } from './actions'
 import { Toast } from '@/components/Toast'
+import { dayOfWeekForDateKey, formatJstDate, formatJstTime, upcomingJstDateKeys } from '@/lib/datetime'
 
 interface Props {
   bookingId: string
@@ -16,15 +17,9 @@ const TIME_SLOTS = [
   '15:00', '16:00', '17:00', '18:00', '19:00', '20:00',
 ]
 
-function getAvailableDates() {
-  const dates = []
-  const today = new Date()
-  for (let i = 1; i <= 14; i++) {
-    const d = new Date(today)
-    d.setDate(today.getDate() + i)
-    dates.push(d)
-  }
-  return dates
+// 日付キー（YYYY-MM-DD）から「5月3日」のような表示を作る。日本時間の暦で扱う
+function formatDateKey(dateKey: string, options: Intl.DateTimeFormatOptions) {
+  return formatJstDate(`${dateKey}T00:00:00+09:00`, options)
 }
 
 export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Props) {
@@ -34,8 +29,8 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
 
-  const dates = getAvailableDates()
-  const currentDate = new Date(currentScheduledAt)
+  // 明日から14日分。日本時間の朝9時前でも1日前にずれないよう日付キーで扱う
+  const dateKeys = upcomingJstDateKeys(14)
 
   async function handleSubmit() {
     if (!selectedDate || !selectedTime) return
@@ -67,7 +62,7 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
       </div>
 
       <p className="text-base text-ink-muted">
-        現在: {currentDate.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'short' })} {currentDate.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+        現在: {formatJstDate(currentScheduledAt, { month: 'long', day: 'numeric', weekday: 'short' })} {formatJstTime(currentScheduledAt)}
       </p>
 
       {error && (
@@ -78,9 +73,8 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
 
       {/* 日付グリッド */}
       <div className="grid grid-cols-7 gap-1">
-        {dates.map((d) => {
-          const iso = d.toISOString().split('T')[0]!
-          const day = d.getDay()
+        {dateKeys.map((iso) => {
+          const day = dayOfWeekForDateKey(iso)
           const isSelected = selectedDate === iso
           const isSat = day === 6
           const isSun = day === 0
@@ -88,6 +82,8 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
             <button
               key={iso}
               type="button"
+              aria-pressed={isSelected}
+              aria-label={formatDateKey(iso, { month: 'long', day: 'numeric', weekday: 'long' })}
               onClick={() => { setSelectedDate(iso); setSelectedTime(null) }}
               className={`flex min-h-16 flex-col items-center justify-center rounded-control leading-tight ${
                 isSelected
@@ -100,7 +96,7 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
               }`}
             >
               <span className="text-base font-medium">{WEEKDAYS[day]}</span>
-              <span className="text-base font-bold">{d.getDate()}</span>
+              <span className="text-base font-bold">{Number(iso.slice(8, 10))}</span>
             </button>
           )
         })}
@@ -132,7 +128,7 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
           disabled={loading}
           className="fitall-primary-action disabled:opacity-40"
         >
-          {loading ? '送信中...' : `${new Date(selectedDate).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })} ${selectedTime} に変更提案`}
+          {loading ? '送信中...' : `${formatDateKey(selectedDate, { month: 'short', day: 'numeric' })} ${selectedTime} に変更提案`}
         </button>
       )}
     </div>
