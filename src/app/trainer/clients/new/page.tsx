@@ -42,7 +42,6 @@ export default async function NewClientPage({ searchParams }: PageProps) {
     <div className="fitall-page fitall-scroll">
       <PageHeader
         title="お客様を追加"
-        subtitle="仮登録して、専用リンクでご本人に確認してもらいます"
         back={{ href: '/trainer/clients', label: 'お客様一覧へ戻る' }}
       />
 
@@ -79,14 +78,14 @@ export default async function NewClientPage({ searchParams }: PageProps) {
         <form action={createClientInviteAction} className="fitall-card space-y-4 p-5">
           <div>
             <h2 className="text-lg font-bold text-ink">仮登録する情報</h2>
-            <p className="mt-1 text-base leading-relaxed text-ink-muted">
+            <p className="mt-1 text-subhead leading-relaxed text-ink-muted">
               後でお客様本人が登録リンクから確認・修正できます。
             </p>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block">
-              <span className="text-base font-medium text-ink-muted">お名前</span>
+              <span className="text-subhead font-medium text-ink-muted">お名前</span>
               <input
                 name="name"
                 required
@@ -95,7 +94,7 @@ export default async function NewClientPage({ searchParams }: PageProps) {
               />
             </label>
             <label className="block">
-              <span className="text-base font-medium text-ink-muted">メールアドレス</span>
+              <span className="text-subhead font-medium text-ink-muted">メールアドレス</span>
               <input
                 name="email"
                 type="email"
@@ -105,7 +104,7 @@ export default async function NewClientPage({ searchParams }: PageProps) {
               />
             </label>
             <label className="block">
-              <span className="text-base font-medium text-ink-muted">身長 cm</span>
+              <span className="text-subhead font-medium text-ink-muted">身長 cm</span>
               <input
                 name="height"
                 type="number"
@@ -115,7 +114,7 @@ export default async function NewClientPage({ searchParams }: PageProps) {
               />
             </label>
             <label className="block">
-              <span className="text-base font-medium text-ink-muted">体重 kg</span>
+              <span className="text-subhead font-medium text-ink-muted">体重 kg</span>
               <input
                 name="weight"
                 type="number"
@@ -127,7 +126,7 @@ export default async function NewClientPage({ searchParams }: PageProps) {
           </div>
 
           <label className="block">
-            <span className="text-base font-medium text-ink-muted">目的・メモ</span>
+            <span className="text-subhead font-medium text-ink-muted">目的・メモ</span>
             <textarea
               name="goal"
               rows={4}

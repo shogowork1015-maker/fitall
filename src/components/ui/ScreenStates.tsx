@@ -25,7 +25,7 @@ export function ErrorScreen({ onRetry, homeHref, homeLabel = 'ホームへ戻る
 }) {
   return (
     <div role="alert" className="mx-auto flex min-h-[60dvh] w-full max-w-[480px] flex-col justify-center gap-3 px-4 py-8 text-center">
-      <p aria-hidden="true" className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-danger-soft text-2xl font-black text-danger">!</p>
+      <p aria-hidden="true" className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-danger-soft text-2xl font-black text-danger">!</p>
       <h1 className="mt-2 text-xl font-black text-ink">画面を表示できませんでした</h1>
       <p className="leading-relaxed text-ink-muted">通信状況を確認して、もう一度お試しください。</p>
       <button type="button" onClick={onRetry} className="fitall-primary-action mt-3">もう一度読み込む</button>

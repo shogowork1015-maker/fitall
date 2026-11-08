@@ -4,7 +4,7 @@ import { formatJstDate, formatJstTime } from '@/lib/datetime'
 import { createCustomerBookingAction } from './actions'
 import { CustomerWeekCalendar } from './CustomerWeekCalendar'
 import { DevPreviewNote, PageHeader } from '@/components/ui/PageHeader'
-import { StatusBadge } from '@/components/ui/StatusBadge'
+import { StatusTag } from '@/components/ui/StatusBadge'
 
 interface PageProps {
   searchParams?: Promise<{
@@ -44,9 +44,9 @@ export default async function CustomerBookingsPage({ searchParams }: PageProps) 
       {!data ? (
         <div className="fitall-page-pad">
           <section className="fitall-card p-5">
-            <p className="text-base font-medium text-ink-muted">はじめての方</p>
+            <p className="text-subhead font-medium text-ink-muted">はじめての方</p>
             <h2 className="mt-1 text-xl font-bold text-ink">チケットを購入して予約</h2>
-            <p className="mt-2 text-base leading-relaxed text-ink-muted">
+            <p className="mt-2 text-subhead leading-relaxed text-ink-muted">
               メニューを購入するとチケットが追加され、予約日時を選べるようになります。
             </p>
             {entryData ? (
@@ -54,7 +54,7 @@ export default async function CustomerBookingsPage({ searchParams }: PageProps) 
                 <div className="fitall-row mt-4 !px-0">
                   <span className="fitall-avatar">{entryData.trainer.name[0] ?? '?'}</span>
                   <div className="fitall-row-main">
-                    <p className="text-base text-ink-muted">担当トレーナー</p>
+                    <p className="text-subhead text-ink-muted">担当トレーナー</p>
                     <p className="fitall-row-title">{entryData.trainer.name}さん</p>
                   </div>
                 </div>
@@ -63,7 +63,7 @@ export default async function CustomerBookingsPage({ searchParams }: PageProps) 
                 </Link>
               </>
             ) : (
-              <p className="mt-4 rounded-control bg-surface-soft px-4 py-4 text-center text-base text-ink-muted">
+              <p className="mt-4 rounded-control bg-surface-soft px-4 py-4 text-center text-subhead text-ink-muted">
                 LINEの登録リンクから開き直してください
               </p>
             )}
@@ -81,7 +81,7 @@ export default async function CustomerBookingsPage({ searchParams }: PageProps) 
           <section aria-label="日時を選ぶ">
             <h2 className="fitall-group-label">
               <span>{availableTicketCount > 0 ? '日時を選ぶ' : '空いている時間'}</span>
-              <Link href="/customer/app/tickets" className="inline-flex min-h-14 items-center">チケット</Link>
+              <Link href="/customer/app/tickets" className="inline-flex min-h-11 items-center">チケット</Link>
             </h2>
             <div className="fitall-card overflow-hidden">
               <CustomerWeekCalendar
@@ -99,21 +99,21 @@ export default async function CustomerBookingsPage({ searchParams }: PageProps) 
           <section aria-label="これからの予約">
             <h2 className="fitall-group-label">
               <span>これからの予約</span>
-              <Link href="/customer/app/bookings/list" className="inline-flex min-h-14 items-center">変更・キャンセル</Link>
+              <Link href="/customer/app/bookings/list" className="inline-flex min-h-11 items-center">変更・キャンセル</Link>
             </h2>
             {data.upcomingBookings.length ? (
               <div className="fitall-group">
                 {data.upcomingBookings.map((booking) => (
                   <div key={booking.id} className="fitall-row" data-status={booking.status}>
                     <div className="fitall-row-main">
-                      <p className="fitall-row-title">{formatDate(booking.scheduled_at)} {formatTime(booking.scheduled_at)}</p>
+                      <p className="fitall-row-title"><StatusTag status={booking.status} />{formatDate(booking.scheduled_at)}</p>
                     </div>
-                    <StatusBadge status={booking.status} />
+                    <p className="fitall-row-figure !text-[17px]">{formatTime(booking.scheduled_at)}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="fitall-group px-5 py-5 text-base text-ink-muted">次回の予約はまだありません</div>
+              <div className="fitall-group px-5 py-5 text-subhead text-ink-muted">次回の予約はまだありません</div>
             )}
           </section>
         </div>

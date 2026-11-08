@@ -118,7 +118,7 @@ export default async function TrainerBookingsPage() {
               <div>
                 <p className="fitall-kicker">カレンダー</p>
                 <h1 className="fitall-desktop-title">予約管理</h1>
-                <p className="mt-2 text-base font-medium text-ink-muted">PCでは週・月カレンダーを広く見ながら予約を管理できます。</p>
+                <p className="mt-2 text-subhead font-medium text-ink-muted">PCでは週・月カレンダーを広く見ながら予約を管理できます。</p>
               </div>
               <div className="flex gap-3">
                 <Link href="/trainer/invite" className="fitall-aqua-action fitall-tap w-auto min-w-[170px]">リンク送信</Link>
@@ -160,7 +160,7 @@ export default async function TrainerBookingsPage() {
         <MobileBookingsHeader />
         <div className="px-4 py-8 md:px-8">
           <div className="fitall-desktop-container">
-          <div className="fitall-card p-6 text-center text-base font-medium text-ink-muted">
+          <div className="fitall-card p-6 text-center text-subhead font-medium text-ink-muted">
             トレーナープロフィールが見つかりません
           </div>
           </div>
@@ -245,7 +245,7 @@ export default async function TrainerBookingsPage() {
             <div>
               <p className="fitall-kicker">カレンダー</p>
               <h1 className="fitall-desktop-title">予約管理</h1>
-              <p className="mt-2 text-base font-medium text-ink-muted">カレンダーから予約作成、移動、完了処理まで行えます。</p>
+              <p className="mt-2 text-subhead font-medium text-ink-muted">カレンダーから予約作成、移動、完了処理まで行えます。</p>
             </div>
             <div className="flex gap-3">
               <Link href="/trainer/invite" className="fitall-aqua-action fitall-tap w-auto min-w-[170px]">リンク送信</Link>

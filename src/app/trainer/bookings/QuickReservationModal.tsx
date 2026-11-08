@@ -191,7 +191,7 @@ export function QuickReservationModal({
             </div>
           ) : (
             <div className="space-y-3">
-              <label htmlFor="reservation-client" className="block text-base font-semibold text-ink-muted">お客様</label>
+              <label htmlFor="reservation-client" className="block text-subhead font-semibold text-ink-muted">お客様</label>
               <select
                 id="reservation-client"
                 autoFocus
@@ -207,7 +207,7 @@ export function QuickReservationModal({
                 ))}
               </select>
 
-              <label htmlFor="reservation-menu" className="block text-base font-semibold text-ink-muted">メニュー</label>
+              <label htmlFor="reservation-menu" className="block text-subhead font-semibold text-ink-muted">メニュー</label>
               <select
                 id="reservation-menu"
                 value={menuId}
@@ -223,7 +223,7 @@ export function QuickReservationModal({
               </select>
 
               <div>
-                <label htmlFor="reservation-time" className="mb-1 block text-base font-medium text-ink-muted">
+                <label htmlFor="reservation-time" className="mb-1 block text-subhead font-medium text-ink-muted">
                   開始時間（5分刻みで変更可）
                 </label>
                 <input
@@ -237,10 +237,10 @@ export function QuickReservationModal({
                 />
               </div>
 
-              <label className="flex min-h-14 items-center justify-between gap-3 rounded-control bg-surface-soft px-4 py-3 has-[:checked]:border-accent has-[:checked]:bg-accent-soft">
+              <label className="flex min-h-11 items-center justify-between gap-3 rounded-control bg-surface-soft px-4 py-3 has-[:checked]:border-accent has-[:checked]:bg-accent-soft">
                 <span>
                   <span className="block text-base font-bold text-ink">毎週固定で予約</span>
-                  <span className="text-base font-medium text-ink-muted">同じ曜日・同じ時間でまとめて作成</span>
+                  <span className="text-subhead font-medium text-ink-muted">同じ曜日・同じ時間でまとめて作成</span>
                 </span>
                 <input
                   type="checkbox"
@@ -252,7 +252,7 @@ export function QuickReservationModal({
 
               {repeatEnabled && (
                 <div>
-                  <label htmlFor="reservation-until" className="mb-1 block text-base font-medium text-ink-muted">固定予約の終了日</label>
+                  <label htmlFor="reservation-until" className="mb-1 block text-subhead font-medium text-ink-muted">固定予約の終了日</label>
                   <input
                     id="reservation-until"
                     required

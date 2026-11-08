@@ -186,7 +186,7 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
       <section className="fitall-card">
         <div className="space-y-3 p-5">
           <h2 className="text-lg font-bold text-ink">予約の基本設定</h2>
-          <p className="text-base leading-relaxed text-ink-muted">
+          <p className="text-subhead leading-relaxed text-ink-muted">
             ここで設定した営業時間とセッション時間を使って、お客様用の予約枠を自動で出します。
           </p>
           <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
@@ -239,7 +239,7 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
         <div className="flex flex-col items-start gap-2 sm:flex-row sm:justify-between sm:gap-3">
           <div>
             <h2 className="text-lg font-bold text-ink">販売メニュー（回数券・月謝）</h2>
-            <p className="mt-1 text-base leading-relaxed text-ink-muted">
+            <p className="mt-1 text-subhead leading-relaxed text-ink-muted">
               作ったメニューが予約ページに出ます。決済はStripeで行います。
             </p>
           </div>
@@ -248,7 +248,7 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
           </span>
         </div>
 
-        <p className="mt-5 text-base font-semibold text-ink-muted">新しいメニュー</p>
+        <p className="mt-5 text-subhead font-semibold text-ink-muted">新しいメニュー</p>
         <div className="mt-2 grid gap-2 md:grid-cols-[150px_1fr_130px_120px]">
           <select
             value={newDraft.billing_type}
@@ -308,7 +308,7 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
       </section>
 
       {!menus.length ? (
-        <div className="fitall-card p-6 text-center text-base text-ink-muted">
+        <div className="fitall-card p-6 text-center text-subhead text-ink-muted">
           まだメニューがありません。回数券か月謝を作ると、お客様マイページで選べるようになります。
         </div>
       ) : (
@@ -337,7 +337,7 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
                       <p className="fitall-figure shrink-0 text-xl">{formatPrice(Number(draft.price) || 0)}</p>
                     </div>
                     <div>
-                      <label className="inline-flex min-h-14 items-center gap-3 text-base font-medium text-ink">
+                      <label className="inline-flex min-h-11 items-center gap-3 text-base font-medium text-ink">
                         <input
                           type="checkbox"
                           checked={draft.is_public}

@@ -53,7 +53,7 @@ export function CustomerWeekCalendar({ availability, availableTicketCount, booki
     <section className="mt-5 rounded-control bg-surface-soft p-4" aria-label="予約内容の確認">
       <h3 className="text-lg font-semibold">{chosen ? formatJstDateTime(chosen.value, { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }) : '予約する時間を選んでください'}</h3>
       <div className="mt-2 flex items-baseline justify-between text-base"><span className="text-ink-muted">使用するチケット</span><strong className="font-semibold">1枚</strong></div>
-      {!needsPurchase && <p className="mt-2 text-base text-ink-muted">予約後の残り {Math.max(0, availableTicketCount - 1)}枚 · 追加のお支払いはありません</p>}
+      {!needsPurchase && <p className="mt-2 text-subhead text-ink-muted">予約後の残り {Math.max(0, availableTicketCount - 1)}枚 · 追加のお支払いはありません</p>}
     </section>
     {state?.status === 'error' && <p ref={errorRef} tabIndex={-1} role="alert" className="mt-4 rounded-control bg-danger-soft p-3 text-base text-danger">{state.message}</p>}
     {needsPurchase ? <div className="mt-4">

@@ -1,36 +1,40 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
-// スマホ画面の見出し。左寄せの大きな題名と、右上の丸いボタンで構成する
-export function PageHeader({ title, subtitle, back, actions }: {
+// スマホ画面上部のナビゲーションバー。iPhone標準アプリと同じく中央に題名、左右に丸いボタンを置く
+export function PageHeader({ title, subtitle, back, leading, actions }: {
   title: string
   subtitle?: ReactNode
   /** 左上の戻るボタン */
   back?: { href: string; label: string }
+  /** 左上に置く丸いボタン（戻るボタンがない画面用） */
+  leading?: ReactNode
   /** 右上の丸いボタン（HeaderAction） */
   actions?: ReactNode
 }) {
   return (
-    <header className="fitall-header" data-bar={back || actions ? 'true' : 'false'}>
-      {(back || actions) && <div className="fitall-header-bar">
+    <header className="fitall-header">
+      <div className="fitall-header-side">
         {back ? (
           <Link href={back.href} aria-label={back.label} className="fitall-circle-button">
             <span>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M15 5l-7 7 7 7" />
               </svg>
             </span>
           </Link>
-        ) : null}
-        {actions ? <div className="fitall-header-actions">{actions}</div> : null}
-      </div>}
-      <h1 className="fitall-large-title">{title}</h1>
-      {subtitle ? <p className="fitall-header-sub">{subtitle}</p> : null}
+        ) : leading}
+      </div>
+      <div className="fitall-header-center">
+        <h1 className="fitall-header-title">{title}</h1>
+        {subtitle ? <p className="fitall-header-sub">{subtitle}</p> : null}
+      </div>
+      <div className="fitall-header-side" data-side="end">{actions}</div>
     </header>
   )
 }
 
-// 見出し右上の丸いボタン。tone="ink" で主要操作として黒くする
+// 見出し左右の丸いボタン。tone="ink" で主要操作として黒くする
 export function HeaderAction({ href, label, tone, children }: {
   href: string
   label: string

@@ -57,7 +57,7 @@ export function MoveBookingForm({
         </button>
       ) : (
         <div className="fitall-fade rounded-control bg-surface-soft p-3">
-          <label className="text-base font-medium text-ink-muted">移動先日時</label>
+          <label className="text-subhead font-medium text-ink-muted">移動先日時</label>
           <input
             type="datetime-local"
             step={300}

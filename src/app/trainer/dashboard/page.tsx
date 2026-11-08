@@ -4,9 +4,9 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { loadTraineeNameMap } from '@/lib/trainee-display'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
-import { DevPreviewNote, HeaderAction, PageHeader } from '@/components/ui/PageHeader'
+import { DevPreviewNote } from '@/components/ui/PageHeader'
 import { StatusBadge } from '@/components/ui/StatusBadge'
-import { CalendarIcon, ChevronRightIcon, ClockIcon, GearIcon, LinkIcon, PersonIcon } from '@/components/ui/Icons'
+import { TrainerHomeMobile } from './TrainerHomeMobile'
 import {
   formatJstDate,
   formatJstDateKey,
@@ -22,6 +22,7 @@ type DashboardBooking = {
   status: string
   trainee_id: string
   trainee_name: string
+  price?: number | null
 }
 
 function formatTime(dateStr: string) {
@@ -58,112 +59,17 @@ function DashboardScreen({
 
   return (
     <>
-    <div className="fitall-mobile-ui fitall-page fitall-scroll">
-      <PageHeader
-        title="ホーム"
-        subtitle={todayLabel}
-        actions={
-          <HeaderAction href="/trainer/settings" label="設定">
-            <GearIcon />
-          </HeaderAction>
-        }
+    <div className="fitall-mobile-ui">
+      <TrainerHomeMobile
+        todayLabel={todayLabel}
+        monthLabel={monthLabel}
+        totalSales={totalSales}
+        salesError={salesError}
+        clientCount={clientCount}
+        pendingCount={pendingCount}
+        todayBookings={todayBookings}
+        preview={preview}
       />
-
-      <div className="fitall-page-pad space-y-7">
-        {preview && <DevPreviewNote>開発用の確認モード（サンプル表示）</DevPreviewNote>}
-
-        <section>
-          <h2 className="fitall-group-label">
-            <span>次の予約</span>
-            <span className="font-medium">今日 {todayBookings.length}件</span>
-          </h2>
-          {nextBooking ? (
-            <Link href="/trainer/bookings" className="fitall-card block p-5">
-              <div className="flex items-start justify-between gap-3">
-                <p className="fitall-figure text-[44px]">{formatTime(nextBooking.scheduled_at)}</p>
-                <StatusBadge status={nextBooking.status} />
-              </div>
-              <p className="mt-3 flex items-center gap-2 text-lg font-semibold text-ink">
-                <PersonIcon className="text-ink-faint" />
-                {nextBooking.trainee_name}
-              </p>
-            </Link>
-          ) : (
-            <div className="fitall-card px-5 py-6">
-              <p className="text-lg font-semibold text-ink">今日は予約がありません</p>
-              <p className="mt-1 text-base text-ink-muted">登録リンクの共有や、空き枠の調整に使えます。</p>
-            </div>
-          )}
-        </section>
-
-        <section className="space-y-3">
-          <Link href="/trainer/sales" className="fitall-card flex items-center gap-3 p-5">
-            <div className="flex-1">
-              <p className="text-base font-medium text-ink-muted">{monthLabel}の売上</p>
-              <p className="fitall-figure mt-1 text-[34px]">{totalSales === null ? '—' : yen(totalSales)}</p>
-              {salesError && <p role="status" className="mt-2 text-base leading-relaxed text-ink-muted">{salesError}</p>}
-            </div>
-            <ChevronRightIcon />
-          </Link>
-          <div className="grid grid-cols-2 gap-3">
-            <Link href="/trainer/clients" className="fitall-card block p-4">
-              <p className="flex items-center gap-1.5 text-base font-medium text-ink-muted">
-                <PersonIcon size={18} />お客様
-              </p>
-              <p className="fitall-figure mt-2 text-[28px]">{clientCount}<small>名</small></p>
-            </Link>
-            <Link href="/trainer/bookings" className="fitall-card relative block p-4">
-              <p className="flex items-center gap-1.5 text-base font-medium text-ink-muted">
-                <ClockIcon size={18} />承認待ち
-              </p>
-              <p className={`fitall-figure mt-2 text-[28px] ${pendingCount > 0 ? '!text-warn' : ''}`}>{pendingCount}<small>件</small></p>
-              {pendingCount > 0 && <span aria-hidden="true" className="fitall-pop absolute right-4 top-4 h-2.5 w-2.5 rounded-full bg-[var(--fitall-warn-dot)]" />}
-            </Link>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="fitall-group-label">
-            <span>今日の予定</span>
-            <Link href="/trainer/bookings" className="inline-flex min-h-14 items-center">カレンダー</Link>
-          </h2>
-          {!todayBookings.length ? (
-            <div className="fitall-group px-5 py-5">
-              <p className="text-base font-semibold text-ink">予定は空いています</p>
-              <p className="mt-1 text-base leading-relaxed text-ink-muted">
-                お客様が予約すると、ここに時間順で並びます。
-              </p>
-            </div>
-          ) : (
-            <div className="fitall-group">
-              {todayBookings.map((booking) => (
-                <Link key={booking.id} href="/trainer/bookings" className="fitall-row" data-status={booking.status}>
-                  <p className="fitall-figure w-14 text-[17px]">{formatTime(booking.scheduled_at)}</p>
-                  <p className="fitall-row-main fitall-row-title">{booking.trainee_name}</p>
-                  <StatusBadge status={booking.status} />
-                  <ChevronRightIcon />
-                </Link>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section>
-          <h2 className="fitall-group-label">すぐにできること</h2>
-          <div className="fitall-group">
-            <Link href="/trainer/invite" className="fitall-row">
-              <span className="fitall-icon-tile" data-tone="accent"><LinkIcon /></span>
-              <span className="fitall-row-main fitall-row-title">お客様に登録リンクを送る</span>
-              <ChevronRightIcon />
-            </Link>
-            <Link href="/trainer/availability" className="fitall-row">
-              <span className="fitall-icon-tile"><CalendarIcon /></span>
-              <span className="fitall-row-main fitall-row-title">空き枠を設定する</span>
-              <ChevronRightIcon />
-            </Link>
-          </div>
-        </section>
-      </div>
     </div>
     <div className="fitall-desktop-ui fitall-desktop-page">
       <div className="fitall-desktop-container">
@@ -171,7 +77,7 @@ function DashboardScreen({
           <div>
             <p className="fitall-kicker">{todayLabel}</p>
             <h1 className="fitall-desktop-title">ホーム</h1>
-            <p className="mt-2 text-base font-medium text-ink-muted">
+            <p className="mt-2 text-subhead font-medium text-ink-muted">
               今日の予約、売上、承認待ちをまとめて確認できます。
             </p>
           </div>
@@ -192,7 +98,7 @@ function DashboardScreen({
         <section className="grid grid-cols-[1.2fr_1fr_.8fr] gap-4">
           <div className="fitall-desktop-card">
             <div className="flex items-center justify-between px-6 pt-5">
-              <p className="text-base font-semibold text-ink-muted">次の予約</p>
+              <p className="text-subhead font-semibold text-ink-muted">次の予約</p>
               <span className="fitall-badge">今日 {todayBookings.length}件</span>
             </div>
             <div className="p-6">
@@ -211,7 +117,7 @@ function DashboardScreen({
               ) : (
                 <div className="rounded-control border border-dashed border-line px-5 py-8 text-center">
                   <p className="text-base font-black text-ink">今日は予約なし</p>
-                <p className="mt-1 text-base font-medium text-ink-muted">登録リンクや空き枠を整えられます</p>
+                <p className="mt-1 text-subhead font-medium text-ink-muted">登録リンクや空き枠を整えられます</p>
                 </div>
               )}
             </div>
@@ -221,16 +127,16 @@ function DashboardScreen({
             <p className="fitall-kicker">売上</p>
             <p className="mt-5 whitespace-nowrap text-3xl font-black text-ink">{totalSales === null ? '—' : yen(totalSales)}</p>
             <p className="mt-2 text-base font-bold text-brand">{monthLabel}の売上</p>
-            {salesError && <p role="status" className="mt-2 text-base leading-relaxed text-ink-muted">{salesError}</p>}
+            {salesError && <p role="status" className="mt-2 text-subhead leading-relaxed text-ink-muted">{salesError}</p>}
           </Link>
 
           <div className="grid gap-4">
             <Link href="/trainer/clients" className="fitall-desktop-card fitall-tap p-5">
-              <p className="text-base font-medium text-ink-muted">お客様</p>
+              <p className="text-subhead font-medium text-ink-muted">お客様</p>
               <p className="mt-2 text-4xl font-black text-ink">{clientCount}<span className="ml-1 text-base">名</span></p>
             </Link>
             <Link href="/trainer/bookings" className="fitall-desktop-card fitall-tap relative p-5">
-              <p className="text-base font-medium text-ink-muted">承認待ち</p>
+              <p className="text-subhead font-medium text-ink-muted">承認待ち</p>
               <p className="mt-2 text-4xl font-black text-ink">{pendingCount}<span className="ml-1 text-base">件</span></p>
               {pendingCount > 0 && <span className="absolute right-5 top-5 h-3 w-3 rounded-full bg-accent" />}
             </Link>
@@ -244,7 +150,7 @@ function DashboardScreen({
               <Link href="/trainer/bookings" className="text-base font-bold text-brand">予約管理へ</Link>
             </div>
             {!todayBookings.length ? (
-              <div className="rounded-control bg-surface-soft px-5 py-6 text-base font-medium text-ink-muted">
+              <div className="rounded-control bg-surface-soft px-5 py-6 text-subhead font-medium text-ink-muted">
                 今日の予約はありません。
               </div>
             ) : (
@@ -260,7 +166,7 @@ function DashboardScreen({
                     </div>
                     <div>
                       <p className="text-base font-black text-ink">{booking.trainee_name}</p>
-                      <p className="mt-1 text-base font-medium text-ink-muted">セッション予約</p>
+                      <p className="mt-1 text-subhead font-medium text-ink-muted">セッション予約</p>
                     </div>
                     <span className="justify-self-end"><StatusBadge status={booking.status} /></span>
                   </Link>
@@ -323,6 +229,7 @@ export default async function TrainerDashboardPage() {
             status: 'confirmed',
             trainee_id: 'preview-client-1',
             trainee_name: '佐藤さん',
+            price: 8800,
           },
           {
             id: 'preview-2',
@@ -330,6 +237,7 @@ export default async function TrainerDashboardPage() {
             status: 'pending',
             trainee_id: 'preview-client-2',
             trainee_name: '田中さん',
+            price: 8800,
           },
           {
             id: 'preview-3',
@@ -337,6 +245,7 @@ export default async function TrainerDashboardPage() {
             status: 'confirmed',
             trainee_id: 'preview-client-3',
             trainee_name: '山本さん',
+            price: 8000,
           },
         ]}
         preview
@@ -357,7 +266,7 @@ export default async function TrainerDashboardPage() {
 
   const { data: todayBookings } = await supabase
     .from('bookings')
-    .select('id, scheduled_at, status, trainee_id')
+    .select('id, scheduled_at, status, trainee_id, price')
     .in('trainer_id', trainerIdsForQuery)
     .gte('scheduled_at', todayStart.toISOString())
     .lte('scheduled_at', todayEnd.toISOString())

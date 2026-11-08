@@ -56,9 +56,9 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
     <main className="min-h-screen px-4 pb-8 pt-[calc(var(--fitall-safe-top)+28px)]">
       <div className="mx-auto max-w-[430px] space-y-6">
         <header>
-          <p className="text-base font-semibold text-brand">Limitless App</p>
-          <h1 className="fitall-large-title mt-1">お客様情報の登録</h1>
-          <p className="mt-2 text-base leading-relaxed text-ink-muted">
+          <p className="text-subhead font-semibold text-brand">Limitless App</p>
+          <h1 className="mt-1 text-title1 font-bold text-ink">お客様情報の登録</h1>
+          <p className="mt-2 text-subhead leading-relaxed text-ink-muted">
             {trainerUser?.name ?? 'トレーナー'}さんの予約・チケット管理アプリを使う準備をします。
           </p>
         </header>
@@ -71,14 +71,14 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
 
         <form action={completeCustomerOnboardingAction.bind(null, token)} className="fitall-card space-y-4 p-5">
           <div>
-            <h2 className="text-lg font-bold text-ink">基本情報</h2>
-            <p className="mt-1 text-base leading-relaxed text-ink-muted">
+            <h2 className="text-title3 font-bold text-ink">基本情報</h2>
+            <p className="mt-1 text-subhead leading-relaxed text-ink-muted">
               入力後、LINE通知連携に進みます。
             </p>
           </div>
 
           <label className="block">
-            <span className="text-base font-medium text-ink-muted">お名前</span>
+            <span className="text-subhead font-medium text-ink-muted">お名前</span>
             <input
               name="name"
               required
@@ -89,7 +89,7 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
           </label>
 
           <label className="block">
-            <span className="text-base font-medium text-ink-muted">メールアドレス</span>
+            <span className="text-subhead font-medium text-ink-muted">メールアドレス</span>
             <input
               name="email"
               type="email"
@@ -102,7 +102,7 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
 
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
-              <span className="text-base font-medium text-ink-muted">身長 cm</span>
+              <span className="text-subhead font-medium text-ink-muted">身長 cm</span>
               <input
                 name="height"
                 type="number"
@@ -113,7 +113,7 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
               />
             </label>
             <label className="block">
-              <span className="text-base font-medium text-ink-muted">体重 kg</span>
+              <span className="text-subhead font-medium text-ink-muted">体重 kg</span>
               <input
                 name="weight"
                 type="number"
@@ -126,7 +126,7 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
           </div>
 
           <label className="block">
-            <span className="text-base font-medium text-ink-muted">目的・相談したいこと</span>
+            <span className="text-subhead font-medium text-ink-muted">目的・相談したいこと</span>
             <textarea
               name="goal"
               rows={4}
@@ -141,7 +141,7 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
           </SubmitButton>
         </form>
 
-        <Link href="/customer/app" className="flex min-h-14 items-center justify-center text-base font-semibold text-brand">
+        <Link href="/customer/app" className="flex min-h-11 items-center justify-center text-base font-semibold text-brand">
           登録済みの方はマイページへ
         </Link>
       </div>

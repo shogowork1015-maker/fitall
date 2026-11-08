@@ -51,7 +51,7 @@ function InviteShell({
         ) : (
           <div className="fitall-card p-6 text-center">
             <p className="text-base font-semibold text-ink">トレーナープロフィールが見つかりません</p>
-            <p className="mt-1 text-base text-ink-muted">プロフィール作成後にLINE招待を発行できます</p>
+            <p className="mt-1 text-subhead text-ink-muted">プロフィール作成後にLINE招待を発行できます</p>
           </div>
         )}
 
@@ -80,7 +80,7 @@ function InviteShell({
           <div>
             <p className="fitall-kicker">招待</p>
             <h1 className="fitall-desktop-title">LINE招待</h1>
-            <p className="mt-2 text-base font-medium text-ink-muted">
+            <p className="mt-2 text-subhead font-medium text-ink-muted">
               PCでは送信文、アプリ入口、事前チェックを横並びで確認できます。
             </p>
           </div>
@@ -96,7 +96,7 @@ function InviteShell({
         <div className="grid grid-cols-[1fr_1.1fr] gap-5">
           <section className="fitall-desktop-card">
             <div className="px-5 pt-5">
-              <p className="text-base font-semibold text-ink-muted">ご案内の流れ</p>
+              <p className="text-subhead font-semibold text-ink-muted">ご案内の流れ</p>
               <h2 className="mt-1 text-2xl font-bold">LINEからアプリに入り、購入と予約まで進む</h2>
             </div>
             <div className="p-5">
@@ -104,21 +104,21 @@ function InviteShell({
                 <span className="fitall-step-num">1</span>
                 <div>
                   <p className="text-base font-bold text-ink">LINEで招待を送る</p>
-                  <p className="mt-0.5 text-base font-medium text-ink-muted">公式LINE運用にそのまま使えます</p>
+                  <p className="mt-0.5 text-subhead font-medium text-ink-muted">公式LINE運用にそのまま使えます</p>
                 </div>
               </div>
               <div className="fitall-step">
                 <span className="fitall-step-num">2</span>
                 <div>
                   <p className="text-base font-bold text-ink">お客様がメニューを購入</p>
-                  <p className="mt-0.5 text-base font-medium text-ink-muted">月謝は期限付きチケットとして管理します</p>
+                  <p className="mt-0.5 text-subhead font-medium text-ink-muted">月謝は期限付きチケットとして管理します</p>
                 </div>
               </div>
               <div className="fitall-step">
                 <span className="fitall-step-num">3</span>
                 <div>
                   <p className="text-base font-bold text-ink">予約と通知を自動化</p>
-                  <p className="mt-0.5 text-base font-medium text-ink-muted">予約、売上、LINE通知へ反映</p>
+                  <p className="mt-0.5 text-subhead font-medium text-ink-muted">予約、売上、LINE通知へ反映</p>
                 </div>
               </div>
             </div>
@@ -130,7 +130,7 @@ function InviteShell({
             ) : (
               <div className="fitall-desktop-card p-6 text-center">
                 <p className="text-base font-bold text-ink">トレーナープロフィールが見つかりません</p>
-                <p className="mt-1 text-base font-medium text-ink-muted">プロフィール作成後にLINE招待を発行できます</p>
+                <p className="mt-1 text-subhead font-medium text-ink-muted">プロフィール作成後にLINE招待を発行できます</p>
               </div>
             )}
             <section className="fitall-desktop-card p-5">

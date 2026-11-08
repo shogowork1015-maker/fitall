@@ -39,7 +39,7 @@ export default async function TrainerSettingsPage() {
     return (
       <div className="fitall-page fitall-scroll px-4 pt-6 pb-4">
         <h1 className="text-2xl font-black text-ink">設定</h1>
-        <div className="fitall-card mt-4 p-6 text-center text-base font-medium text-ink-muted">
+        <div className="fitall-card mt-4 p-6 text-center text-subhead font-medium text-ink-muted">
           トレーナープロフィールが見つかりません
         </div>
       </div>
@@ -117,7 +117,7 @@ export default async function TrainerSettingsPage() {
                     {item.level === 'ok' ? 'OK' : item.level === 'warn' ? '確認' : '不足'}
                   </span>
                 </div>
-                <p className="mt-1 text-base font-medium leading-relaxed text-ink-muted">
+                <p className="mt-1 text-subhead font-medium leading-relaxed text-ink-muted">
                   {item.detail}
                 </p>
               </div>
@@ -127,7 +127,7 @@ export default async function TrainerSettingsPage() {
         <details className="fitall-details">
           <summary>LINE連携</summary>
           <div className="space-y-4 p-4 pt-0">
-            <p className="text-base font-medium leading-relaxed text-ink-muted">
+            <p className="text-subhead font-medium leading-relaxed text-ink-muted">
               お客様はLINEログインでアプリに入り、予約確認・チケット残数・通知を受け取る設計にします。
             </p>
             <div className="grid gap-2 md:grid-cols-3">
@@ -139,7 +139,7 @@ export default async function TrainerSettingsPage() {
                     <p className="mt-1 text-base font-bold text-ink">
                       {ready ? '設定済み' : '未設定'}
                     </p>
-                    <p className="mt-1 font-mono text-base font-medium text-ink-muted">{item.env}</p>
+                    <p className="mt-1 font-mono text-subhead font-medium text-ink-muted">{item.env}</p>
                   </div>
                 )
               })}

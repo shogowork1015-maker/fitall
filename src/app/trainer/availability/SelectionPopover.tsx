@@ -115,7 +115,7 @@ export function SelectionPopover({
           </button>
         </div>
 
-        <p className="text-base text-ink-muted mb-3">
+        <p className="text-subhead text-ink-muted mb-3">
           {dateLabel} {startTime} - {endTime}
         </p>
 
@@ -129,7 +129,7 @@ export function SelectionPopover({
           <button
             type="button"
             onClick={() => setTab('reservation')}
-            className={`h-11 px-4 rounded-control text-base font-medium ${
+            className={`h-11 px-4 rounded-control text-subhead font-medium ${
               tab === 'reservation'
                 ? 'bg-ink text-white'
                 : 'bg-surface-soft text-ink-muted'
@@ -140,7 +140,7 @@ export function SelectionPopover({
           <button
             type="button"
             onClick={() => setTab('block')}
-            className={`h-11 px-4 rounded-control text-base font-medium ${
+            className={`h-11 px-4 rounded-control text-subhead font-medium ${
               tab === 'block' ? 'bg-ink text-white' : 'bg-surface-soft text-ink-muted'
             }`}
           >
@@ -153,7 +153,7 @@ export function SelectionPopover({
             <select
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
-              className="w-full h-14 px-3 rounded-control border border-line text-base font-semibold"
+              className="w-full h-11 px-3 rounded-control border border-line text-base font-semibold"
             >
               <option value="">お客様を選択</option>
               {clients.map((c) => (
@@ -165,7 +165,7 @@ export function SelectionPopover({
             <select
               value={menuId}
               onChange={(e) => setMenuId(e.target.value)}
-              className="w-full h-14 px-3 rounded-control border border-line text-base font-semibold"
+              className="w-full h-11 px-3 rounded-control border border-line text-base font-semibold"
             >
               {menus.map((m) => (
                 <option key={m.id} value={m.id}>
@@ -178,13 +178,13 @@ export function SelectionPopover({
               step={300}
               value={time}
               onChange={(e) => setTime(e.target.value)}
-              className="w-full h-14 px-3 rounded-control border border-line text-base font-semibold"
+              className="w-full h-11 px-3 rounded-control border border-line text-base font-semibold"
             />
           </div>
         )}
 
         {tab === 'block' && (
-          <div className="text-base text-ink-muted bg-white border border-line rounded-control p-3">
+          <div className="text-subhead text-ink-muted bg-white border border-line rounded-control p-3">
             この時間帯を予約不可（ブロック）にします。
           </div>
         )}
@@ -204,13 +204,13 @@ export function SelectionPopover({
                 type="date"
                 value={repeatStart}
                 onChange={(e) => setRepeatStart(e.target.value)}
-                className="h-12 px-3 rounded-control border border-line text-base font-semibold"
+                className="h-11 px-3 rounded-control border border-line text-base font-semibold"
               />
               <input
                 type="date"
                 value={repeatUntil}
                 onChange={(e) => setRepeatUntil(e.target.value)}
-                className="h-12 px-3 rounded-control border border-line text-base font-semibold"
+                className="h-11 px-3 rounded-control border border-line text-base font-semibold"
               />
             </div>
           )}
@@ -220,7 +220,7 @@ export function SelectionPopover({
           <button
             type="button"
             onClick={onClose}
-            className="h-12 px-4 rounded-control border border-line text-base font-medium text-ink-muted"
+            className="h-11 px-4 rounded-control border border-line text-subhead font-medium text-ink-muted"
           >
             キャンセル
           </button>
@@ -228,7 +228,7 @@ export function SelectionPopover({
             type="button"
             disabled={saving}
             onClick={() => void (tab === 'reservation' ? onSaveReservation() : onSaveBlock())}
-            className="h-12 px-5 rounded-control bg-ink text-white text-base font-bold disabled:opacity-40"
+            className="h-11 px-5 rounded-control bg-ink text-white text-base font-bold disabled:opacity-40"
           >
             保存
           </button>

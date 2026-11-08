@@ -163,6 +163,7 @@ test('actual sales and dashboard page functions agree on current month and use p
     'next/link': {}, '@/app/auth/login/actions': {},
   }
   Object.assign(dependencies, uiDependencies(dependencies['react/jsx-runtime'], {}))
+  dependencies['./TrainerHomeMobile'] = { TrainerHomeMobile: () => null }
   const salesPage = await load('src/app/trainer/sales/page.tsx', dependencies).default()
   const dashboard = await load('src/app/trainer/dashboard/page.tsx', dependencies).default()
   assert.equal(salesPage.props.currentTotal, 33000)
@@ -199,6 +200,10 @@ test('ambiguous revenue hides only dashboard sales and gives explicit sales-page
     'next/link': { default: props => jsxRuntime.jsx('a', props) }, '@/app/auth/login/actions': {},
   }
   Object.assign(dependencies, uiDependencies(jsxRuntime, dependencies['next/link']))
+  // スマホのホーム画面も本物を描画し、売上エラーやお客様名が出ることまで確認する
+  dependencies['./TrainerHomeMobile'] = load('src/app/trainer/dashboard/TrainerHomeMobile.tsx', {
+    'react/jsx-runtime': jsxRuntime, react: await import('react'), 'next/link': dependencies['next/link'], '@/lib/datetime': datetime,
+  })
   const dashboard = await load('src/app/trainer/dashboard/page.tsx', dependencies).default()
   assert.equal(dashboard.props.totalSales, null)
   assert.equal(dashboard.props.clientCount, 1)

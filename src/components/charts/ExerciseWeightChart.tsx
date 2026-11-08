@@ -27,7 +27,7 @@ export function ExerciseWeightChart({
 
   if (!exercises.length) {
     return (
-      <div className="p-4 text-center text-base text-ink-faint">
+      <div className="p-4 text-center text-subhead text-ink-faint">
         30日以内のトレーニング記録がありません
       </div>
     )
@@ -42,7 +42,7 @@ export function ExerciseWeightChart({
             key={ex.id}
             type="button"
             onClick={() => setSelectedId(ex.id)}
-            className={`flex-shrink-0 px-3 h-8 rounded-full text-base font-medium transition-colors ${
+            className={`flex-shrink-0 px-3 h-8 rounded-full text-subhead font-medium transition-colors ${
               selectedId === ex.id
                 ? 'bg-ink text-white'
                 : 'bg-white text-ink-muted'
@@ -91,7 +91,7 @@ export function ExerciseWeightChart({
           </LineChart>
         </ResponsiveContainer>
       ) : (
-        <div className="text-center text-base text-ink-faint py-10">
+        <div className="text-center text-subhead text-ink-faint py-10">
           この種目のデータがありません
         </div>
       )}

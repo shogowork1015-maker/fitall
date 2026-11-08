@@ -343,7 +343,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
         {DAY_NAMES.map((name) => (
           <div
             key={`head-${name}`}
-            className="h-14 flex items-center justify-center text-base font-medium text-ink-muted bg-white border-b border-line"
+            className="h-11 flex items-center justify-center text-subhead font-medium text-ink-muted bg-white border-b border-line"
           >
             {name}
           </div>
@@ -367,7 +367,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
               } ${!isCurrentMonth ? 'text-ink-faint' : 'text-ink'}`}
             >
               <p className="text-base font-bold">{date.getDate()}</p>
-              <p className="mt-1 text-base text-ink-muted">{slotText}</p>
+              <p className="mt-1 text-subhead text-ink-muted">{slotText}</p>
               <div className="mt-1 space-y-1">
                 {bookings.slice(0, 2).map((b) => (
                   <div
@@ -382,7 +382,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
                   </div>
                 ))}
                 {bookings.length > 2 && (
-                  <p className="text-base text-ink-muted">+{bookings.length - 2}件</p>
+                  <p className="text-subhead text-ink-muted">+{bookings.length - 2}件</p>
                 )}
               </div>
             </button>
@@ -403,7 +403,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
               : 'grid-cols-[72px_repeat(7,minmax(140px,1fr))]'
           }`}
         >
-          <div className="h-14 border-b border-line bg-white" />
+          <div className="h-11 border-b border-line bg-white" />
           {columnDates.map((date) => {
             const key = toDateKey(date)
             const isSelected = selectedDateKey === key
@@ -412,11 +412,11 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
                 key={`head-${key}`}
                 type="button"
                 onClick={() => setSelectedDateKey(key)}
-                className={`h-14 border-b border-l border-line text-center ${
+                className={`h-11 border-b border-l border-line text-center ${
                   isSelected ? 'bg-accent-soft' : 'bg-white'
                 }`}
               >
-                <p className="text-base text-ink-muted">{DAY_NAMES[date.getDay()]}</p>
+                <p className="text-subhead text-ink-muted">{DAY_NAMES[date.getDay()]}</p>
                 <p className="text-base font-bold text-ink">
                   {date.getMonth() + 1}/{date.getDate()}
                 </p>
@@ -427,7 +427,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
           {GRID_HOURS.map((hour) => (
             <div key={`row-${hour}`} className="contents">
               <div className="h-[72px] px-2 border-b border-line bg-white">
-                <p className="text-base text-ink-muted mt-2">{String(hour).padStart(2, '0')}:00</p>
+                <p className="text-subhead text-ink-muted mt-2">{String(hour).padStart(2, '0')}:00</p>
               </div>
               {columnDates.map((date) => {
                 const key = toDateKey(date)
@@ -472,7 +472,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
                   >
                     <div className="space-y-1">
                       <p
-                        className={`text-base font-medium ${
+                        className={`text-subhead font-medium ${
                           isOpen ? 'text-brand' : 'text-ink-muted'
                         }`}
                       >
@@ -514,7 +514,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
       <div className="bg-white rounded-card border border-line p-3">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-base font-medium text-ink-muted">
+            <p className="text-subhead font-medium text-ink-muted">
               {viewTitle(view)}
             </p>
             <p className="text-lg font-bold text-ink">
@@ -537,7 +537,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
 
           <div className="flex flex-wrap gap-2">
             {dirty && (
-              <span className="h-14 inline-flex items-center px-3 rounded-control text-base font-bold bg-accent-soft text-brand border border-line">
+              <span className="h-11 inline-flex items-center px-3 rounded-control text-base font-bold bg-accent-soft text-brand border border-line">
                 未保存の変更あり
               </span>
             )}
@@ -546,7 +546,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
                 key={m}
                 type="button"
                 onClick={() => setView(m)}
-                className={`h-14 px-4 rounded-control text-base font-medium ${
+                className={`h-11 px-4 rounded-control text-subhead font-medium ${
                   view === m
                     ? 'bg-ink text-white'
                     : 'bg-white text-ink-muted border border-line'
@@ -558,21 +558,21 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
             <button
               type="button"
               onClick={() => move('prev')}
-              className="h-14 w-14 rounded-control border border-line text-ink text-xl font-bold"
+              className="h-11 w-11 rounded-control border border-line text-ink text-xl font-bold"
             >
               ‹
             </button>
             <button
               type="button"
               onClick={() => move('next')}
-              className="h-14 w-14 rounded-control border border-line text-ink text-xl font-bold"
+              className="h-11 w-11 rounded-control border border-line text-ink text-xl font-bold"
             >
               ›
             </button>
             <button
               type="button"
               onClick={goToday}
-              className="h-14 px-5 rounded-control border border-line text-base font-bold text-ink"
+              className="h-11 px-5 rounded-control border border-line text-base font-bold text-ink"
             >
               今日
             </button>
@@ -583,12 +583,12 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
       <div className="space-y-3">
         <div className="bg-white rounded-card border border-line p-3 space-y-3">
           <p className="text-base font-bold text-ink">毎週の繰り返し設定</p>
-          <p className="text-base text-ink-muted">指定曜日をまとめて設定します（今後約6ヶ月に反映）</p>
+          <p className="text-subhead text-ink-muted">指定曜日をまとめて設定します（今後約6ヶ月に反映）</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
             <select
               value={weeklyPresetDay}
               onChange={(e) => setWeeklyPresetDay(Number(e.target.value))}
-              className="h-14 px-3 bg-white border border-line rounded-control text-base font-semibold text-ink focus:outline-none focus:border-ink"
+              className="h-11 px-3 bg-white border border-line rounded-control text-base font-semibold text-ink focus:outline-none focus:border-ink"
             >
               {DAY_NAMES.map((name, idx) => (
                 <option key={name} value={idx}>
@@ -599,7 +599,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
             <select
               value={weeklyPresetStart}
               onChange={(e) => setWeeklyPresetStart(e.target.value)}
-              className="h-14 px-3 bg-white border border-line rounded-control text-base font-semibold text-ink focus:outline-none focus:border-ink"
+              className="h-11 px-3 bg-white border border-line rounded-control text-base font-semibold text-ink focus:outline-none focus:border-ink"
             >
               {TIME_OPTIONS.map((t) => (
                 <option key={`preset-start-${t}`} value={t}>
@@ -610,7 +610,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
             <select
               value={weeklyPresetEnd}
               onChange={(e) => setWeeklyPresetEnd(e.target.value)}
-              className="h-14 px-3 bg-white border border-line rounded-control text-base font-semibold text-ink focus:outline-none focus:border-ink"
+              className="h-11 px-3 bg-white border border-line rounded-control text-base font-semibold text-ink focus:outline-none focus:border-ink"
             >
               {TIME_OPTIONS.map((t) => (
                 <option key={`preset-end-${t}`} value={t}>
@@ -624,7 +624,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
               type="button"
               disabled={presetSaving}
               onClick={() => void handleApplyWeeklyPreset('open')}
-              className="h-12 px-4 rounded-control bg-ink text-white text-base font-bold disabled:opacity-40"
+              className="h-11 px-4 rounded-control bg-ink text-white text-base font-bold disabled:opacity-40"
             >
               毎週この時間を空きにする
             </button>
@@ -632,7 +632,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
               type="button"
               disabled={presetSaving}
               onClick={() => void handleApplyWeeklyPreset('block')}
-              className="h-12 px-4 rounded-control border border-line text-ink bg-white text-base font-bold disabled:opacity-40"
+              className="h-11 px-4 rounded-control border border-line text-ink bg-white text-base font-bold disabled:opacity-40"
             >
               毎週この曜日を休みにする
             </button>
@@ -677,7 +677,7 @@ export function AvailabilityManager({ initialSlots, initialBookings, clientOptio
         {view === 'week' && renderWeekOrDayView('week')}
         {view === 'day' && renderWeekOrDayView('day')}
 
-        <div className="bg-white rounded-card border border-line p-3 text-base text-ink-muted">
+        <div className="bg-white rounded-card border border-line p-3 text-subhead text-ink-muted">
           日付をタップして、時間セルをドラッグすると空き時間/ブロックをその日付だけに設定できます。
         </div>
       </div>

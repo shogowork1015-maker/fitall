@@ -39,9 +39,9 @@ export default async function CustomerTicketsPage({ searchParams }: PageProps) {
       {!data ? (
         <div className="fitall-page-pad">
           <section className="fitall-card p-5">
-            <p className="text-base font-medium text-ink-muted">はじめての方</p>
+            <p className="text-subhead font-medium text-ink-muted">はじめての方</p>
             <h2 className="mt-1 text-xl font-bold text-ink">チケットの購入が必要です</h2>
-            <p className="mt-2 text-base leading-relaxed text-ink-muted">
+            <p className="mt-2 text-subhead leading-relaxed text-ink-muted">
               メニューを購入するとチケットが追加され、予約日時を選べるようになります。
             </p>
             {entryData ? (
@@ -49,7 +49,7 @@ export default async function CustomerTicketsPage({ searchParams }: PageProps) {
                 <div className="fitall-row mt-4 !px-0">
                   <span className="fitall-avatar">{entryData.trainer.name[0] ?? '?'}</span>
                   <div className="fitall-row-main">
-                    <p className="text-base text-ink-muted">担当トレーナー</p>
+                    <p className="text-subhead text-ink-muted">担当トレーナー</p>
                     <p className="fitall-row-title">{entryData.trainer.name}さん</p>
                   </div>
                 </div>
@@ -58,7 +58,7 @@ export default async function CustomerTicketsPage({ searchParams }: PageProps) {
                 </Link>
               </>
             ) : (
-              <p className="mt-4 rounded-control bg-surface-soft px-4 py-4 text-center text-base text-ink-muted">
+              <p className="mt-4 rounded-control bg-surface-soft px-4 py-4 text-center text-subhead text-ink-muted">
                 LINEの登録リンクから開き直してください
               </p>
             )}
@@ -80,7 +80,7 @@ export default async function CustomerTicketsPage({ searchParams }: PageProps) {
                   <div className="min-w-0">
                     <span className="fitall-badge" data-tone="accent">{ticket.kind === 'monthly' ? '月謝' : '回数券'}</span>
                     <h2 className="mt-2 text-lg font-semibold text-ink">{ticket.title}</h2>
-                    <p className="mt-0.5 text-base text-ink-muted">{ticket.expiresLabel}</p>
+                    <p className="mt-0.5 text-subhead text-ink-muted">{ticket.expiresLabel}</p>
                   </div>
                   <p className="fitall-figure text-right text-[40px]">
                     {ticket.remaining}<small>/ {ticket.total}枚</small>
@@ -124,7 +124,7 @@ export default async function CustomerTicketsPage({ searchParams }: PageProps) {
             {!data.tickets.length && (
               <div className="fitall-card p-5 text-center">
                 <p className="text-base font-semibold text-ink">使えるチケットがありません</p>
-                <p className="mt-2 text-base leading-relaxed text-ink-muted">
+                <p className="mt-2 text-subhead leading-relaxed text-ink-muted">
                   下のメニューから購入すると、そのまま予約できます。
                 </p>
               </div>
@@ -142,7 +142,7 @@ export default async function CustomerTicketsPage({ searchParams }: PageProps) {
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <h3 className="text-lg font-semibold text-ink">{menu.name}</h3>
-                      <p className="mt-0.5 text-base text-ink-muted">
+                      <p className="mt-0.5 text-subhead text-ink-muted">
                         {menu.billing_type === 'monthly' ? `月謝・毎月${menu.sessions}枚` : `${menu.sessions}枚`}
                         {menu.description ? `・${menu.description}` : ''}
                       </p>
@@ -161,9 +161,9 @@ export default async function CustomerTicketsPage({ searchParams }: PageProps) {
           <section>
             <h2 className="fitall-group-label">お知らせについて</h2>
             <ul className="fitall-group">
-              <li className="fitall-row text-base text-ink-muted">予約確定と前日リマインドはLINEで届きます。</li>
-              <li className="fitall-row text-base text-ink-muted">回数券が0枚になると、LINEで追加のご案内が届きます。</li>
-              <li className="fitall-row text-base text-ink-muted">月謝チケットは月末で期限切れになります。繰越はトレーナーに相談できます。</li>
+              <li className="fitall-row text-subhead text-ink-muted">予約確定と前日リマインドはLINEで届きます。</li>
+              <li className="fitall-row text-subhead text-ink-muted">回数券が0枚になると、LINEで追加のご案内が届きます。</li>
+              <li className="fitall-row text-subhead text-ink-muted">月謝チケットは月末で期限切れになります。繰越はトレーナーに相談できます。</li>
             </ul>
           </section>
         </div>

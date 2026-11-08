@@ -20,7 +20,7 @@ function ClientProfileCard({ name, email }: { name: string; email: string }) {
     <section className="fitall-card px-4 pb-4 pt-6 text-center">
       <span className="fitall-avatar mx-auto !h-20 !w-20 !text-3xl">{name[0] ?? '?'}</span>
       <h2 className="mt-3 break-words text-2xl font-bold text-ink">{name}</h2>
-      <p className="mt-1 break-all text-base text-ink-muted">{email}</p>
+      <p className="mt-1 break-all text-subhead text-ink-muted">{email}</p>
       <div className="mt-5 grid grid-cols-3 gap-2">
         {actions.map(({ href, label, Icon }) => (
           <Link key={label} href={href} className="flex min-h-[72px] flex-col items-center justify-center gap-1 rounded-control bg-surface-soft text-brand">
@@ -43,7 +43,7 @@ function ClientDetailHeader() {
 function ValueRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="fitall-row">
-      <span className="fitall-row-main text-base text-ink-muted">{label}</span>
+      <span className="fitall-row-main text-subhead text-ink-muted">{label}</span>
       <span className="text-right text-base font-semibold text-ink">{value}</span>
     </div>
   )
@@ -257,7 +257,7 @@ export default async function ClientDetailPage({
             ].map((item) => (
               <div key={item.label} className="px-2">
                 <p className="fitall-figure text-[28px]">{item.value}<small>回</small></p>
-                <p className="mt-1 text-base text-ink-muted">{item.label}</p>
+                <p className="mt-1 text-subhead text-ink-muted">{item.label}</p>
               </div>
             ))}
           </div>
@@ -320,7 +320,7 @@ export default async function ClientDetailPage({
                           <span>最大 {e.maxWeight}kg × {e.totalReps}回</span>
                         </p>
                       ))}
-                      {log.memo && <p className="mt-2 text-base leading-relaxed text-ink-muted">{log.memo}</p>}
+                      {log.memo && <p className="mt-2 text-subhead leading-relaxed text-ink-muted">{log.memo}</p>}
                     </div>
                   </div>
                 )
@@ -332,7 +332,7 @@ export default async function ClientDetailPage({
         <section>
           <h3 className="fitall-group-label">予約の履歴</h3>
           {!bookings?.length ? (
-            <div className="fitall-group px-5 py-5 text-base text-ink-muted">
+            <div className="fitall-group px-5 py-5 text-subhead text-ink-muted">
               まだ予約がありません
             </div>
           ) : (

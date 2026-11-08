@@ -5,60 +5,64 @@ import { BottomTabBar } from '@/components/ui/BottomTabBar'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-function DashboardIcon({ active }: { active: boolean }) {
-  const c = 'currentColor'
+// 下部タブのアイコン。iPhoneと同じく、選択中は塗りつぶし・それ以外は線で描く
+function TabSvg({ children }: { children: React.ReactNode }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={active ? 2.4 : 2} strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="7" height="7" rx="1" />
-      <rect x="14" y="3" width="7" height="7" rx="1" />
-      <rect x="3" y="14" width="7" height="7" rx="1" />
-      <rect x="14" y="14" width="7" height="7" rx="1" />
+    <svg width="26" height="26" viewBox="0 0 24 24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {children}
     </svg>
+  )
+}
+
+function DashboardIcon({ active }: { active: boolean }) {
+  return (
+    <TabSvg>
+      <path
+        d="M3.5 10.2 12 3.5l8.5 6.7V19a1.5 1.5 0 0 1-1.5 1.5h-4.2v-5.6H9.2v5.6H5A1.5 1.5 0 0 1 3.5 19Z"
+        fill={active ? 'currentColor' : 'none'}
+        stroke="currentColor"
+      />
+    </TabSvg>
   )
 }
 
 function WalletIcon({ active }: { active: boolean }) {
-  const c = 'currentColor'
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={active ? 2.4 : 2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
-      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
-      <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
-    </svg>
+    <TabSvg>
+      <rect x="3.5" y="12" width="4" height="8.5" rx="1.2" fill={active ? 'currentColor' : 'none'} stroke="currentColor" />
+      <rect x="10" y="7.5" width="4" height="13" rx="1.2" fill={active ? 'currentColor' : 'none'} stroke="currentColor" />
+      <rect x="16.5" y="3.5" width="4" height="17" rx="1.2" fill={active ? 'currentColor' : 'none'} stroke="currentColor" />
+    </TabSvg>
   )
 }
 
 function UsersIcon({ active }: { active: boolean }) {
-  const c = 'currentColor'
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={active ? 2.4 : 2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
+    <TabSvg>
+      <circle cx="9" cy="8" r="3.6" fill={active ? 'currentColor' : 'none'} stroke="currentColor" />
+      <path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2Z" fill={active ? 'currentColor' : 'none'} stroke="currentColor" />
+      <path d="M15.5 4.7a3.4 3.4 0 0 1 0 6.6M17.5 13.9c2.4.6 4 2.9 4 6.1" fill="none" stroke="currentColor" />
+    </TabSvg>
   )
 }
 
 function CalendarIcon({ active }: { active: boolean }) {
-  const c = 'currentColor'
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={active ? 2.4 : 2} strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" />
-      <path d="M16 2v4" />
-      <path d="M8 2v4" />
-      <path d="M3 10h18" />
-    </svg>
+    <TabSvg>
+      <rect x="3" y="4.5" width="18" height="16.5" rx="3.5" fill={active ? 'currentColor' : 'none'} stroke="currentColor" />
+      <path d="M8 2.5v4M16 2.5v4" fill="none" stroke="currentColor" />
+      <path d="M3 9.5h18" fill="none" stroke={active ? '#ffffff' : 'currentColor'} />
+      <path d="M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01" fill="none" stroke={active ? '#ffffff' : 'currentColor'} strokeWidth="2.4" />
+    </TabSvg>
   )
 }
 
 function LinkIcon({ active }: { active: boolean }) {
-  const c = 'currentColor'
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={active ? 2.4 : 2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-    </svg>
+    <TabSvg>
+      <path d="M21 3 3.5 10.4l7 2.6 2.6 7Z" fill={active ? 'currentColor' : 'none'} stroke="currentColor" />
+      <path d="M21 3 10.5 13" fill="none" stroke={active ? '#ffffff' : 'currentColor'} />
+    </TabSvg>
   )
 }
 
@@ -100,7 +104,7 @@ export function TrainerTabNav() {
               <Link
                 key={href}
                 href={href}
-                className={`grid h-14 grid-cols-[28px_1fr] items-center gap-3 rounded-control px-3 font-bold ${
+                className={`grid h-11 grid-cols-[28px_1fr] items-center gap-3 rounded-control px-3 font-bold ${
                   isActive
                     ? 'bg-accent-soft text-ink'
                     : 'text-ink-muted hover:bg-surface-soft'
@@ -113,13 +117,13 @@ export function TrainerTabNav() {
           })}
         </nav>
         <div className="space-y-2 border-t border-line px-4 py-4">
-          <Link href="/trainer/settings" className="flex h-14 items-center rounded-control px-3 font-bold text-ink-muted hover:bg-surface-soft">
+          <Link href="/trainer/settings" className="flex h-11 items-center rounded-control px-3 font-bold text-ink-muted hover:bg-surface-soft">
             設定
           </Link>
           <form action={signOutAction}>
             <button
               type="submit"
-              className="grid h-14 w-full grid-cols-[28px_1fr] items-center gap-3 rounded-control px-3 text-left font-bold text-ink-muted hover:bg-surface-soft"
+              className="grid h-11 w-full grid-cols-[28px_1fr] items-center gap-3 rounded-control px-3 text-left font-bold text-ink-muted hover:bg-surface-soft"
             >
               <LogoutIcon />
               <span>ログアウト</span>

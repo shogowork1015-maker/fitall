@@ -63,7 +63,7 @@ function SalesScreen({
         {preview && <DevPreviewNote>開発用の確認モード（サンプルの売上）</DevPreviewNote>}
 
         <section className="fitall-card p-5">
-          <p className="text-base font-medium text-ink-muted">{monthLabel(now)}の売上</p>
+          <p className="text-subhead font-medium text-ink-muted">{monthLabel(now)}の売上</p>
           <p className="fitall-figure mt-1 text-[40px]">{yen(currentTotal)}</p>
           <p className="mt-3">
             <span className="fitall-badge" data-tone={diff >= 0 ? 'accent' : 'danger'}>
@@ -73,7 +73,7 @@ function SalesScreen({
 
           <div className="mt-6">
             <div className="flex items-baseline justify-between">
-              <p className="text-base font-medium text-ink-muted">販売回数</p>
+              <p className="text-subhead font-medium text-ink-muted">販売回数</p>
               <p className="text-base font-semibold text-ink">
                 <span className="fitall-figure text-xl">{currentSoldSessions}</span>
                 <span className="text-ink-muted"> / 目標{sessionGoal}回</span>
@@ -82,7 +82,7 @@ function SalesScreen({
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-soft">
               <div className="fitall-grow-x h-full rounded-full bg-accent" style={{ width: `${progress}%` }} />
             </div>
-            <p className="mt-2 text-base text-ink-muted">
+            <p className="mt-2 text-subhead text-ink-muted">
               {remainingSessions === 0 ? '今月の目標を達成しました' : `あと${remainingSessions}回で目標です`}
             </p>
           </div>
@@ -90,11 +90,11 @@ function SalesScreen({
 
         <section className="fitall-group">
           <div className="fitall-row">
-            <span className="fitall-row-main text-base text-ink-muted">平均単価（1回あたり）</span>
+            <span className="fitall-row-main text-subhead text-ink-muted">平均単価（1回あたり）</span>
             <span className="fitall-figure text-lg">{yen(averageTicket)}</span>
           </div>
           <div className="fitall-row">
-            <span className="fitall-row-main text-base text-ink-muted">先月の売上</span>
+            <span className="fitall-row-main text-subhead text-ink-muted">先月の売上</span>
             <span className="fitall-figure text-lg">{yen(prevTotal)}</span>
           </div>
         </section>
@@ -112,7 +112,7 @@ function SalesScreen({
             <span className="font-medium">{records.length}件</span>
           </h2>
           {!records.length ? (
-            <div className="fitall-group px-5 py-6 text-base text-ink-muted">
+            <div className="fitall-group px-5 py-6 text-subhead text-ink-muted">
               今月の売上はまだありません
             </div>
           ) : (
@@ -141,7 +141,7 @@ function SalesScreen({
           <div>
             <p className="fitall-kicker">売上</p>
             <h1 className="fitall-desktop-title">売上管理</h1>
-            <p className="mt-2 text-base font-medium text-ink-muted">
+            <p className="mt-2 text-subhead font-medium text-ink-muted">
               PCでは月次売上、販売回数、明細をまとめて確認できます。
             </p>
           </div>
@@ -155,10 +155,10 @@ function SalesScreen({
         <section className="grid grid-cols-[1.4fr_.8fr_.8fr] gap-4">
           <div className="fitall-desktop-card">
             <div className="px-6 pt-5">
-              <p className="text-base font-semibold text-ink-muted">{now.getMonth() + 1}月の売上</p>
+              <p className="text-subhead font-semibold text-ink-muted">{now.getMonth() + 1}月の売上</p>
             </div>
             <div className="p-6">
-              <p className="text-base font-medium text-ink-muted">いま入っている金額</p>
+              <p className="text-subhead font-medium text-ink-muted">いま入っている金額</p>
               <h2 className="mt-2 text-6xl font-black leading-none text-ink">{yen(currentTotal)}</h2>
               <p className={`mt-3 text-base font-black ${diff >= 0 ? 'text-brand' : 'text-danger'}`}>
                 先月比 {diff >= 0 ? '+' : '-'}{yen(Math.abs(diff))} / {diffRate >= 0 ? '+' : ''}{diffRate}%
@@ -169,13 +169,13 @@ function SalesScreen({
           <div className="fitall-desktop-card p-5">
             <p className="fitall-kicker">販売数</p>
             <p className="mt-4 text-5xl font-black text-ink">{currentSoldSessions}<span className="ml-1 text-base">回</span></p>
-            <p className="mt-2 text-base font-medium text-ink-muted">販売回数</p>
+            <p className="mt-2 text-subhead font-medium text-ink-muted">販売回数</p>
           </div>
 
           <div className="fitall-desktop-card p-5">
             <p className="fitall-kicker">平均</p>
             <p className="mt-4 text-4xl font-black text-ink">{yen(averageTicket)}</p>
-            <p className="mt-2 text-base font-medium text-ink-muted">平均単価</p>
+            <p className="mt-2 text-subhead font-medium text-ink-muted">平均単価</p>
           </div>
         </section>
 
@@ -191,10 +191,10 @@ function SalesScreen({
           <div className="fitall-desktop-card p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="fitall-section-title">今月の明細</h2>
-              <span className="text-base font-medium text-ink-muted">{records.length}件</span>
+              <span className="text-subhead font-medium text-ink-muted">{records.length}件</span>
             </div>
             {!records.length ? (
-              <div className="rounded-card border border-dashed border-line bg-white p-6 text-center text-base font-medium text-ink-muted">
+              <div className="rounded-card border border-dashed border-line bg-white p-6 text-center text-subhead font-medium text-ink-muted">
                 今月の売上はまだありません
               </div>
             ) : (
@@ -206,7 +206,7 @@ function SalesScreen({
                     </div>
                     <div>
                       <p className="text-base font-bold text-ink">{record.name}</p>
-                      <p className="mt-0.5 text-base font-medium text-ink-muted">
+                      <p className="mt-0.5 text-subhead font-medium text-ink-muted">
                         {new Date(record.date).toLocaleDateString('ja-JP')} / {record.quantity}回
                       </p>
                     </div>

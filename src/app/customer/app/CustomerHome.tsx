@@ -18,16 +18,16 @@ export function CustomerHome({ data }: { data: Pick<CustomerAppData, 'customer' 
         {data.preview && <DevPreviewNote>開発用の確認モード（サンプル表示）</DevPreviewNote>}
 
         <section className="fitall-card p-5" aria-label="残りチケット">
-          <p className="text-base font-medium text-ink-muted">使えるチケット</p>
+          <p className="text-subhead font-medium text-ink-muted">使えるチケット</p>
           <div className="mt-1 flex items-end justify-between gap-3">
-            <p className="fitall-figure text-[56px]">{remaining}<small className="!text-xl">枚</small></p>
+            <p className="fitall-figure text-[44px]">{remaining}<small className="!text-xl">枚</small></p>
             {scheduled > 0 && <span className="fitall-badge mb-2">予約で使用中 {scheduled}枚</span>}
           </div>
           <Link href={remaining > 0 ? '/customer/app/bookings' : '/customer/app/tickets'} className="fitall-primary-action mt-5">
             {remaining > 0 ? 'チケットで予約する' : 'チケットを購入する'}
           </Link>
           {remaining > 0 && (
-            <Link href="/customer/app/tickets" className="mt-2 flex min-h-14 items-center justify-center font-semibold text-brand">
+            <Link href="/customer/app/tickets" className="mt-2 flex min-h-11 items-center justify-center font-semibold text-brand">
               チケットを買い足す
             </Link>
           )}
@@ -36,7 +36,7 @@ export function CustomerHome({ data }: { data: Pick<CustomerAppData, 'customer' 
         <section aria-label="次の予約">
           <h2 className="fitall-group-label">
             <span>次の予約</span>
-            <Link href="/customer/app/bookings/list" className="inline-flex min-h-14 items-center">予約一覧</Link>
+            <Link href="/customer/app/bookings/list" className="inline-flex min-h-11 items-center">予約一覧</Link>
           </h2>
           {next ? (
             <Link href="/customer/app/bookings/list" className="fitall-card flex items-center gap-4 p-4">
@@ -54,7 +54,7 @@ export function CustomerHome({ data }: { data: Pick<CustomerAppData, 'customer' 
               <ChevronRightIcon />
             </Link>
           ) : (
-            <div className="fitall-card px-5 py-5 text-base text-ink-muted">次の予約はまだありません。</div>
+            <div className="fitall-card px-5 py-5 text-subhead text-ink-muted">次の予約はまだありません。</div>
           )}
         </section>
 
@@ -74,7 +74,7 @@ export function CustomerHome({ data }: { data: Pick<CustomerAppData, 'customer' 
               ))}
             </div>
           ) : (
-            <div className="fitall-group px-5 py-5 text-base text-ink-muted">購入済みのチケットはありません。</div>
+            <div className="fitall-group px-5 py-5 text-subhead text-ink-muted">購入済みのチケットはありません。</div>
           )}
         </section>
       </div>

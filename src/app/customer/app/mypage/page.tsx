@@ -36,7 +36,7 @@ export default async function CustomerMyPage({ searchParams }: PageProps) {
 
       {!data ? (
         <div className="fitall-page-pad">
-          <div className="fitall-card p-6 text-center text-base text-ink-muted">
+          <div className="fitall-card p-6 text-center text-subhead text-ink-muted">
             お客様情報が見つかりません
           </div>
         </div>
@@ -53,17 +53,17 @@ export default async function CustomerMyPage({ searchParams }: PageProps) {
             <span className="fitall-avatar !h-16 !w-16 !text-2xl">{data.customer.name[0] ?? '?'}</span>
             <div className="min-w-0">
               <h2 className="text-xl font-bold text-ink">{data.customer.name}さん</h2>
-              <p className="mt-0.5 break-all text-base text-ink-muted">{data.customer.email}</p>
+              <p className="mt-0.5 break-all text-subhead text-ink-muted">{data.customer.email}</p>
             </div>
           </section>
 
           <section className="fitall-group">
             <div className="fitall-row">
-              <span className="fitall-row-main text-base text-ink-muted">目標</span>
+              <span className="fitall-row-main text-subhead text-ink-muted">目標</span>
               <span className="text-right text-base font-semibold text-ink">{data.customer.goal}</span>
             </div>
             <div className="fitall-row">
-              <span className="fitall-row-main text-base text-ink-muted">担当トレーナー</span>
+              <span className="fitall-row-main text-subhead text-ink-muted">担当トレーナー</span>
               <span className="text-right text-base font-semibold text-ink">{data.trainer.name}</span>
             </div>
           </section>
@@ -86,7 +86,7 @@ export default async function CustomerMyPage({ searchParams }: PageProps) {
               {notificationItems.map((item) => (
                 <div key={item.label} className="fitall-row">
                   <span className="fitall-row-main text-base text-ink">{item.label}</span>
-                  <span className="text-base text-ink-muted">{item.status}</span>
+                  <span className="text-subhead text-ink-muted">{item.status}</span>
                 </div>
               ))}
             </div>

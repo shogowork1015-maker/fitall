@@ -16,7 +16,7 @@ export type MonthlySales = { month: string; amount: number }
 export function SalesBarChart({ data, dark }: { data: MonthlySales[]; dark?: boolean }) {
   if (!data.length) {
     return (
-      <div className="text-center text-base text-ink-muted py-4">
+      <div className="text-center text-subhead text-ink-muted py-4">
         売上データがありません
       </div>
     )

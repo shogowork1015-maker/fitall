@@ -41,24 +41,24 @@ export default async function TrainerAvailabilityPage() {
       <div className="fitall-page fitall-scroll">
         <PageHeader title="空き時間" back={{ href: '/trainer/bookings', label: '予約へ戻る' }} />
 
-        <div className="px-4 py-6 space-y-4">
-          <div className="mb-5"><DevPreviewNote>開発用の確認モード。空き時間設定の保存はログイン後に有効になります。</DevPreviewNote></div>
-          <div className="fitall-card p-5">
-            <h2 className="text-base font-bold text-ink">受付時間サンプル</h2>
-            <div className="mt-4 space-y-3">
+        <div className="fitall-page-pad space-y-4">
+          <DevPreviewNote>開発用の確認モード。空き時間設定の保存はログイン後に有効になります。</DevPreviewNote>
+          <section aria-label="受付時間サンプル">
+            <h2 className="fitall-group-label">受付時間</h2>
+            <div className="fitall-group">
               {[
                 ['月', '10:00 - 20:00'],
                 ['火', '09:00 - 18:00'],
                 ['木', '11:00 - 20:00'],
                 ['土', '09:00 - 14:00'],
               ].map(([day, time]) => (
-                <div key={day} className="flex items-center justify-between rounded-control bg-surface-soft px-4 py-3">
-                  <span className="text-base font-bold text-ink">毎週{day}曜日</span>
-                  <span className="text-base font-bold text-brand">{time}</span>
+                <div key={day} className="fitall-row">
+                  <span className="flex-1">毎週{day}曜日</span>
+                  <span className="font-semibold tabular-nums text-ink-muted">{time}</span>
                 </div>
               ))}
             </div>
-          </div>
+          </section>
           <Link
             href="/trainer/bookings"
             className="fitall-primary-action fitall-tap"
@@ -169,7 +169,7 @@ export default async function TrainerAvailabilityPage() {
       />
 
       <div className="px-4 py-6 space-y-4">
-        <p className="text-base text-ink-muted px-1">
+        <p className="text-subhead text-ink-muted px-1">
           受付する日付・時間帯を設定してください。設定がない日はお客様が予約できません。
           営業時間: {trainerSettings.business_open} - {trainerSettings.business_close}
         </p>

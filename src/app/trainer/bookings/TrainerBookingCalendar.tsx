@@ -5,7 +5,7 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { BookingActions } from './BookingActions'
 import { MoveBookingForm } from './MoveBookingForm'
 import { QuickReservationModal } from './QuickReservationModal'
-import { StatusBadge } from '@/components/ui/StatusBadge'
+import { StatusBadge, StatusTag, statusLabel } from '@/components/ui/StatusBadge'
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, TicketIcon } from '@/components/ui/Icons'
 
 type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled'
@@ -199,10 +199,10 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
               aria-pressed={selected}
               aria-label={`${date.getMonth() + 1}月${date.getDate()}日 ${WEEKDAYS[date.getDay()]}曜日 予約${count}件`}
               onClick={() => selectDate(date)}
-              className="flex h-[84px] flex-col items-center justify-center gap-1 rounded-control"
+              className="flex h-[70px] flex-col items-center justify-center gap-1 rounded-control"
             >
-              <span className={`font-medium ${today ? 'text-brand' : 'text-ink-muted'}`}>{WEEKDAYS[date.getDay()]}</span>
-              <span className={`flex h-9 w-9 items-center justify-center rounded-full text-lg font-semibold leading-none transition-colors ${
+              <span className={`text-footnote font-medium ${today ? 'text-brand' : 'text-ink-muted'}`}>{WEEKDAYS[date.getDay()]}</span>
+              <span className={`flex h-9 w-9 items-center justify-center rounded-full text-title3 font-semibold leading-none transition-colors ${
                 selected ? 'bg-ink text-white' : today ? 'text-brand' : 'text-ink'
               }`}>{date.getDate()}</span>
               <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${count ? 'bg-accent' : 'bg-transparent'}`} />
@@ -265,7 +265,7 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
     return (
       <div className={`${mode === 'week' ? 'hidden md:block' : ''} w-full max-w-full overflow-x-auto rounded-card bg-white`}>
         <div className={`grid ${mode === 'day' ? 'grid-cols-[72px_minmax(0,1fr)]' : 'min-w-[900px] grid-cols-[72px_repeat(7,minmax(0,1fr))]'}`}>
-          <div className="h-14 border-b border-line bg-white" />
+          <div className="h-11 border-b border-line bg-white" />
           {dates.map((date) => {
             const key = toDateKey(date)
             const isSelected = selectedDateKey === key
@@ -275,7 +275,7 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => selectDate(date)}
-                className={`flex h-14 items-center justify-center gap-2 border-b border-l border-line font-semibold ${
+                className={`flex h-11 items-center justify-center gap-2 border-b border-l border-line font-semibold ${
                   isSelected ? 'bg-accent-soft text-brand' : 'bg-white text-ink'
                 }`}
               >
@@ -325,8 +325,8 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
     <div className="min-w-0 space-y-4 pb-20 md:pb-0">
       <div className="space-y-3">
         <div className="flex items-center gap-1">
-          <h2 aria-live="polite" className="min-w-0 flex-1 text-xl font-bold leading-tight text-ink">{title()}</h2>
-          <button type="button" onClick={goToday} className="fitall-secondary-action !rounded-full !px-5 !text-base">今日</button>
+          <h2 aria-live="polite" className="min-w-0 flex-1 text-title3 font-bold leading-tight text-ink">{title()}</h2>
+          <button type="button" onClick={goToday} className="fitall-secondary-action !min-h-11 !rounded-full !px-4 !text-subhead">今日</button>
           <button type="button" aria-label={`前の${viewTitle(view)}`} onClick={() => move(-1)} className="fitall-circle-button"><span><ChevronLeftIcon /></span></button>
           <button type="button" aria-label={`次の${viewTitle(view)}`} onClick={() => move(1)} className="fitall-circle-button -ml-2"><span><ChevronRightIcon size={20} className="" /></span></button>
         </div>
@@ -368,7 +368,7 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
               weekday: 'short',
             })}
           </h2>
-          <span className="font-medium">{selectedBookings.length}件</span>
+          <span className="text-subhead font-medium text-ink-muted">{selectedBookings.length}件</span>
         </div>
 
         {!selectedBookings.length ? (
@@ -383,35 +383,35 @@ export function TrainerBookingCalendar({ bookings, clients, menus, preview = fal
             </button>
           </div>
         ) : (
-          <div key={selectedDateKey} className="space-y-3">
+          <div key={selectedDateKey} className="space-y-2.5">
             {selectedBookings.map((booking, index) => (
               <div
                 key={booking.id}
-                className="fitall-card fitall-card-pop relative overflow-hidden p-4"
+                className="fitall-booking-card fitall-card-pop"
+                data-status={booking.status}
                 style={{ animationDelay: `${index * 40}ms` }}
               >
-                <div
-                  aria-hidden="true"
-                  className={`absolute bottom-4 left-0 top-4 w-1 rounded-r-full ${
-                    booking.status === 'confirmed' ? 'bg-accent' : booking.status === 'pending' ? 'bg-[var(--fitall-warn-dot)]' : booking.status === 'cancelled' ? 'bg-line' : 'bg-ink'
-                  }`}
-                />
-                <div className="ml-1 flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="flex items-baseline gap-3">
-                      <span className="fitall-figure text-2xl">{startTimeLabel(booking.scheduled_at)}</span>
-                      <span className="truncate text-lg font-semibold text-ink">{booking.trainee_name}</span>
+                {/* カシカリ帳の明細のように、左に札と名前、右に大きな時刻を置く */}
+                <div className="flex items-center gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="fitall-row-title">
+                      <StatusTag status={booking.status} />
+                      <span className="truncate">{booking.trainee_name}</span>
+                      {booking.status === 'pending' && <span role="img" aria-label="要対応" className="fitall-dot" />}
                     </p>
-                    <p className="fitall-row-meta mt-1">
+                    <p className="fitall-row-meta">
                       <span>¥{booking.price.toLocaleString()}</span>
-                      {booking.credit_status ? <span><TicketIcon size={16} />チケット予約</span> : null}
+                      {booking.credit_status ? <span><TicketIcon size={14} />チケット予約</span> : null}
                     </p>
                   </div>
-                  <StatusBadge status={booking.status} />
+                  <div className="fitall-row-side">
+                    <p className="fitall-row-figure">{startTimeLabel(booking.scheduled_at)}</p>
+                    <p className={`fitall-row-meta ${booking.status === 'pending' ? '!text-warn' : ''}`}>{statusLabel(booking.status)}</p>
+                  </div>
                 </div>
-                <div className="ml-1 mt-3">
+                <div className="mt-3">
                   {preview ? (
-                    <p className="text-base text-ink-faint">
+                    <p className="text-footnote text-ink-muted">
                       確認モードのため、承認・完了・移動はできません
                     </p>
                   ) : (

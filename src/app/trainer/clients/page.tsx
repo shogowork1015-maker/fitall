@@ -62,7 +62,7 @@ function ClientListScreen({
         {!clients.length ? (
           <section className="fitall-card px-5 py-8 text-center">
             <p className="text-lg font-semibold text-ink">まだお客様がいません</p>
-            <p className="mt-2 text-base leading-relaxed text-ink-muted">
+            <p className="mt-2 text-subhead leading-relaxed text-ink-muted">
               お客様を仮登録して、LINEで登録リンクを送れます。
             </p>
             <Link href="/trainer/clients/new" className="fitall-primary-action mt-5">
@@ -100,7 +100,7 @@ function ClientListScreen({
           <div>
             <p className="fitall-kicker">お客様</p>
             <h1 className="fitall-desktop-title">お客様管理</h1>
-            <p className="mt-2 text-base font-medium text-ink-muted">
+            <p className="mt-2 text-subhead font-medium text-ink-muted">
               PCでは残チケット、今月回数、最終記録を一覧で確認できます。
             </p>
           </div>
@@ -117,24 +117,24 @@ function ClientListScreen({
           <div className="fitall-desktop-card p-5">
             <p className="fitall-kicker">お客様</p>
             <p className="mt-3 text-5xl font-black text-ink">{clients.length}<span className="ml-1 text-base">名</span></p>
-            <p className="mt-2 text-base font-medium text-ink-muted">管理中のお客様</p>
+            <p className="mt-2 text-subhead font-medium text-ink-muted">管理中のお客様</p>
           </div>
           <div className="fitall-desktop-card p-5">
             <p className="text-base font-semibold text-warn">要フォロー</p>
             <p className="fitall-figure mt-3 text-5xl">{lowCreditCount}<small>名</small></p>
-            <p className="mt-2 text-base text-ink-muted">残チケットが1回以下</p>
+            <p className="mt-2 text-subhead text-ink-muted">残チケットが1回以下</p>
           </div>
           <div className="fitall-desktop-card p-5">
             <p className="fitall-kicker">次回</p>
             <p className="mt-3 text-xl font-black text-ink">連絡・更新の確認</p>
-            <p className="mt-2 text-base font-medium text-ink-muted">残1回以下のお客様に次回チケット案内</p>
+            <p className="mt-2 text-subhead font-medium text-ink-muted">残1回以下のお客様に次回チケット案内</p>
           </div>
         </section>
 
         {!clients.length ? (
           <section className="fitall-desktop-card p-10 text-center">
             <p className="text-lg font-black text-ink">まだお客様がいません</p>
-            <p className="mt-2 text-base font-medium text-ink-muted">お客様を仮登録して、LINEで登録リンクを送れます。</p>
+            <p className="mt-2 text-subhead font-medium text-ink-muted">お客様を仮登録して、LINEで登録リンクを送れます。</p>
             <Link href="/trainer/clients/new" className="fitall-aqua-action fitall-tap mx-auto mt-5 w-auto min-w-[220px]">
               お客様を追加
             </Link>
@@ -159,7 +159,7 @@ function ClientListScreen({
                     <span className="fitall-avatar">{client.name[0] ?? '?'}</span>
                     <p className="text-base font-black text-ink">{client.name}</p>
                   </div>
-                  <p className="text-base font-medium text-ink-muted">{client.last}</p>
+                  <p className="text-subhead font-medium text-ink-muted">{client.last}</p>
                   <p className="text-base font-bold text-ink">{client.sessions}回</p>
                   <span className="fitall-badge w-fit" data-tone={client.credits <= 1 ? 'warn' : 'accent'}>
                     残{client.credits}回

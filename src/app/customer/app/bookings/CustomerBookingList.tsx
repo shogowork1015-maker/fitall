@@ -4,9 +4,9 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { BookingManagement } from './BookingManagement'
 import type { CustomerBooking } from '@/lib/customer-app'
-import { formatJstDateTime } from '@/lib/datetime'
+import { formatJstDate, formatJstTime } from '@/lib/datetime'
 import { DevPreviewNote, PageHeader } from '@/components/ui/PageHeader'
-import { StatusBadge } from '@/components/ui/StatusBadge'
+import { StatusTag, statusLabel } from '@/components/ui/StatusBadge'
 
 export function CustomerBookingList({ upcomingBookings, pastBookings = [], managementEnabled = false }: {
   upcomingBookings: CustomerBooking[]; pastBookings?: CustomerBooking[]; managementEnabled?: boolean
@@ -16,12 +16,18 @@ export function CustomerBookingList({ upcomingBookings, pastBookings = [], manag
     .sort((a, b) => Date.parse(a.scheduled_at) - Date.parse(b.scheduled_at))
   const past = [...pastBookings].sort((a, b) => Date.parse(b.scheduled_at) - Date.parse(a.scheduled_at))
   function row(booking: CustomerBooking) {
-    return <li key={booking.id} className="fitall-card p-4">
-      <div className="flex items-start justify-between gap-3">
-        <time dateTime={booking.scheduled_at} className="block text-lg font-semibold leading-snug text-ink">
-          {formatJstDateTime(booking.scheduled_at, { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' })}
-        </time>
-        <StatusBadge status={booking.status} />
+    return <li key={booking.id} className="fitall-booking-card" data-status={booking.status}>
+      <div className="flex items-center gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="fitall-row-title">
+            <StatusTag status={booking.status} />
+            <time dateTime={booking.scheduled_at} className="truncate">
+              {formatJstDate(booking.scheduled_at, { month: 'long', day: 'numeric', weekday: 'short' })}
+            </time>
+          </p>
+          <p className={`fitall-row-meta ${booking.status === 'pending' ? '!text-warn' : ''}`}>{statusLabel(booking.status)}</p>
+        </div>
+        <p className="fitall-row-figure">{formatJstTime(booking.scheduled_at)}</p>
       </div>
       {managementEnabled && <BookingManagement key={`${booking.id}-${booking.scheduled_at}-${booking.status}`} booking={booking} onSuccess={setNotice} />}
     </li>
@@ -32,18 +38,19 @@ export function CustomerBookingList({ upcomingBookings, pastBookings = [], manag
       {!managementEnabled && <DevPreviewNote>開発用の確認モード。変更・キャンセルはできません。</DevPreviewNote>}
       {notice && <p role="status" className="fitall-card-pop rounded-control bg-accent-soft p-3 font-medium text-brand">{notice}</p>}
       <section aria-label="これからの予約">
-        <h2 className="fitall-group-label">これからの予約 <span className="font-medium">{upcoming.length}件</span></h2>
-        {upcoming.length ? <ul className="space-y-3">{upcoming.map(row)}</ul> : <p className="fitall-card p-5 text-center text-ink-muted">予約はまだありません。</p>}
+        <h2 className="fitall-group-label"><span>これからの予約</span><span>{upcoming.length}件</span></h2>
+        {upcoming.length ? <ul className="space-y-2.5">{upcoming.map(row)}</ul> : <p className="fitall-card p-5 text-center text-ink-muted">予約はまだありません。</p>}
         <Link href="/customer/app/bookings" className="fitall-primary-action mt-4">新しく予約する</Link>
       </section>
       {past.length > 0 && <section aria-label="過去の予約">
         <h2 className="fitall-group-label">過去の予約</h2>
         <ul className="fitall-group">
           {past.map(booking => <li key={booking.id} className="fitall-row" data-status={booking.status}>
-            <time dateTime={booking.scheduled_at} className="fitall-row-main text-base text-ink">
-              {formatJstDateTime(booking.scheduled_at, { month: 'numeric', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' })}
-            </time>
-            <StatusBadge status={booking.status} />
+            <p className="fitall-row-main fitall-row-title">
+              <StatusTag status={booking.status} />
+              <time dateTime={booking.scheduled_at}>{formatJstDate(booking.scheduled_at, { month: 'long', day: 'numeric', weekday: 'short' })}</time>
+            </p>
+            <span className="text-subhead font-semibold tabular-nums text-ink-muted">{formatJstTime(booking.scheduled_at)}</span>
           </li>)}
         </ul>
       </section>}

@@ -9,7 +9,7 @@ export function BookingPageContent({ data, checkoutAction, cancelled = false }: 
         <header className="mb-7 border-b-2 border-ink pb-5">
           <p className="text-base font-bold text-brand">Limitless Booking</p>
           <h1 className="mt-2 text-2xl font-black leading-tight">{data.trainer.name}さんのチケット</h1>
-          <p className="mt-3 text-base text-ink-muted">先にチケットを購入して、お好きな日時に予約。</p>
+          <p className="mt-3 text-subhead text-ink-muted">先にチケットを購入して、お好きな日時に予約。</p>
           <Link href="/customer/app/bookings" className="mt-3 inline-flex min-h-11 items-center text-base font-bold text-brand underline underline-offset-4">
             チケットをお持ちの方は予約へ
           </Link>

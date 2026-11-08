@@ -55,13 +55,13 @@ export function RescheduleModal({ bookingId, currentScheduledAt, onClose }: Prop
         <p className="text-base font-bold text-ink">新しい日時を選択</p>
         <button
           onClick={onClose}
-          className="text-base font-medium text-ink-muted"
+          className="text-subhead font-medium text-ink-muted"
         >
           キャンセル
         </button>
       </div>
 
-      <p className="text-base text-ink-muted">
+      <p className="text-subhead text-ink-muted">
         現在: {formatJstDate(currentScheduledAt, { month: 'long', day: 'numeric', weekday: 'short' })} {formatJstTime(currentScheduledAt)}
       </p>
 

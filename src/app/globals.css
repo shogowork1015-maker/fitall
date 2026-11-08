@@ -6,14 +6,14 @@
    ========================================================================== */
 :root {
   /* 面: iPhoneの設定画面のような、薄いグレーの地に白いまとまりを置く構成 */
-  --fitall-bg: #F2F3F5;
+  --fitall-bg: #F2F2F7;
   --fitall-surface: #FFFFFF;
-  --fitall-surface-soft: #F2F3F5;
-  --fitall-surface-press: #E9EAED;
+  --fitall-surface-soft: #F2F2F7;
+  --fitall-surface-press: #E5E5EA;
 
   /* 文字。補足は彩度のないグレーで、白地でも地色でも4.5:1以上を保つ */
   --fitall-ink: #0A0A0A;
-  --fitall-ink-muted: #5E5E66;
+  --fitall-ink-muted: #6D6D72;
   --fitall-ink-faint: #707076;
 
   /* ブランド。アクアは塗り専用、文字にはコントラストの取れる brand を使う */
@@ -22,8 +22,8 @@
   --fitall-brand: #06726D;
 
   /* 線: 枠線ではなく区切り線として細く使う */
-  --fitall-line: #E3E4E8;
-  --fitall-hairline: rgb(60 60 67 / 14%);
+  --fitall-line: #E5E5EA;
+  --fitall-hairline: rgb(60 60 67 / 18%);
 
   /* 状態。色は意味のある所（確定・承認待ち・エラー）にだけ使う */
   --fitall-warn: #B54708;
@@ -35,17 +35,18 @@
 
   /* 形 */
   --fitall-radius-chip: 8px;
-  --fitall-radius-control: 14px;
-  --fitall-radius-card: 18px;
+  --fitall-radius-control: 12px;
+  --fitall-radius-card: 14px;
 
   /* 影。カードには付けず、浮かせたい丸ボタン等にだけ使う */
-  --fitall-shadow-card: none;
+  --fitall-shadow-card: 0 1px 2px rgb(0 0 0 / 4%), 0 1px 12px rgb(0 0 0 / 4%);
   --fitall-shadow-float: 0 1px 2px rgb(10 10 10 / 6%), 0 4px 12px rgb(10 10 10 / 8%);
   --fitall-shadow-raised: 0 8px 28px rgb(10 10 10 / 16%);
 
-  /* 寸法 */
-  --fitall-tap: 56px;
-  --fitall-tabbar: 72px;
+  /* 寸法。タップ領域はiPhone標準の44pt */
+  --fitall-tap: 44px;
+  --fitall-navbar: 52px;
+  --fitall-tabbar: 54px;
   --fitall-safe-top: env(safe-area-inset-top, 0px);
   --fitall-safe-bottom: env(safe-area-inset-bottom, 0px);
 
@@ -78,6 +79,20 @@
   --radius-control: var(--fitall-radius-control);
   --radius-card: var(--fitall-radius-card);
 
+  /* iPhoneの文字サイズ（補足13・小見出し15・本文17・見出し20/22/28） */
+  --text-footnote: 13px;
+  --text-footnote--line-height: 1.35;
+  --text-subhead: 15px;
+  --text-subhead--line-height: 1.4;
+  --text-body: 17px;
+  --text-body--line-height: 1.35;
+  --text-title3: 20px;
+  --text-title3--line-height: 1.25;
+  --text-title2: 22px;
+  --text-title2--line-height: 1.25;
+  --text-title1: 28px;
+  --text-title1--line-height: 1.2;
+
   /* 太字を使いすぎると野暮ったく見えるため、もっとも太い字も700に抑える */
   --font-weight-black: 700;
 
@@ -98,26 +113,26 @@
     background: var(--fitall-bg);
     color: var(--fitall-ink);
     font-feature-settings: "palt";
-    font-size: 16px;
+    font-size: 17px;
     font-variant-numeric: tabular-nums;
-    letter-spacing: .01em;
-    line-height: 1.6;
+    letter-spacing: 0;
+    line-height: 1.4;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* タップ領域は全画面で56px以上を保証する（プロジェクトルール） */
+  /* タップ領域は全画面で44pt以上を保証する（iPhone標準） */
   button,
   select,
   summary,
   input:not([type="checkbox"], [type="radio"], [type="range"], [type="hidden"]) {
-    font-size: 16px;
+    font-size: 17px;
     min-height: var(--fitall-tap);
   }
 
   textarea {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   input:not([type="checkbox"], [type="radio"], [type="range"]),
@@ -183,6 +198,19 @@
     overflow-y: auto;
   }
 
+  /* スマホではスクロールバーを出さない（ブラウザらしさを消す） */
+  @media (max-width: 767px) {
+    .fitall-trainer-main,
+    .fitall-scroll {
+      scrollbar-width: none;
+    }
+
+    .fitall-trainer-main::-webkit-scrollbar,
+    .fitall-scroll::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
   /* お客様画面: 中央カラムを画面の高さまで伸ばし、タブ分の余白を確保する */
   .fitall-customer-main {
     margin: 0 auto;
@@ -221,9 +249,9 @@
   .fitall-topbar {
     align-items: center;
     backdrop-filter: saturate(180%) blur(20px);
-    background: rgb(242 243 245 / 86%);
+    background: rgb(242 242 247 / 82%);
     display: flex;
-    min-height: calc(56px + var(--fitall-safe-top));
+    min-height: calc(var(--fitall-navbar) + var(--fitall-safe-top));
     justify-content: space-between;
     padding: var(--fitall-safe-top) 8px 0;
     position: sticky;
@@ -239,48 +267,58 @@
     min-height: var(--fitall-tap);
   }
 
-  /* iPhone標準アプリと同じ「左寄せの大きな見出し」 */
+  /* iPhone標準アプリと同じ上部のナビゲーションバー。中央に題名、左右に丸いボタン */
   .fitall-header {
-    padding: calc(var(--fitall-safe-top) + 4px) 16px 4px;
+    align-items: center;
+    backdrop-filter: saturate(180%) blur(20px);
+    background: rgb(242 242 247 / 82%);
+    display: grid;
+    gap: 8px;
+    grid-template-columns: minmax(var(--fitall-tap), 1fr) auto minmax(var(--fitall-tap), 1fr);
+    min-height: calc(var(--fitall-navbar) + var(--fitall-safe-top));
+    padding: var(--fitall-safe-top) 12px 0;
+    position: sticky;
+    top: 0;
+    z-index: 40;
   }
 
-  /* 上部に丸ボタンがない画面は、見出しの上に少しだけ余白を取る */
-  .fitall-header[data-bar="false"] {
-    padding-top: calc(var(--fitall-safe-top) + 28px);
-  }
-
-  .fitall-header-bar {
+  .fitall-header-side {
     align-items: center;
     display: flex;
-    gap: 8px;
-    justify-content: space-between;
-    margin: 0 -6px;
-    min-height: var(--fitall-tap);
-  }
-
-  .fitall-header-actions {
-    display: flex;
     gap: 4px;
-    margin-left: auto;
+    min-width: 0;
   }
 
-  .fitall-large-title {
+  .fitall-header-side[data-side="end"] {
+    justify-content: flex-end;
+  }
+
+  .fitall-header-center {
+    max-width: 62vw;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .fitall-header-title {
     color: var(--fitall-ink);
-    font-size: 30px;
-    font-weight: 700;
-    letter-spacing: -.01em;
-    line-height: 1.2;
-    margin-top: 2px;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .fitall-header-sub {
     color: var(--fitall-ink-muted);
-    font-size: 16px;
-    font-weight: 500;
-    margin-top: 2px;
+    font-size: 13px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  /* 見出し横の丸いボタン。タップ領域は56pxを確保し、見た目の丸は44px */
+  /* 見出し横の丸いボタン。タップ領域は44pt、見た目の丸は38pt */
   .fitall-circle-button {
     align-items: center;
     color: var(--fitall-ink);
@@ -295,11 +333,16 @@
     align-items: center;
     background: var(--fitall-surface);
     border-radius: 999px;
-    box-shadow: var(--fitall-shadow-float);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 6%), 0 2px 8px rgb(0 0 0 / 8%);
     display: flex;
-    height: 44px;
+    height: 38px;
     justify-content: center;
-    width: 44px;
+    width: 38px;
+  }
+
+  .fitall-circle-button svg {
+    height: 20px;
+    width: 20px;
   }
 
   .fitall-circle-button[data-tone="ink"] > span {
@@ -309,7 +352,7 @@
 
   .fitall-page-pad {
     max-width: 100%;
-    padding: 16px 16px 32px;
+    padding: 8px 16px calc(32px + var(--fitall-safe-bottom));
   }
 
   /* ==========================================================================
@@ -319,6 +362,7 @@
   .fitall-card-strong {
     background: var(--fitall-surface);
     border-radius: var(--fitall-radius-card);
+    box-shadow: var(--fitall-shadow-card);
     max-width: 100%;
     overflow-wrap: anywhere;
   }
@@ -327,29 +371,54 @@
   .fitall-group {
     background: var(--fitall-surface);
     border-radius: var(--fitall-radius-card);
+    box-shadow: var(--fitall-shadow-card);
     overflow: hidden;
   }
 
+  /* まとまりの上の見出し。ホームの「今日の予定」と同じ太字 */
   .fitall-group-label {
-    align-items: baseline;
-    color: var(--fitall-ink-muted);
+    align-items: center;
+    color: var(--fitall-ink);
     display: flex;
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 20px;
+    font-weight: 700;
     justify-content: space-between;
-    margin: 0 4px 8px;
+    margin: 0 2px 8px;
+    min-height: 28px;
   }
 
-  .fitall-group-label a {
+  .fitall-group-label a,
+  .fitall-group-label button {
+    align-items: center;
     color: var(--fitall-brand);
-    font-weight: 600;
+    display: inline-flex;
+    font-size: 15px;
+    font-weight: 500;
+    min-height: var(--fitall-tap);
+    margin: -8px 0;
+  }
+
+  /* 見出し右側の件数や補足は小さな灰色にする */
+  .fitall-group-label > :not(:first-child):not(a, button) {
+    color: var(--fitall-ink-muted);
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  /* 入力フォームなどの小さな見出し（設定アプリの灰色の見出し） */
+  .fitall-form-label {
+    color: var(--fitall-ink-muted);
+    display: block;
+    font-size: 13px;
+    font-weight: 400;
+    margin: 0 16px 6px;
   }
 
   .fitall-group-note {
     color: var(--fitall-ink-muted);
-    font-size: 16px;
-    line-height: 1.6;
-    margin: 8px 4px 0;
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 6px 16px 0;
   }
 
   /* 一覧の1行。区切り線は左端を空けて引く */
@@ -358,7 +427,7 @@
     display: flex;
     gap: 12px;
     min-height: var(--fitall-tap);
-    padding: 12px 16px;
+    padding: 11px 16px;
     position: relative;
   }
 
@@ -375,7 +444,7 @@
   }
 
   .fitall-row[data-inset="avatar"] + .fitall-row[data-inset="avatar"]::before {
-    left: 64px;
+    left: 68px;
   }
 
   a.fitall-row:active,
@@ -394,10 +463,13 @@
   }
 
   .fitall-row-title {
+    align-items: center;
     color: var(--fitall-ink);
+    display: flex;
     font-size: 17px;
     font-weight: 600;
-    line-height: 1.4;
+    gap: 8px;
+    line-height: 1.3;
   }
 
   .fitall-row-meta {
@@ -405,10 +477,10 @@
     color: var(--fitall-ink-muted);
     display: flex;
     flex-wrap: wrap;
-    font-size: 16px;
-    gap: 2px 12px;
-    line-height: 1.5;
-    margin-top: 2px;
+    font-size: 13px;
+    gap: 2px 10px;
+    line-height: 1.35;
+    margin-top: 3px;
   }
 
   .fitall-row-meta > span {
@@ -418,44 +490,65 @@
   }
 
   .fitall-row-meta svg {
-    color: var(--fitall-ink-faint);
+    color: #8E8E93;
     flex: none;
+    height: 14px;
+    width: 14px;
+  }
+
+  /* 行の右側に置く時刻・金額。カシカリ帳の金額のように大きく右に揃える */
+  .fitall-row-side {
+    flex: none;
+    text-align: right;
+  }
+
+  .fitall-row-figure {
+    color: var(--fitall-ink);
+    font-feature-settings: "tnum";
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    line-height: 1.2;
+  }
+
+  .fitall-row-side .fitall-row-meta {
+    justify-content: flex-end;
   }
 
   .fitall-chevron {
-    color: #C4C4C9;
+    color: #C4C4C7;
     flex: none;
   }
 
   /* 左端の細い色帯で状態を示す（確定=アクア、承認待ち=オレンジ） */
   .fitall-row[data-status]::after {
     border-radius: 0 3px 3px 0;
-    bottom: 12px;
+    bottom: 10px;
     content: "";
     left: 0;
     position: absolute;
-    top: 12px;
+    top: 10px;
     width: 4px;
   }
 
   .fitall-row[data-status="confirmed"]::after { background: var(--fitall-accent); }
   .fitall-row[data-status="pending"]::after { background: var(--fitall-warn-dot); }
   .fitall-row[data-status="completed"]::after { background: var(--fitall-ink); }
-  .fitall-row[data-status="cancelled"]::after { background: var(--fitall-line); }
+  .fitall-row[data-status="cancelled"]::after { background: #D1D1D6; }
 
   /* 状態などを示す小さな印 */
   .fitall-badge {
     align-items: center;
     background: var(--fitall-surface-soft);
-    border-radius: 7px;
+    border-radius: 6px;
     color: var(--fitall-ink-muted);
     display: inline-flex;
     flex: none;
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 600;
-    gap: 6px;
+    gap: 4px;
     line-height: 1;
-    padding: 6px 9px;
+    padding: 5px 8px;
     white-space: nowrap;
   }
 
@@ -464,17 +557,79 @@
   .fitall-badge[data-tone="danger"] { background: var(--fitall-danger-soft); color: var(--fitall-danger); }
   .fitall-badge[data-tone="ink"] { background: var(--fitall-ink); color: #ffffff; }
 
+  /* 「確」「待」などの1文字の札（カシカリ帳の「貸」「借」にならう） */
+  .fitall-tag {
+    align-items: center;
+    background: var(--fitall-accent-soft);
+    border: 1px solid rgb(18 199 190 / 45%);
+    border-radius: 6px;
+    color: var(--fitall-brand);
+    display: inline-flex;
+    flex: none;
+    font-size: 12px;
+    font-weight: 700;
+    height: 22px;
+    justify-content: center;
+    line-height: 1;
+    width: 22px;
+  }
+
+  .fitall-tag[data-status="pending"] { background: var(--fitall-warn-soft); border-color: rgb(247 144 9 / 45%); color: var(--fitall-warn); }
+  .fitall-tag[data-status="completed"] { background: var(--fitall-ink); border-color: var(--fitall-ink); color: #ffffff; }
+  .fitall-tag[data-status="cancelled"],
+  .fitall-tag[data-status="rejected"] { background: #F2F2F7; border-color: #D1D1D6; color: var(--fitall-ink-muted); }
+
+  /* 予約1件のカード。左端の色帯（確定=アクア、承認待ち=オレンジ）で状態を示す */
+  .fitall-booking-card {
+    background: var(--fitall-surface);
+    border-radius: var(--fitall-radius-card);
+    box-shadow: var(--fitall-shadow-card);
+    overflow: hidden;
+    padding: 12px 16px 12px 18px;
+    position: relative;
+  }
+
+  .fitall-booking-card::before {
+    background: var(--fitall-accent);
+    bottom: 0;
+    content: "";
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 5px;
+  }
+
+  .fitall-booking-card[data-status="pending"]::before { background: var(--fitall-warn-dot); }
+  .fitall-booking-card[data-status="completed"]::before { background: var(--fitall-ink); }
+  .fitall-booking-card[data-status="cancelled"]::before,
+  .fitall-booking-card[data-status="rejected"]::before { background: #D1D1D6; }
+
+  /* カードの中のボタンは一段小さく（タップ領域44ptは保つ） */
+  .fitall-booking-card :is(.fitall-primary-action, .fitall-aqua-action, .fitall-secondary-action, .fitall-danger-action, .fitall-tinted-action) {
+    font-size: 15px;
+    min-height: var(--fitall-tap);
+  }
+
+  .fitall-dot {
+    background: var(--fitall-warn-dot);
+    border-radius: 999px;
+    display: inline-block;
+    flex: none;
+    height: 8px;
+    width: 8px;
+  }
+
   /* 入力欄。枠線ではなく淡い地色で入力できる場所を示す */
   .fitall-input {
     background: var(--fitall-surface-soft);
     border: 0;
-    border-radius: var(--fitall-radius-control);
+    border-radius: 10px;
     color: var(--fitall-ink);
     font-size: 17px;
-    font-weight: 500;
+    font-weight: 400;
     min-height: var(--fitall-tap);
     outline: none;
-    padding: 0 14px;
+    padding: 0 12px;
     width: 100%;
   }
 
@@ -483,27 +638,92 @@
   }
 
   .fitall-textarea {
-    line-height: 1.6;
+    line-height: 1.45;
     min-height: 96px;
-    padding: 14px;
+    padding: 11px 12px;
   }
 
-  /* 一覧の先頭に置く角丸の色付きアイコン */
+  /* 設定アプリのような入力欄の行。左に項目名、右に入力欄を置く */
+  .fitall-field {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    min-height: var(--fitall-tap);
+    padding: 0 16px;
+    position: relative;
+  }
+
+  .fitall-field + .fitall-field::before {
+    background: var(--fitall-hairline);
+    content: "";
+    height: 1px;
+    left: 16px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: scaleY(.5);
+    transform-origin: top;
+  }
+
+  .fitall-field > label {
+    color: var(--fitall-ink);
+    flex: none;
+    font-size: 17px;
+    width: 104px;
+  }
+
+  .fitall-field > input {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    color: var(--fitall-ink);
+    flex: 1;
+    font-size: 17px;
+    min-width: 0;
+    outline: none;
+  }
+
+  .fitall-field > input::placeholder {
+    color: #A1A1A6;
+  }
+
+  .fitall-field:focus-within > label {
+    color: var(--fitall-brand);
+  }
+
+  /* アプリのアイコン（ログイン画面などで使う） */
+  .fitall-app-icon {
+    align-items: center;
+    background: var(--fitall-accent);
+    border-radius: 18px;
+    box-shadow: 0 6px 18px rgb(18 199 190 / 28%);
+    color: var(--fitall-ink);
+    display: flex;
+    font-size: 34px;
+    font-weight: 800;
+    height: 76px;
+    justify-content: center;
+    letter-spacing: -.04em;
+    width: 76px;
+  }
+
+  /* 一覧の先頭に置く角丸の色付きアイコン（設定アプリと同じ30pt） */
   .fitall-icon-tile {
     align-items: center;
     background: var(--fitall-ink);
-    border-radius: 10px;
+    border-radius: 8px;
     color: #ffffff;
     display: flex;
     flex: none;
-    height: 34px;
+    height: 30px;
     justify-content: center;
-    width: 34px;
+    width: 30px;
   }
 
   .fitall-icon-tile[data-tone="accent"] { background: var(--fitall-accent); color: var(--fitall-ink); }
   .fitall-icon-tile[data-tone="warn"] { background: var(--fitall-warn-dot); color: #ffffff; }
-  .fitall-icon-tile svg { height: 19px; width: 19px; }
+  .fitall-icon-tile[data-tone="gray"] { background: #8E8E93; color: #ffffff; }
+  .fitall-icon-tile svg { height: 18px; width: 18px; }
 
   /* 丸い頭文字アイコン */
   .fitall-avatar {
@@ -514,10 +734,10 @@
     display: flex;
     flex: none;
     font-size: 17px;
-    font-weight: 700;
-    height: 44px;
+    font-weight: 600;
+    height: 40px;
     justify-content: center;
-    width: 44px;
+    width: 40px;
   }
 
   /* 金額や件数などの大きな数字 */
@@ -531,8 +751,8 @@
 
   .fitall-figure small {
     color: var(--fitall-ink-muted);
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 500;
     letter-spacing: 0;
     margin-left: 2px;
   }
@@ -542,9 +762,10 @@
     align-items: center;
     color: var(--fitall-ink-muted);
     display: flex;
-    font-size: 16px;
-    gap: 8px;
-    line-height: 1.5;
+    font-size: 13px;
+    gap: 6px;
+    justify-content: center;
+    line-height: 1.4;
     padding: 0 4px;
   }
 
@@ -553,25 +774,25 @@
     border-radius: 999px;
     content: "";
     flex: none;
-    height: 8px;
-    width: 8px;
+    height: 6px;
+    width: 6px;
   }
 
   .fitall-kicker {
     color: var(--fitall-brand);
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 600;
   }
 
   .fitall-section-title {
     color: var(--fitall-ink);
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
   }
 
   .fitall-muted {
     color: var(--fitall-ink-muted);
-    font-weight: 500;
+    font-weight: 400;
   }
 
   .fitall-pill {
@@ -579,10 +800,10 @@
     background: var(--fitall-surface-soft);
     border-radius: 999px;
     display: inline-flex;
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 600;
-    min-height: 32px;
-    padding: 0 12px;
+    min-height: 26px;
+    padding: 0 10px;
   }
 
   .fitall-pill-aqua {
@@ -604,11 +825,11 @@
 
   .fitall-step {
     align-items: center;
-    border-top: 1px solid var(--fitall-line);
+    border-top: .5px solid var(--fitall-hairline);
     display: grid;
     gap: 12px;
-    grid-template-columns: 36px 1fr;
-    padding: 14px 0;
+    grid-template-columns: 28px 1fr;
+    padding: 12px 0;
   }
 
   .fitall-step:first-child {
@@ -623,15 +844,15 @@
     color: #ffffff;
     display: flex;
     flex: none;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
-    height: 32px;
+    height: 28px;
     justify-content: center;
-    width: 32px;
+    width: 28px;
   }
 
   /* ==========================================================================
-     ボタン
+     ボタン（iPhoneの大きいボタンと同じ50pt）
      ========================================================================== */
   .fitall-primary-action,
   .fitall-aqua-action,
@@ -642,8 +863,9 @@
     display: inline-flex;
     font-size: 17px;
     font-weight: 600;
+    gap: 6px;
     justify-content: center;
-    min-height: var(--fitall-tap);
+    min-height: 50px;
     padding: 8px 18px;
     text-align: center;
   }
@@ -679,8 +901,9 @@
     display: inline-flex;
     font-size: 17px;
     font-weight: 600;
+    gap: 6px;
     justify-content: center;
-    min-height: var(--fitall-tap);
+    min-height: 50px;
     padding: 8px 18px;
   }
 
@@ -698,11 +921,11 @@
     align-items: center;
     background: var(--fitall-surface);
     border-radius: 999px;
-    box-shadow: var(--fitall-shadow-float);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 6%), 0 2px 8px rgb(0 0 0 / 8%);
     color: var(--fitall-ink);
     display: inline-flex;
     flex: none;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 500;
     height: var(--fitall-tap);
     justify-content: center;
@@ -719,14 +942,14 @@
     box-shadow: var(--fitall-shadow-raised);
     color: #ffffff;
     display: inline-flex;
-    font-size: 32px;
-    font-weight: 500;
-    height: 64px;
+    font-size: 28px;
+    font-weight: 400;
+    height: 56px;
     justify-content: center;
     line-height: 1;
     position: fixed;
     right: 16px;
-    width: 64px;
+    width: 56px;
     z-index: 30;
   }
 
@@ -748,15 +971,15 @@
   }
 
   /* ==========================================================================
-     セグメント切替（日／週／月）
+     セグメント切替（日／週／月）。ホームと同じ黒い丸型
      ========================================================================== */
   .fitall-segmented {
-    background: #E6E7EA;
+    background: #E4E4E9;
     border-radius: 999px;
     display: grid;
     grid-auto-columns: 1fr;
     grid-auto-flow: column;
-    padding: 3px;
+    padding: 0;
     position: relative;
   }
 
@@ -764,22 +987,26 @@
     background: var(--fitall-ink);
     border-radius: 999px;
     bottom: 3px;
-    box-shadow: 0 1px 3px rgb(10 10 10 / 18%);
     left: 3px;
     position: absolute;
     top: 3px;
-    transition: transform var(--fitall-motion-base) var(--fitall-ease-out);
+    transition: transform 260ms var(--fitall-ease-out);
     width: calc((100% - 6px) / var(--fitall-segment-count));
   }
 
   .fitall-segmented button {
+    align-items: center;
     background: transparent;
     border-radius: 999px;
-    color: var(--fitall-ink-muted);
+    color: #3C3C43;
+    display: flex;
+    font-size: 15px;
     font-weight: 600;
+    gap: 4px;
+    justify-content: center;
     min-height: var(--fitall-tap);
     position: relative;
-    transition: color var(--fitall-motion-fast) ease;
+    transition: color 160ms ease;
     z-index: 1;
   }
 
@@ -787,13 +1014,19 @@
     color: #ffffff;
   }
 
+  .fitall-segmented button small {
+    font-size: 13px;
+    font-weight: 500;
+    opacity: .7;
+  }
+
   /* ==========================================================================
      下部タブ
      ========================================================================== */
   .fitall-tabbar {
-    background: rgb(255 255 255 / 88%);
+    background: rgb(249 249 249 / 94%);
     backdrop-filter: saturate(180%) blur(20px);
-    box-shadow: inset 0 .5px 0 var(--fitall-hairline);
+    box-shadow: inset 0 .5px 0 rgb(0 0 0 / 22%);
     display: grid;
     grid-template-columns: repeat(var(--fitall-tab-count), minmax(0, 1fr));
     height: calc(var(--fitall-tabbar) + var(--fitall-safe-bottom));
@@ -811,7 +1044,7 @@
   }
 
   .fitall-tabbar-indicator {
-    display: flex;
+    display: none;
     justify-content: center;
     left: 0;
     pointer-events: none;
@@ -831,20 +1064,22 @@
 
   .fitall-tab {
     align-items: center;
-    color: var(--fitall-ink-faint);
+    color: #8E8E93;
     display: flex;
     flex-direction: column;
-    font-size: 16px;
-    font-weight: 600;
-    gap: 2px;
+    font-size: 10px;
+    font-weight: 500;
+    gap: 3px;
     height: var(--fitall-tabbar);
-    justify-content: center;
+    justify-content: flex-start;
+    letter-spacing: .01em;
     line-height: 1.1;
+    padding-top: 7px;
     transition: color var(--fitall-motion-fast) ease;
   }
 
   .fitall-tab[aria-current="page"] {
-    color: var(--fitall-brand);
+    color: var(--fitall-ink);
   }
 
   .fitall-tab[aria-current="page"] svg {
@@ -857,17 +1092,19 @@
   .fitall-details {
     background: var(--fitall-surface);
     border-radius: var(--fitall-radius-card);
+    box-shadow: var(--fitall-shadow-card);
     overflow: hidden;
   }
 
   .fitall-details > summary {
     align-items: center;
     display: flex;
-    font-weight: 700;
+    font-weight: 600;
     gap: 12px;
     justify-content: space-between;
     list-style: none;
-    padding: 8px 16px;
+    min-height: var(--fitall-tap);
+    padding: 6px 16px;
   }
 
   .fitall-details > summary::-webkit-details-marker {
@@ -875,7 +1112,7 @@
   }
 
   .fitall-details > summary::after {
-    color: var(--fitall-ink-faint);
+    color: #C4C4C7;
     content: "›";
     flex: none;
     font-size: 24px;
@@ -895,14 +1132,14 @@
   .fitall-sheet {
     background: var(--fitall-surface);
     border: 0;
-    border-radius: 20px 20px 0 0;
+    border-radius: 16px 16px 0 0;
     color: var(--fitall-ink);
     margin: auto auto 0;
     max-height: calc(100dvh - 24px - var(--fitall-safe-top));
     max-width: 100%;
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: 20px 16px calc(12px + var(--fitall-safe-bottom));
+    padding: 22px 16px calc(12px + var(--fitall-safe-bottom));
     transition:
       transform var(--fitall-motion-slow) var(--fitall-ease-out),
       opacity var(--fitall-motion-base) ease,
@@ -919,6 +1156,17 @@
 
   .fitall-sheet[data-closing="true"] {
     transform: translateY(100%);
+  }
+
+  /* シート上部のつまみ */
+  .fitall-sheet::before {
+    background: #C7C7CC;
+    border-radius: 999px;
+    content: "";
+    display: block;
+    height: 5px;
+    margin: -12px auto 12px;
+    width: 36px;
   }
 
   .fitall-sheet::backdrop {
@@ -958,8 +1206,8 @@
     box-shadow: var(--fitall-shadow-raised);
     color: #ffffff;
     display: flex;
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 600;
     gap: 10px;
     left: 16px;
     margin: 0 auto;
@@ -1183,6 +1431,10 @@
       width: 520px;
     }
 
+    .fitall-sheet::before {
+      display: none;
+    }
+
     @starting-style {
       .fitall-sheet[open] {
         opacity: 0;
@@ -1194,6 +1446,361 @@
       opacity: 0;
       transform: translateY(12px) scale(.98);
     }
+  }
+
+  /* ==========================================================================
+     iPhone標準サイズの画面（.ios の中だけに効く）
+     本文17pt・補足13〜15pt・タップ44ptを基準にする。
+     ========================================================================== */
+  .ios {
+    --ios-bg: #F2F2F7;
+    --ios-label-2: #6D6D72;   /* 補足文字。白地で5:1程度 */
+    --ios-label-3: #8E8E93;   /* アイコンなど文字以外 */
+    --ios-separator: rgb(60 60 67 / 18%);
+    --ios-tap: 44px;
+    background: var(--ios-bg);
+    font-size: 17px;
+    letter-spacing: 0;
+    line-height: 1.35;
+    min-height: 100%;
+  }
+
+  .ios button,
+  .ios select,
+  .ios input {
+    font-size: inherit;
+    min-height: var(--ios-tap);
+  }
+
+  /* 上部のナビゲーションバー: 中央に題名、左右に丸いボタン */
+  .ios-navbar {
+    align-items: center;
+    backdrop-filter: saturate(180%) blur(20px);
+    background: rgb(242 242 247 / 82%);
+    display: grid;
+    gap: 8px;
+    grid-template-columns: var(--ios-tap) 1fr var(--ios-tap);
+    min-height: calc(52px + var(--fitall-safe-top));
+    padding: var(--fitall-safe-top) 12px 0;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
+  .ios-navbar h1 {
+    font-size: 17px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .ios-round {
+    align-items: center;
+    display: flex;
+    height: var(--ios-tap);
+    justify-content: center;
+    width: var(--ios-tap);
+  }
+
+  .ios-round > span {
+    align-items: center;
+    background: #FFFFFF;
+    border-radius: 999px;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 6%), 0 2px 8px rgb(0 0 0 / 8%);
+    color: var(--fitall-ink);
+    display: flex;
+    height: 38px;
+    justify-content: center;
+    width: 38px;
+  }
+
+  .ios-round[data-tone="ink"] > span {
+    background: var(--fitall-ink);
+    color: #FFFFFF;
+  }
+
+  .ios-content {
+    padding: 4px 16px calc(24px + var(--fitall-safe-bottom));
+  }
+
+  .ios-footnote {
+    color: var(--ios-label-2);
+    font-size: 13px;
+  }
+
+  /* 黒い丸型の切り替え（全て／確定／承認待ち） */
+  .ios-segmented {
+    background: #E4E4E9;
+    border-radius: 999px;
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    position: relative;
+  }
+
+  .ios-segmented-thumb {
+    background: var(--fitall-ink);
+    border-radius: 999px;
+    bottom: 3px;
+    left: 3px;
+    position: absolute;
+    top: 3px;
+    transition: transform 260ms var(--fitall-ease-out);
+    width: calc((100% - 6px) / var(--ios-segment-count));
+  }
+
+  .ios-segmented button {
+    align-items: center;
+    background: transparent;
+    color: #3C3C43;
+    display: flex;
+    font-size: 15px;
+    font-weight: 600;
+    gap: 4px;
+    justify-content: center;
+    position: relative;
+    transition: color 160ms ease;
+    z-index: 1;
+  }
+
+  .ios-segmented button[aria-pressed="true"] {
+    color: #FFFFFF;
+  }
+
+  .ios-segmented button small {
+    font-size: 13px;
+    font-weight: 500;
+    opacity: .7;
+  }
+
+  /* まとめカード（今日の件数・今月の売上など） */
+  .ios-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 1px 12px rgb(0 0 0 / 4%);
+  }
+
+  .ios-summary-head {
+    align-items: center;
+    border-bottom: .5px solid var(--ios-separator);
+    display: flex;
+    font-size: 15px;
+    justify-content: space-between;
+    padding: 12px 16px;
+  }
+
+  .ios-summary-head strong {
+    font-weight: 600;
+  }
+
+  .ios-stats {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr 1fr;
+  }
+
+  .ios-stat {
+    display: block;
+    padding: 12px 14px 14px;
+  }
+
+  .ios-stat + .ios-stat {
+    border-left: .5px solid var(--ios-separator);
+  }
+
+  .ios-stat-label {
+    align-items: center;
+    color: var(--ios-label-2);
+    display: flex;
+    font-size: 13px;
+    gap: 4px;
+    white-space: nowrap;
+  }
+
+  .ios-stat-value {
+    font-feature-settings: "tnum";
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    margin-top: 4px;
+    white-space: nowrap;
+  }
+
+  .ios-stat-value small {
+    color: var(--ios-label-2);
+    font-size: 13px;
+    font-weight: 500;
+    margin-left: 1px;
+  }
+
+  .ios-section-title {
+    align-items: baseline;
+    display: flex;
+    font-size: 20px;
+    font-weight: 700;
+    justify-content: space-between;
+    margin: 28px 2px 10px;
+  }
+
+  .ios-section-title a {
+    align-items: center;
+    color: var(--fitall-brand);
+    display: inline-flex;
+    font-size: 15px;
+    font-weight: 500;
+    min-height: var(--ios-tap);
+  }
+
+  /* 予約1件のカード。左端の色帯と小さな札で状態を示す */
+  .ios-item {
+    align-items: center;
+    background: #FFFFFF;
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 1px 10px rgb(0 0 0 / 4%);
+    display: flex;
+    gap: 12px;
+    min-height: 72px;
+    overflow: hidden;
+    padding: 12px 16px 12px 18px;
+    position: relative;
+  }
+
+  .ios-item + .ios-item {
+    margin-top: 10px;
+  }
+
+  .ios-item::before {
+    background: var(--fitall-accent);
+    bottom: 0;
+    content: "";
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 5px;
+  }
+
+  .ios-item[data-status="pending"]::before { background: var(--fitall-warn-dot); }
+  .ios-item[data-status="completed"]::before { background: var(--fitall-ink); }
+  .ios-item[data-status="cancelled"]::before { background: #D1D1D6; }
+
+  .ios-item-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ios-item-title {
+    align-items: center;
+    display: flex;
+    font-size: 17px;
+    font-weight: 600;
+    gap: 8px;
+  }
+
+  .ios-item-meta {
+    align-items: center;
+    color: var(--ios-label-2);
+    display: flex;
+    font-size: 13px;
+    gap: 4px;
+    margin-top: 4px;
+  }
+
+  .ios-item-meta svg {
+    color: var(--ios-label-3);
+    flex: none;
+  }
+
+  .ios-item-side {
+    flex: none;
+    text-align: right;
+  }
+
+  .ios-item-time {
+    font-feature-settings: "tnum";
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+  }
+
+  /* 「確」「待」などの1文字の札 */
+  .ios-tag {
+    align-items: center;
+    background: var(--fitall-accent-soft);
+    border: 1px solid rgb(18 199 190 / 45%);
+    border-radius: 6px;
+    color: var(--fitall-brand);
+    display: inline-flex;
+    flex: none;
+    font-size: 12px;
+    font-weight: 700;
+    height: 22px;
+    justify-content: center;
+    width: 22px;
+  }
+
+  .ios-tag[data-status="pending"] { background: var(--fitall-warn-soft); border-color: rgb(247 144 9 / 45%); color: var(--fitall-warn); }
+  .ios-tag[data-status="completed"] { background: var(--fitall-ink); border-color: var(--fitall-ink); color: #FFFFFF; }
+  .ios-tag[data-status="cancelled"] { background: #F2F2F7; border-color: #D1D1D6; color: var(--ios-label-2); }
+
+  .ios-dot {
+    background: var(--fitall-warn-dot);
+    border-radius: 999px;
+    flex: none;
+    height: 8px;
+    width: 8px;
+  }
+
+  /* 設定アプリのような一覧（すぐにやること） */
+  .ios-list {
+    background: #FFFFFF;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .ios-list-row {
+    align-items: center;
+    display: flex;
+    font-size: 17px;
+    gap: 12px;
+    min-height: 52px;
+    padding: 0 16px;
+    position: relative;
+  }
+
+  .ios-list-row + .ios-list-row::before {
+    background: var(--ios-separator);
+    content: "";
+    height: .5px;
+    left: 60px;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .ios-list-row:active {
+    background: #E5E5EA;
+  }
+
+  .ios-icon-tile {
+    align-items: center;
+    border-radius: 8px;
+    color: #FFFFFF;
+    display: flex;
+    flex: none;
+    height: 30px;
+    justify-content: center;
+    width: 30px;
+  }
+
+  .ios-chevron {
+    color: #C4C4C7;
+    flex: none;
+    margin-left: auto;
+  }
+
+  .ios-empty {
+    color: var(--ios-label-2);
+    font-size: 15px;
+    padding: 28px 16px;
+    text-align: center;
   }
 
   .scrollbar-hide {

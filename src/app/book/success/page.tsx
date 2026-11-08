@@ -32,7 +32,7 @@ export default async function PublicBookingSuccessPage({ searchParams }: PagePro
         <h1 className="mt-5 text-2xl font-bold text-ink">
           チケットの購入手続き
         </h1>
-        <p className="mt-3 text-base leading-relaxed text-ink-muted">
+        <p className="mt-3 text-subhead leading-relaxed text-ink-muted">
           決済完了後にチケットが反映されます。LINEを連携してマイページを開き、残りチケットを確認してから予約日時を選んでください。
         </p>
         {lineStatus && (
