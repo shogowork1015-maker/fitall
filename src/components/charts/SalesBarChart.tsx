@@ -3,6 +3,7 @@
 import {
   BarChart,
   Bar,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -22,17 +23,17 @@ export function SalesBarChart({ data, dark }: { data: MonthlySales[]; dark?: boo
   }
 
   return (
-    <ResponsiveContainer width="100%" height={120}>
+    <ResponsiveContainer width="100%" height={160}>
       <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#2F3A3A' : '#DDE8E8'} vertical={false} />
+        <CartesianGrid stroke={dark ? '#2F3A3A' : '#ECEDEF'} vertical={false} />
         <XAxis
           dataKey="month"
-          tick={{ fill: dark ? '#B7F3EF' : '#555555', fontSize: 10, fontWeight: 700 }}
+          tick={{ fill: dark ? '#B7F3EF' : '#5E5E66', fontSize: 12, fontWeight: 500 }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: dark ? '#B7F3EF' : '#555555', fontSize: 9, fontWeight: 700 }}
+          tick={{ fill: dark ? '#B7F3EF' : '#707076', fontSize: 11, fontWeight: 500 }}
           axisLine={false}
           tickLine={false}
           width={36}
@@ -44,7 +45,7 @@ export function SalesBarChart({ data, dark }: { data: MonthlySales[]; dark?: boo
           contentStyle={{
             backgroundColor: '#0A0A0A',
             border: 'none',
-            borderRadius: '6px',
+            borderRadius: '10px',
             color: '#fff',
             fontSize: '12px',
             fontWeight: '600',
@@ -52,7 +53,12 @@ export function SalesBarChart({ data, dark }: { data: MonthlySales[]; dark?: boo
           labelStyle={{ color: '#12C7BE' }}
           formatter={(v) => [`¥${Number(v).toLocaleString()}`, '売上']}
         />
-        <Bar dataKey="amount" fill="#12C7BE" radius={[2, 2, 0, 0]} />
+        {/* 今月（最後の棒）だけアクアで強調し、過去の月は淡くする */}
+        <Bar dataKey="amount" radius={[6, 6, 0, 0]} maxBarSize={28}>
+          {data.map((entry, index) => (
+            <Cell key={entry.month} fill={index === data.length - 1 ? '#12C7BE' : '#CDEFEC'} />
+          ))}
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   )

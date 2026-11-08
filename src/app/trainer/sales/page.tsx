@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import { SalesBarChart, type MonthlySales } from '@/components/charts/SalesBarChart'
 import { loadTraineeNameMap } from '@/lib/trainee-display'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
+import { DevPreviewNote, PageHeader } from '@/components/ui/PageHeader'
+import { TicketIcon } from '@/components/ui/Icons'
 import {
   addMonthsToDateKey,
   formatJstDate,
@@ -54,122 +56,83 @@ function SalesScreen({
 
   return (
     <>
-    <div className="fitall-mobile-ui flex min-w-0 flex-col overflow-hidden bg-white">
-      <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md px-4 py-4 flex items-center justify-between border-b border-line">
-        <div className="w-14" />
-        <h1 className="text-[17px] font-black text-ink flex-1 text-center">売上管理</h1>
-        <div className="w-14" />
-      </div>
+    <div className="fitall-mobile-ui fitall-page">
+      <PageHeader title="売上" subtitle={`${monthLabel(now)}の実績`} />
 
-      <div className="fitall-page-pad space-y-4">
-        {preview && (
-          <div className="rounded-control border border-accent bg-accent-soft px-4 py-3 text-base font-bold text-brand">
-            開発用UI確認モードです。売上データはサンプルです。
-          </div>
-        )}
+      <div className="fitall-page-pad space-y-7">
+        {preview && <DevPreviewNote>開発用の確認モード（サンプルの売上）</DevPreviewNote>}
 
-        <div className="fitall-card-strong overflow-hidden">
-          <div className="bg-accent px-4 py-4 text-ink">
-            <p className="text-base font-bold">今月</p>
-            <p className="mt-1 text-base font-bold">{monthLabel(now)}の売上ダッシュ</p>
-          </div>
+        <section className="fitall-card p-5">
+          <p className="text-base font-medium text-ink-muted">{monthLabel(now)}の売上</p>
+          <p className="fitall-figure mt-1 text-[40px]">{yen(currentTotal)}</p>
+          <p className="mt-3">
+            <span className="fitall-badge" data-tone={diff >= 0 ? 'accent' : 'danger'}>
+              先月比 {diff >= 0 ? '+' : '−'}{yen(Math.abs(diff))}（{diffRate >= 0 ? '+' : ''}{diffRate}%）
+            </span>
+          </p>
 
-          <div className="px-4 py-5">
-            <p className="text-base font-medium text-ink-muted">いま入っている金額</p>
-            <div className="mt-1">
-              <h2 className="text-[40px] leading-none font-black tracking-tight text-ink">
-                {yen(currentTotal)}
-              </h2>
-              <p className={`mt-2 text-base font-bold ${diff >= 0 ? 'text-brand' : 'text-danger'}`}>
-                先月比 {diff >= 0 ? '+' : '-'}{yen(Math.abs(diff))} / {diffRate >= 0 ? '+' : ''}{diffRate}%
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-[1fr_1fr] border-t border-line">
-            <div className="border-r border-line px-4 py-3">
+          <div className="mt-6">
+            <div className="flex items-baseline justify-between">
               <p className="text-base font-medium text-ink-muted">販売回数</p>
-              <p className="mt-1 text-2xl font-black text-ink">{currentSoldSessions}<span className="ml-1 text-base">回</span></p>
-            </div>
-            <div className="px-4 py-3">
-              <p className="text-base font-medium text-ink-muted">目標</p>
-              <p className="mt-1 text-2xl font-black text-ink">{sessionGoal}<span className="ml-1 text-base">回</span></p>
-            </div>
-          </div>
-
-          <div className="border-t border-line px-4 py-4">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-base font-bold text-ink">販売ペース</p>
-              <p className="text-base font-bold text-brand">
-                {remainingSessions === 0 ? '目標達成' : `あと${remainingSessions}回で${sessionGoal}回`}
+              <p className="text-base font-semibold text-ink">
+                <span className="fitall-figure text-xl">{currentSoldSessions}</span>
+                <span className="text-ink-muted"> / 目標{sessionGoal}回</span>
               </p>
             </div>
-            <div className="h-4 overflow-hidden rounded-full bg-surface-soft">
-              <div
-                className="fitall-grow-x h-full rounded-full bg-accent"
-                style={{ width: `${progress}%` }}
-              />
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-soft">
+              <div className="fitall-grow-x h-full rounded-full bg-accent" style={{ width: `${progress}%` }} />
             </div>
+            <p className="mt-2 text-base text-ink-muted">
+              {remainingSessions === 0 ? '今月の目標を達成しました' : `あと${remainingSessions}回で目標です`}
+            </p>
           </div>
-        </div>
+        </section>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div className="fitall-card p-4">
-            <p className="text-base font-medium text-ink-muted">平均単価</p>
-            <p className="mt-2 whitespace-nowrap text-xl font-black text-ink">{yen(averageTicket)}</p>
-            <p className="mt-1 text-base font-bold text-brand">1チケットあたり</p>
+        <section className="fitall-group">
+          <div className="fitall-row">
+            <span className="fitall-row-main text-base text-ink-muted">平均単価（1回あたり）</span>
+            <span className="fitall-figure text-lg">{yen(averageTicket)}</span>
           </div>
-          <div className="fitall-card p-4">
-            <p className="text-base font-medium text-ink-muted">先月の売上</p>
-            <p className="mt-2 whitespace-nowrap text-xl font-black text-ink">{yen(prevTotal)}</p>
-            <p className="mt-1 text-base font-bold text-brand">比較用</p>
+          <div className="fitall-row">
+            <span className="fitall-row-main text-base text-ink-muted">先月の売上</span>
+            <span className="fitall-figure text-lg">{yen(prevTotal)}</span>
           </div>
-        </div>
+        </section>
 
-        <div className="fitall-card p-4">
-          <div className="mb-3">
-            <h2 className="font-bold text-ink">6ヶ月の流れ</h2>
-            <p className="mt-1 text-base font-bold text-brand">水色の棒が月ごとの売上です</p>
+        <section>
+          <h2 className="fitall-group-label">月ごとの売上</h2>
+          <div className="fitall-card px-3 pb-3 pt-5">
+            <SalesBarChart data={monthlySalesData} />
           </div>
-          <SalesBarChart data={monthlySalesData} />
-        </div>
+        </section>
 
-        <div>
-          <div className="mb-3 flex items-center justify-between px-1">
-            <h2 className="text-base font-bold text-ink">今月の明細</h2>
-            <span className="text-base font-medium text-ink-muted">{records.length}件</span>
-          </div>
-
+        <section>
+          <h2 className="fitall-group-label">
+            <span>今月の明細</span>
+            <span className="font-medium">{records.length}件</span>
+          </h2>
           {!records.length ? (
-            <div className="rounded-card border border-dashed border-line bg-white p-6 text-center text-base font-medium text-ink-muted">
+            <div className="fitall-group px-5 py-6 text-base text-ink-muted">
               今月の売上はまだありません
             </div>
           ) : (
-            <div className="space-y-2">
-              {records.map((record, index) => (
-                <div
-                  key={record.id}
-                  className="fitall-card fitall-card-pop grid grid-cols-[40px_1fr] items-center gap-3 p-3"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-base font-bold text-ink">
-                    {record.quantity}
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-ink">{record.name}</h3>
-                    <p className="mt-0.5 text-base font-medium text-ink-muted">
-                      {new Date(record.date).toLocaleDateString('ja-JP')} / {record.quantity}回チケット
+            <div className="fitall-group">
+              {records.map((record) => (
+                <div key={record.id} className="fitall-row" data-inset="avatar">
+                  <span className="fitall-icon-tile" data-tone="accent"><TicketIcon /></span>
+                  <div className="fitall-row-main">
+                    <p className="fitall-row-title">{record.name}</p>
+                    <p className="fitall-row-meta">
+                      <span>{formatJstDate(record.date, { month: 'numeric', day: 'numeric' })}</span>
+                      <span>{record.quantity}回チケット</span>
                     </p>
                   </div>
-                  <div className="col-span-2 border-t border-line pt-2">
-                    <p className="text-base font-black text-ink">{yen(record.amount)}</p>
-                    <p className="text-base font-bold text-brand">支払済</p>
-                  </div>
+                  <span className="fitall-figure text-lg">{yen(record.amount)}</span>
                 </div>
               ))}
             </div>
           )}
-        </div>
+        </section>
       </div>
     </div>
     <div className="fitall-desktop-ui fitall-desktop-page">
@@ -186,16 +149,13 @@ function SalesScreen({
         </header>
 
         {preview && (
-          <div className="fitall-desktop-card mb-5 bg-accent-soft px-5 py-3 text-base font-bold text-brand">
-            開発用UI確認モードです。売上データはサンプルです。
-          </div>
+          <div className="mb-5"><DevPreviewNote>開発用の確認モード。売上データはサンプルです。</DevPreviewNote></div>
         )}
 
         <section className="grid grid-cols-[1.4fr_.8fr_.8fr] gap-4">
-          <div className="fitall-desktop-card border-ink">
-            <div className="bg-accent px-5 py-4 text-ink">
-              <p className="text-base font-bold text-ink/70">今月</p>
-              <p className="mt-1 text-lg font-black">{now.getMonth() + 1}月の売上</p>
+          <div className="fitall-desktop-card">
+            <div className="px-6 pt-5">
+              <p className="text-base font-semibold text-ink-muted">{now.getMonth() + 1}月の売上</p>
             </div>
             <div className="p-6">
               <p className="text-base font-medium text-ink-muted">いま入っている金額</p>

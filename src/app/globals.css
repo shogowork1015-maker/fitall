@@ -5,37 +5,43 @@
    色・角丸・影・動きはここだけで定義する。デザイン差し替え時はこのブロックを変更する。
    ========================================================================== */
 :root {
-  /* 面 */
-  --fitall-bg: #F4F7F7;
+  /* 面: iPhoneの設定画面のような、薄いグレーの地に白いまとまりを置く構成 */
+  --fitall-bg: #F2F3F5;
   --fitall-surface: #FFFFFF;
-  --fitall-surface-soft: #EEF3F3;
+  --fitall-surface-soft: #F2F3F5;
+  --fitall-surface-press: #E9EAED;
 
-  /* 文字 */
+  /* 文字。補足は彩度のないグレーで、白地でも地色でも4.5:1以上を保つ */
   --fitall-ink: #0A0A0A;
-  --fitall-ink-muted: #4F5B5B;
-  --fitall-ink-faint: #6B7878; /* 非アクティブなタブなど。白地で4.5:1以上を保つ */
+  --fitall-ink-muted: #5E5E66;
+  --fitall-ink-faint: #707076;
 
   /* ブランド。アクアは塗り専用、文字にはコントラストの取れる brand を使う */
   --fitall-accent: #12C7BE;
   --fitall-accent-soft: #E3F8F6;
-  --fitall-brand: #087D78;
+  --fitall-brand: #06726D;
 
-  /* 線 */
-  --fitall-line: #DCE6E6;
+  /* 線: 枠線ではなく区切り線として細く使う */
+  --fitall-line: #E3E4E8;
+  --fitall-hairline: rgb(60 60 67 / 14%);
 
-  /* 状態 */
+  /* 状態。色は意味のある所（確定・承認待ち・エラー）にだけ使う */
+  --fitall-warn: #B54708;
+  --fitall-warn-soft: #FFF4E5;
+  --fitall-warn-dot: #F79009;
   --fitall-danger: #C8102E;
   --fitall-danger-soft: #FDEEF0;
   --fitall-danger-line: #F6C5CD;
 
   /* 形 */
   --fitall-radius-chip: 8px;
-  --fitall-radius-control: 12px;
-  --fitall-radius-card: 16px;
+  --fitall-radius-control: 14px;
+  --fitall-radius-card: 18px;
 
-  /* 影 */
-  --fitall-shadow-card: 0 1px 2px rgb(10 10 10 / 4%), 0 2px 8px rgb(10 10 10 / 4%);
-  --fitall-shadow-raised: 0 8px 24px rgb(10 10 10 / 14%);
+  /* 影。カードには付けず、浮かせたい丸ボタン等にだけ使う */
+  --fitall-shadow-card: none;
+  --fitall-shadow-float: 0 1px 2px rgb(10 10 10 / 6%), 0 4px 12px rgb(10 10 10 / 8%);
+  --fitall-shadow-raised: 0 8px 28px rgb(10 10 10 / 16%);
 
   /* 寸法 */
   --fitall-tap: 56px;
@@ -62,6 +68,8 @@
   --color-brand: var(--fitall-brand);
   --color-line: var(--fitall-line);
   --color-surface-soft: var(--fitall-surface-soft);
+  --color-warn: var(--fitall-warn);
+  --color-warn-soft: var(--fitall-warn-soft);
   --color-danger: var(--fitall-danger);
   --color-danger-soft: var(--fitall-danger-soft);
   --color-danger-line: var(--fitall-danger-line);
@@ -70,10 +78,11 @@
   --radius-control: var(--fitall-radius-control);
   --radius-card: var(--fitall-radius-card);
 
-  /* 900は英数字が横に広がりすぎるため、もっとも太い字を800に抑える */
-  --font-weight-black: 800;
+  /* 太字を使いすぎると野暮ったく見えるため、もっとも太い字も700に抑える */
+  --font-weight-black: 700;
 
-  --font-sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "YuGothic",
+  /* 英数字はSF/Segoe、日本語はヒラギノ/游ゴシック。数字がきれいに揃う */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "YuGothic",
                "Yu Gothic", "Meiryo", system-ui, sans-serif;
 }
 
@@ -91,7 +100,7 @@
     font-feature-settings: "palt";
     font-size: 16px;
     font-variant-numeric: tabular-nums;
-    letter-spacing: .02em;
+    letter-spacing: .01em;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -208,13 +217,13 @@
     width: 100%;
   }
 
+  /* 旧来の小さな中央見出しバー。地色に溶け込ませて主張させない */
   .fitall-topbar {
     align-items: center;
-    backdrop-filter: blur(16px);
-    background: rgb(255 255 255 / 92%);
-    border-bottom: 1px solid var(--fitall-line);
+    backdrop-filter: saturate(180%) blur(20px);
+    background: rgb(242 243 245 / 86%);
     display: flex;
-    min-height: calc(64px + var(--fitall-safe-top));
+    min-height: calc(56px + var(--fitall-safe-top));
     justify-content: space-between;
     padding: var(--fitall-safe-top) 8px 0;
     position: sticky;
@@ -230,6 +239,74 @@
     min-height: var(--fitall-tap);
   }
 
+  /* iPhone標準アプリと同じ「左寄せの大きな見出し」 */
+  .fitall-header {
+    padding: calc(var(--fitall-safe-top) + 4px) 16px 4px;
+  }
+
+  /* 上部に丸ボタンがない画面は、見出しの上に少しだけ余白を取る */
+  .fitall-header[data-bar="false"] {
+    padding-top: calc(var(--fitall-safe-top) + 28px);
+  }
+
+  .fitall-header-bar {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    margin: 0 -6px;
+    min-height: var(--fitall-tap);
+  }
+
+  .fitall-header-actions {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+  }
+
+  .fitall-large-title {
+    color: var(--fitall-ink);
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    line-height: 1.2;
+    margin-top: 2px;
+  }
+
+  .fitall-header-sub {
+    color: var(--fitall-ink-muted);
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  /* 見出し横の丸いボタン。タップ領域は56pxを確保し、見た目の丸は44px */
+  .fitall-circle-button {
+    align-items: center;
+    color: var(--fitall-ink);
+    display: inline-flex;
+    flex: none;
+    height: var(--fitall-tap);
+    justify-content: center;
+    width: var(--fitall-tap);
+  }
+
+  .fitall-circle-button > span {
+    align-items: center;
+    background: var(--fitall-surface);
+    border-radius: 999px;
+    box-shadow: var(--fitall-shadow-float);
+    display: flex;
+    height: 44px;
+    justify-content: center;
+    width: 44px;
+  }
+
+  .fitall-circle-button[data-tone="ink"] > span {
+    background: var(--fitall-ink);
+    color: #ffffff;
+  }
+
   .fitall-page-pad {
     max-width: 100%;
     padding: 16px 16px 32px;
@@ -241,23 +318,255 @@
   .fitall-card,
   .fitall-card-strong {
     background: var(--fitall-surface);
-    border: 1px solid var(--fitall-line);
     border-radius: var(--fitall-radius-card);
-    box-shadow: var(--fitall-shadow-card);
     max-width: 100%;
     overflow-wrap: anywhere;
+  }
+
+  /* 一覧のまとまり（iPhoneの設定画面のグループ） */
+  .fitall-group {
+    background: var(--fitall-surface);
+    border-radius: var(--fitall-radius-card);
+    overflow: hidden;
+  }
+
+  .fitall-group-label {
+    align-items: baseline;
+    color: var(--fitall-ink-muted);
+    display: flex;
+    font-size: 16px;
+    font-weight: 600;
+    justify-content: space-between;
+    margin: 0 4px 8px;
+  }
+
+  .fitall-group-label a {
+    color: var(--fitall-brand);
+    font-weight: 600;
+  }
+
+  .fitall-group-note {
+    color: var(--fitall-ink-muted);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 8px 4px 0;
+  }
+
+  /* 一覧の1行。区切り線は左端を空けて引く */
+  .fitall-row {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    min-height: var(--fitall-tap);
+    padding: 12px 16px;
+    position: relative;
+  }
+
+  .fitall-row + .fitall-row::before {
+    background: var(--fitall-hairline);
+    content: "";
+    height: 1px;
+    left: 16px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: scaleY(.5);
+    transform-origin: top;
+  }
+
+  .fitall-row[data-inset="avatar"] + .fitall-row[data-inset="avatar"]::before {
+    left: 64px;
+  }
+
+  a.fitall-row:active,
+  button.fitall-row:active {
+    background: var(--fitall-surface-press);
+  }
+
+  .fitall-device a.fitall-row:active,
+  .fitall-device button.fitall-row:active {
+    transform: none;
+  }
+
+  .fitall-row-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .fitall-row-title {
+    color: var(--fitall-ink);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .fitall-row-meta {
+    align-items: center;
+    color: var(--fitall-ink-muted);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 16px;
+    gap: 2px 12px;
+    line-height: 1.5;
+    margin-top: 2px;
+  }
+
+  .fitall-row-meta > span {
+    align-items: center;
+    display: inline-flex;
+    gap: 4px;
+  }
+
+  .fitall-row-meta svg {
+    color: var(--fitall-ink-faint);
+    flex: none;
+  }
+
+  .fitall-chevron {
+    color: #C4C4C9;
+    flex: none;
+  }
+
+  /* 左端の細い色帯で状態を示す（確定=アクア、承認待ち=オレンジ） */
+  .fitall-row[data-status]::after {
+    border-radius: 0 3px 3px 0;
+    bottom: 12px;
+    content: "";
+    left: 0;
+    position: absolute;
+    top: 12px;
+    width: 4px;
+  }
+
+  .fitall-row[data-status="confirmed"]::after { background: var(--fitall-accent); }
+  .fitall-row[data-status="pending"]::after { background: var(--fitall-warn-dot); }
+  .fitall-row[data-status="completed"]::after { background: var(--fitall-ink); }
+  .fitall-row[data-status="cancelled"]::after { background: var(--fitall-line); }
+
+  /* 状態などを示す小さな印 */
+  .fitall-badge {
+    align-items: center;
+    background: var(--fitall-surface-soft);
+    border-radius: 7px;
+    color: var(--fitall-ink-muted);
+    display: inline-flex;
+    flex: none;
+    font-size: 16px;
+    font-weight: 600;
+    gap: 6px;
+    line-height: 1;
+    padding: 6px 9px;
+    white-space: nowrap;
+  }
+
+  .fitall-badge[data-tone="accent"] { background: var(--fitall-accent-soft); color: var(--fitall-brand); }
+  .fitall-badge[data-tone="warn"] { background: var(--fitall-warn-soft); color: var(--fitall-warn); }
+  .fitall-badge[data-tone="danger"] { background: var(--fitall-danger-soft); color: var(--fitall-danger); }
+  .fitall-badge[data-tone="ink"] { background: var(--fitall-ink); color: #ffffff; }
+
+  /* 入力欄。枠線ではなく淡い地色で入力できる場所を示す */
+  .fitall-input {
+    background: var(--fitall-surface-soft);
+    border: 0;
+    border-radius: var(--fitall-radius-control);
+    color: var(--fitall-ink);
+    font-size: 17px;
+    font-weight: 500;
+    min-height: var(--fitall-tap);
+    outline: none;
+    padding: 0 14px;
+    width: 100%;
+  }
+
+  .fitall-input:focus {
+    box-shadow: 0 0 0 2px var(--fitall-accent);
+  }
+
+  .fitall-textarea {
+    line-height: 1.6;
+    min-height: 96px;
+    padding: 14px;
+  }
+
+  /* 一覧の先頭に置く角丸の色付きアイコン */
+  .fitall-icon-tile {
+    align-items: center;
+    background: var(--fitall-ink);
+    border-radius: 10px;
+    color: #ffffff;
+    display: flex;
+    flex: none;
+    height: 34px;
+    justify-content: center;
+    width: 34px;
+  }
+
+  .fitall-icon-tile[data-tone="accent"] { background: var(--fitall-accent); color: var(--fitall-ink); }
+  .fitall-icon-tile[data-tone="warn"] { background: var(--fitall-warn-dot); color: #ffffff; }
+  .fitall-icon-tile svg { height: 19px; width: 19px; }
+
+  /* 丸い頭文字アイコン */
+  .fitall-avatar {
+    align-items: center;
+    background: var(--fitall-accent-soft);
+    border-radius: 999px;
+    color: var(--fitall-brand);
+    display: flex;
+    flex: none;
+    font-size: 17px;
+    font-weight: 700;
+    height: 44px;
+    justify-content: center;
+    width: 44px;
+  }
+
+  /* 金額や件数などの大きな数字 */
+  .fitall-figure {
+    color: var(--fitall-ink);
+    font-feature-settings: "tnum";
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+  }
+
+  .fitall-figure small {
+    color: var(--fitall-ink-muted);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0;
+    margin-left: 2px;
+  }
+
+  /* 開発用確認モードの控えめな注記 */
+  .fitall-dev-note {
+    align-items: center;
+    color: var(--fitall-ink-muted);
+    display: flex;
+    font-size: 16px;
+    gap: 8px;
+    line-height: 1.5;
+    padding: 0 4px;
+  }
+
+  .fitall-dev-note::before {
+    background: var(--fitall-accent);
+    border-radius: 999px;
+    content: "";
+    flex: none;
+    height: 8px;
+    width: 8px;
   }
 
   .fitall-kicker {
     color: var(--fitall-brand);
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 600;
   }
 
   .fitall-section-title {
     color: var(--fitall-ink);
-    font-size: 16px;
-    font-weight: 800;
+    font-size: 18px;
+    font-weight: 700;
   }
 
   .fitall-muted {
@@ -267,24 +576,30 @@
 
   .fitall-pill {
     align-items: center;
-    border: 1px solid var(--fitall-line);
+    background: var(--fitall-surface-soft);
     border-radius: 999px;
     display: inline-flex;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 600;
     min-height: 32px;
     padding: 0 12px;
   }
 
   .fitall-pill-aqua {
     background: var(--fitall-accent-soft);
-    border-color: rgb(18 199 190 / 35%);
     color: var(--fitall-brand);
   }
 
   .fitall-table-head {
     background: var(--fitall-ink);
     color: #ffffff;
+  }
+
+  /* PCの表の見出し行。黒帯ではなく細い線で区切る */
+  .fitall-list-head {
+    border-bottom: 1px solid var(--fitall-line);
+    color: var(--fitall-ink-muted);
+    font-weight: 600;
   }
 
   .fitall-step {
@@ -307,11 +622,12 @@
     border-radius: 999px;
     color: #ffffff;
     display: flex;
+    flex: none;
     font-size: 16px;
-    font-weight: 800;
-    height: 36px;
+    font-weight: 600;
+    height: 32px;
     justify-content: center;
-    width: 36px;
+    width: 32px;
   }
 
   /* ==========================================================================
@@ -324,8 +640,8 @@
     align-items: center;
     border-radius: var(--fitall-radius-control);
     display: inline-flex;
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 17px;
+    font-weight: 600;
     justify-content: center;
     min-height: var(--fitall-tap);
     padding: 8px 18px;
@@ -350,8 +666,22 @@
 
   .fitall-secondary-action {
     background: var(--fitall-surface);
-    border: 1px solid var(--fitall-line);
+    box-shadow: inset 0 0 0 1px var(--fitall-line);
     color: var(--fitall-ink);
+  }
+
+  /* 白いまとまりの中で使う控えめなボタン */
+  .fitall-tinted-action {
+    align-items: center;
+    background: var(--fitall-accent-soft);
+    border-radius: var(--fitall-radius-control);
+    color: var(--fitall-brand);
+    display: inline-flex;
+    font-size: 17px;
+    font-weight: 600;
+    justify-content: center;
+    min-height: var(--fitall-tap);
+    padding: 8px 18px;
   }
 
   .fitall-danger-action {
@@ -367,13 +697,13 @@
   .fitall-icon-button {
     align-items: center;
     background: var(--fitall-surface);
-    border: 1px solid var(--fitall-line);
-    border-radius: var(--fitall-radius-control);
+    border-radius: 999px;
+    box-shadow: var(--fitall-shadow-float);
     color: var(--fitall-ink);
     display: inline-flex;
     flex: none;
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 500;
     height: var(--fitall-tap);
     justify-content: center;
     line-height: 1;
@@ -421,49 +751,49 @@
      セグメント切替（日／週／月）
      ========================================================================== */
   .fitall-segmented {
-    background: var(--fitall-surface-soft);
-    border-radius: var(--fitall-radius-control);
+    background: #E6E7EA;
+    border-radius: 999px;
     display: grid;
     grid-auto-columns: 1fr;
     grid-auto-flow: column;
-    padding: 4px;
+    padding: 3px;
     position: relative;
   }
 
   .fitall-segmented-thumb {
-    background: var(--fitall-surface);
-    border-radius: 9px;
-    bottom: 4px;
-    box-shadow: 0 1px 3px rgb(10 10 10 / 14%);
-    left: 4px;
+    background: var(--fitall-ink);
+    border-radius: 999px;
+    bottom: 3px;
+    box-shadow: 0 1px 3px rgb(10 10 10 / 18%);
+    left: 3px;
     position: absolute;
-    top: 4px;
+    top: 3px;
     transition: transform var(--fitall-motion-base) var(--fitall-ease-out);
-    width: calc((100% - 8px) / var(--fitall-segment-count));
+    width: calc((100% - 6px) / var(--fitall-segment-count));
   }
 
   .fitall-segmented button {
     background: transparent;
-    border-radius: 9px;
+    border-radius: 999px;
     color: var(--fitall-ink-muted);
-    font-weight: 700;
-    min-height: 48px;
+    font-weight: 600;
+    min-height: var(--fitall-tap);
     position: relative;
     transition: color var(--fitall-motion-fast) ease;
     z-index: 1;
   }
 
   .fitall-segmented button[aria-pressed="true"] {
-    color: var(--fitall-ink);
+    color: #ffffff;
   }
 
   /* ==========================================================================
      下部タブ
      ========================================================================== */
   .fitall-tabbar {
-    background: rgb(255 255 255 / 96%);
-    backdrop-filter: blur(16px);
-    border-top: 1px solid var(--fitall-line);
+    background: rgb(255 255 255 / 88%);
+    backdrop-filter: saturate(180%) blur(20px);
+    box-shadow: inset 0 .5px 0 var(--fitall-hairline);
     display: grid;
     grid-template-columns: repeat(var(--fitall-tab-count), minmax(0, 1fr));
     height: calc(var(--fitall-tabbar) + var(--fitall-safe-bottom));
@@ -505,7 +835,7 @@
     display: flex;
     flex-direction: column;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 600;
     gap: 2px;
     height: var(--fitall-tabbar);
     justify-content: center;
@@ -514,7 +844,7 @@
   }
 
   .fitall-tab[aria-current="page"] {
-    color: var(--fitall-ink);
+    color: var(--fitall-brand);
   }
 
   .fitall-tab[aria-current="page"] svg {
@@ -526,9 +856,7 @@
      ========================================================================== */
   .fitall-details {
     background: var(--fitall-surface);
-    border: 1px solid var(--fitall-line);
     border-radius: var(--fitall-radius-card);
-    box-shadow: var(--fitall-shadow-card);
     overflow: hidden;
   }
 
@@ -722,15 +1050,19 @@
     transform: scale(.97);
   }
 
-  .fitall-device .fitall-card:active,
-  .fitall-device .fitall-desktop-card:active {
+  .fitall-device a.fitall-card:active,
+  .fitall-device a.fitall-desktop-card:active {
     transform: scale(.985);
   }
 
   @media (hover: hover) {
-    .fitall-tap:hover,
     .fitall-secondary-action:hover {
-      border-color: var(--fitall-ink);
+      box-shadow: inset 0 0 0 1px var(--fitall-ink-faint);
+    }
+
+    a.fitall-row:hover,
+    button.fitall-row:hover {
+      background: #F7F7F9;
     }
 
     .fitall-primary-action:hover {
@@ -827,8 +1159,8 @@
     .fitall-desktop-title {
       color: var(--fitall-ink);
       font-size: 32px;
-      font-weight: 800;
-      letter-spacing: 0;
+      font-weight: 700;
+      letter-spacing: -.01em;
       line-height: 1.15;
     }
 
@@ -839,9 +1171,7 @@
 
     .fitall-desktop-card {
       background: var(--fitall-surface);
-      border: 1px solid var(--fitall-line);
       border-radius: var(--fitall-radius-card);
-      box-shadow: var(--fitall-shadow-card);
       overflow: hidden;
     }
 

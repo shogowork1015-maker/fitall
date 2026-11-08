@@ -22,29 +22,28 @@ export default async function PublicBookingSuccessPage({ searchParams }: PagePro
   const lineStatus = lineStatusMessage(params?.line)
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white px-4">
-      <div className="w-full max-w-[390px] border border-ink bg-white p-5 text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center border border-ink bg-accent text-ink">
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="fitall-card w-full max-w-[390px] p-6 text-center">
+        <div className="fitall-pop mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent text-ink">
           <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 6 9 17l-5-5" />
           </svg>
         </div>
-        <p className="mt-5 text-base font-bold text-brand">チケット</p>
-        <h1 className="mt-2 text-2xl font-black tracking-tight text-ink">
+        <h1 className="mt-5 text-2xl font-bold text-ink">
           チケットの購入手続き
         </h1>
-        <p className="mt-3 text-base font-medium leading-relaxed text-ink-muted">
+        <p className="mt-3 text-base leading-relaxed text-ink-muted">
           決済完了後にチケットが反映されます。LINEを連携してマイページを開き、残りチケットを確認してから予約日時を選んでください。
         </p>
         {lineStatus && (
-          <p className="mt-4 border border-line bg-surface-soft px-3 py-2 text-base font-bold text-ink">
+          <p role="status" className="mt-4 rounded-control bg-surface-soft px-4 py-3 text-base font-semibold text-ink">
             {lineStatus}
           </p>
         )}
         {sessionId && params?.line !== 'connected' && params?.line !== 'not-paid' && (
           <Link
             href={`/api/line/connect/start?session_id=${encodeURIComponent(sessionId)}`}
-            className="mt-5 inline-flex h-[52px] w-full items-center justify-center border border-accent bg-accent px-6 text-base font-bold text-ink"
+            className="fitall-aqua-action mt-5"
           >
             LINEを連携してマイページへ
           </Link>
@@ -52,14 +51,14 @@ export default async function PublicBookingSuccessPage({ searchParams }: PagePro
         {params?.line === 'connected' ? (
           <Link
             href="/customer/app"
-            className="mt-3 inline-flex h-12 w-full items-center justify-center border border-ink bg-ink px-6 text-base font-bold text-white"
+            className="fitall-primary-action mt-3"
           >
             お客様アプリを開く
           </Link>
         ) : (
           <Link
             href="/auth/login"
-            className="mt-3 inline-flex h-12 w-full items-center justify-center border border-ink bg-white px-6 text-base font-bold text-ink"
+            className="fitall-secondary-action mt-3 w-full"
           >
             閉じる
           </Link>

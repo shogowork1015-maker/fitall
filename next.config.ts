@@ -8,6 +8,8 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // 開発時の「N」マークが下部タブに重なり見た目を確認しづらいため出さない（エラー表示は残る）
+  devIndicators: false,
   turbopack: {
     root: projectRoot,
   },

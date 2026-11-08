@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { TrainerBookingCalendar } from './TrainerBookingCalendar'
 import { loadTraineeNameMap } from '@/lib/trainee-display'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
+import { DevPreviewNote, HeaderAction, PageHeader } from '@/components/ui/PageHeader'
+import { ClockIcon, LinkIcon } from '@/components/ui/Icons'
 
 function addDays(date: Date, days: number) {
   const d = new Date(date)
@@ -74,6 +76,27 @@ function mockCalendarData() {
   }
 }
 
+// スマホの見出し。右上に「空き枠」と「予約リンクを送る」を置く
+function MobileBookingsHeader() {
+  return (
+    <div className="fitall-mobile-ui">
+      <PageHeader
+        title="予約"
+        actions={
+          <>
+            <HeaderAction href="/trainer/availability" label="空き枠を設定">
+              <ClockIcon />
+            </HeaderAction>
+            <HeaderAction href="/trainer/invite" label="予約リンクを送る">
+              <LinkIcon />
+            </HeaderAction>
+          </>
+        }
+      />
+    </div>
+  )
+}
+
 export default async function TrainerBookingsPage() {
   const supabase = await createServerSupabaseClient()
   const {
@@ -87,13 +110,7 @@ export default async function TrainerBookingsPage() {
     const mock = mockCalendarData()
     return (
       <div className="fitall-page fitall-scroll md:bg-surface-soft">
-        <div className="fitall-mobile-ui fitall-topbar">
-          <div className="w-14" />
-          <h1 className="text-[17px] font-black text-ink flex-1 text-center">予約</h1>
-          <Link href="/trainer/invite" className="w-14 font-bold text-brand">
-            送る
-          </Link>
-        </div>
+        <MobileBookingsHeader />
 
         <div className="hidden px-8 pt-8 md:block">
           <div className="fitall-desktop-container">
@@ -111,15 +128,13 @@ export default async function TrainerBookingsPage() {
           </div>
         </div>
 
-        <div className="px-4 pt-4 md:px-8 md:pt-0">
+        <div className="px-4 pt-2 md:px-8 md:pt-0">
           <div className="fitall-desktop-container">
-          <div className="fitall-card bg-accent-soft px-4 py-3 text-base font-bold leading-relaxed text-brand">
-            開発用UI確認モードです。ログインなしで表示しています。予約作成・移動・完了などの保存は実行されません。
-          </div>
+          <DevPreviewNote>開発用の確認モード。予約の作成・移動・完了は保存されません。</DevPreviewNote>
           </div>
         </div>
 
-        <div className="px-4 py-6 md:px-8">
+        <div className="px-4 pb-6 pt-4 md:px-8 md:py-6">
           <div className="fitall-desktop-container">
           <TrainerBookingCalendar
             bookings={mock.bookings}
@@ -142,11 +157,7 @@ export default async function TrainerBookingsPage() {
   if (!trainerProfile) {
     return (
       <div className="fitall-page fitall-scroll md:bg-surface-soft">
-        <div className="fitall-mobile-ui fitall-topbar">
-          <div className="w-14" />
-          <h1 className="text-[17px] font-black text-ink flex-1 text-center">予約</h1>
-          <div className="w-14" />
-        </div>
+        <MobileBookingsHeader />
         <div className="px-4 py-8 md:px-8">
           <div className="fitall-desktop-container">
           <div className="fitall-card p-6 text-center text-base font-medium text-ink-muted">
@@ -226,18 +237,7 @@ export default async function TrainerBookingsPage() {
 
   return (
     <div className="fitall-page fitall-scroll md:bg-surface-soft">
-      <div className="fitall-mobile-ui fitall-topbar">
-        <div className="w-14" />
-        <h1 className="text-[17px] font-black text-ink flex-1 text-center">予約</h1>
-        <div className="flex w-14 justify-end">
-          <Link
-            href="/trainer/availability"
-            className="text-base font-bold text-brand"
-          >
-            空き
-          </Link>
-        </div>
-      </div>
+      <MobileBookingsHeader />
 
       <div className="hidden px-8 pt-8 md:block">
         <div className="fitall-desktop-container">
@@ -254,7 +254,7 @@ export default async function TrainerBookingsPage() {
           </header>
         </div>
       </div>
-      <div className="px-4 py-6 md:px-8 md:pt-0">
+      <div className="px-4 pb-6 pt-2 md:px-8 md:pt-0">
         <div className="fitall-desktop-container">
         <TrainerBookingCalendar
           bookings={calendarBookings}

@@ -3,6 +3,33 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { BookingLinkManager } from './BookingLinkManager'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
+import { DevPreviewNote, PageHeader } from '@/components/ui/PageHeader'
+import { ChevronRightIcon, ClockIcon, TicketIcon } from '@/components/ui/Icons'
+
+// お客様が招待を受け取ってから予約するまでの流れ
+function InviteFlow() {
+  const steps = [
+    { title: 'LINEで招待を送る', body: 'お客様はLINEからアプリを開けます' },
+    { title: 'お客様がメニューを購入', body: '月謝は毎月チケットを自動で付与します' },
+    { title: '予約と通知を自動化', body: '予約・売上・LINE通知に反映します' },
+  ]
+  return (
+    <section>
+      <h2 className="fitall-group-label">ご案内の流れ</h2>
+      <ol className="fitall-group">
+        {steps.map((step, index) => (
+          <li key={step.title} className="fitall-row" data-inset="avatar">
+            <span className="fitall-step-num">{index + 1}</span>
+            <div className="fitall-row-main">
+              <p className="fitall-row-title">{step.title}</p>
+              <p className="fitall-row-meta">{step.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}
 
 function InviteShell({
   trainerProfileId,
@@ -14,71 +41,34 @@ function InviteShell({
   return (
     <>
     <div className="fitall-mobile-ui fitall-page fitall-scroll">
-      <div className="fitall-topbar">
-        <div className="w-14" />
-        <h1 className="flex-1 text-center text-[17px] font-black text-ink">LINE招待</h1>
-        <Link href="/trainer/bookings" className="w-14 font-bold text-brand">
-          予約
-        </Link>
-      </div>
+      <PageHeader title="招待" subtitle="LINEでお客様アプリにご案内します" />
 
-      <div className="fitall-page-pad space-y-5">
-        {preview && (
-          <div className="fitall-card bg-accent-soft px-4 py-3 text-base font-bold leading-relaxed text-brand">
-            開発用UI確認モードです。サンプルのLINE招待を表示しています。
-          </div>
-        )}
-
-        <section className="fitall-card-strong overflow-hidden">
-          <div className="bg-accent px-4 py-4 text-ink">
-            <p className="text-base font-bold text-ink/70">ご案内の流れ</p>
-            <h2 className="mt-1 break-words text-lg font-black leading-snug">LINEからお客様アプリへ招待</h2>
-          </div>
-          <div className="p-4">
-            <div className="fitall-step">
-              <span className="fitall-step-num">1</span>
-              <div>
-                <p className="text-base font-bold text-ink">LINEで招待を送る</p>
-                <p className="mt-0.5 text-base font-medium text-ink-muted">お客様はLINEからアプリを開けます</p>
-              </div>
-            </div>
-            <div className="fitall-step">
-              <span className="fitall-step-num">2</span>
-              <div>
-                <p className="text-base font-bold text-ink">お客様がメニューを購入</p>
-                <p className="mt-0.5 text-base font-medium text-ink-muted">月謝は毎月チケットを自動付与します</p>
-              </div>
-            </div>
-            <div className="fitall-step">
-              <span className="fitall-step-num">3</span>
-              <div>
-                <p className="text-base font-bold text-ink">予約と通知を自動化</p>
-                <p className="mt-0.5 text-base font-medium text-ink-muted">予約、売上、LINE通知に反映します</p>
-              </div>
-            </div>
-          </div>
-        </section>
+      <div className="fitall-page-pad space-y-7">
+        {preview && <DevPreviewNote>開発用の確認モード（サンプルの招待）</DevPreviewNote>}
 
         {trainerProfileId ? (
           <BookingLinkManager trainerProfileId={trainerProfileId} />
         ) : (
           <div className="fitall-card p-6 text-center">
-            <p className="text-base font-bold text-ink">トレーナープロフィールが見つかりません</p>
-            <p className="mt-1 text-base font-medium text-ink-muted">プロフィール作成後にLINE招待を発行できます</p>
+            <p className="text-base font-semibold text-ink">トレーナープロフィールが見つかりません</p>
+            <p className="mt-1 text-base text-ink-muted">プロフィール作成後にLINE招待を発行できます</p>
           </div>
         )}
 
-        <section className="fitall-card p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="fitall-section-title">送る前の確認</h2>
-            <span className="fitall-pill fitall-pill-aqua">2分で完了</span>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <Link href="/trainer/availability" className="fitall-secondary-action fitall-tap">
-              空き枠
+        <InviteFlow />
+
+        <section>
+          <h2 className="fitall-group-label">送る前の確認</h2>
+          <div className="fitall-group">
+            <Link href="/trainer/availability" className="fitall-row">
+              <span className="fitall-icon-tile" data-tone="accent"><ClockIcon /></span>
+              <span className="fitall-row-main fitall-row-title">空き枠</span>
+              <ChevronRightIcon />
             </Link>
-            <Link href="/trainer/settings" className="fitall-secondary-action fitall-tap">
-              料金メニュー
+            <Link href="/trainer/settings" className="fitall-row">
+              <span className="fitall-icon-tile" data-tone="accent"><TicketIcon /></span>
+              <span className="fitall-row-main fitall-row-title">料金メニュー</span>
+              <ChevronRightIcon />
             </Link>
           </div>
         </section>
@@ -100,16 +90,14 @@ function InviteShell({
         </header>
 
         {preview && (
-          <div className="fitall-desktop-card mb-5 bg-accent-soft px-5 py-3 text-base font-bold text-brand">
-            開発用UI確認モードです。サンプルのLINE招待を表示しています。
-          </div>
+          <div className="mb-5"><DevPreviewNote>開発用の確認モード（サンプルの招待）</DevPreviewNote></div>
         )}
 
         <div className="grid grid-cols-[1fr_1.1fr] gap-5">
-          <section className="fitall-desktop-card border-ink">
-            <div className="bg-accent px-5 py-5 text-ink">
-              <p className="text-base font-bold text-ink/70">流れ</p>
-              <h2 className="mt-2 text-2xl font-black">LINEからアプリに入り、購入と予約まで進む</h2>
+          <section className="fitall-desktop-card">
+            <div className="px-5 pt-5">
+              <p className="text-base font-semibold text-ink-muted">ご案内の流れ</p>
+              <h2 className="mt-1 text-2xl font-bold">LINEからアプリに入り、購入と予約まで進む</h2>
             </div>
             <div className="p-5">
               <div className="fitall-step">

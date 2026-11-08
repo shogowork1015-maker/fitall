@@ -16,6 +16,12 @@ function load(file, dependencies = {}) {
   return exports
 }
 const revenue = load('src/lib/trainer-revenue.ts')
+// 画面が使う共通UI部品は本物を読み込み、画面の描画結果まで確認できるようにする
+const uiDependencies = (jsxRuntime, link) => ({
+  '@/components/ui/PageHeader': load('src/components/ui/PageHeader.tsx', { 'react/jsx-runtime': jsxRuntime, 'next/link': link }),
+  '@/components/ui/StatusBadge': load('src/components/ui/StatusBadge.tsx', { 'react/jsx-runtime': jsxRuntime }),
+  '@/components/ui/Icons': load('src/components/ui/Icons.tsx', { 'react/jsx-runtime': jsxRuntime }),
+})
 const from = '2026-09-30T15:00:00.000Z'
 const paidAt = '2026-10-01T01:00:00.000Z'
 const purchase = (overrides = {}) => ({ id: 'p1', amount: 28000, quantity: 4,
@@ -156,6 +162,7 @@ test('actual sales and dashboard page functions agree on current month and use p
     '@/components/charts/SalesBarChart': {},
     'next/link': {}, '@/app/auth/login/actions': {},
   }
+  Object.assign(dependencies, uiDependencies(dependencies['react/jsx-runtime'], {}))
   const salesPage = await load('src/app/trainer/sales/page.tsx', dependencies).default()
   const dashboard = await load('src/app/trainer/dashboard/page.tsx', dependencies).default()
   assert.equal(salesPage.props.currentTotal, 33000)
@@ -191,6 +198,7 @@ test('ambiguous revenue hides only dashboard sales and gives explicit sales-page
     '@/components/charts/SalesBarChart': {},
     'next/link': { default: props => jsxRuntime.jsx('a', props) }, '@/app/auth/login/actions': {},
   }
+  Object.assign(dependencies, uiDependencies(jsxRuntime, dependencies['next/link']))
   const dashboard = await load('src/app/trainer/dashboard/page.tsx', dependencies).default()
   assert.equal(dashboard.props.totalSales, null)
   assert.equal(dashboard.props.clientCount, 1)

@@ -178,25 +178,22 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
     <div className="space-y-4">
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {error && (
-        <div className="rounded-control border border-danger bg-danger-soft px-4 py-3 text-base font-bold text-danger">
+        <div role="alert" className="rounded-control bg-danger-soft px-4 py-3 text-base font-semibold text-danger">
           {error}
         </div>
       )}
 
-      <section className="fitall-card-strong overflow-hidden">
-        <div className="bg-accent px-4 py-3 text-ink">
-          <p className="text-base font-bold text-ink/70">予約の設定</p>
-          <h2 className="mt-1 text-lg font-black">予約の基本設定</h2>
-        </div>
-        <div className="space-y-3 p-4">
-          <p className="text-base font-medium leading-relaxed text-ink-muted">
+      <section className="fitall-card">
+        <div className="space-y-3 p-5">
+          <h2 className="text-lg font-bold text-ink">予約の基本設定</h2>
+          <p className="text-base leading-relaxed text-ink-muted">
             ここで設定した営業時間とセッション時間を使って、お客様用の予約枠を自動で出します。
           </p>
           <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
             <select
               value={open}
               onChange={(e) => setOpen(e.target.value)}
-              className="h-14 border border-line bg-white px-3 text-base font-bold text-ink outline-none focus:border-accent"
+              className="fitall-input"
             >
               {TIME_OPTIONS.map((t) => (
                 <option key={`open-${t}`} value={t}>
@@ -207,7 +204,7 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
             <select
               value={close}
               onChange={(e) => setClose(e.target.value)}
-              className="h-14 border border-line bg-white px-3 text-base font-bold text-ink outline-none focus:border-accent"
+              className="fitall-input"
             >
               {TIME_OPTIONS.map((t) => (
                 <option key={`close-${t}`} value={t}>
@@ -218,7 +215,7 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
             <select
               value={sessionMinutes}
               onChange={(e) => setSessionMinutes(Number(e.target.value))}
-              className="h-14 border border-line bg-white px-3 text-base font-bold text-ink outline-none focus:border-accent"
+              className="fitall-input"
             >
               {SESSION_OPTIONS.map((v) => (
                 <option key={`session-${v}`} value={v}>
@@ -231,35 +228,28 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
             type="button"
             onClick={() => void onSaveSettings()}
             disabled={savingKey === 'operation'}
-            className="h-12 w-full rounded-control bg-ink text-base font-bold text-white disabled:opacity-40"
+            className="fitall-primary-action disabled:opacity-40"
           >
             {savingKey === 'operation' ? '保存中...' : '予約設定を保存'}
           </button>
         </div>
       </section>
 
-      <section className="fitall-card p-4">
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+      <section className="fitall-card p-5">
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:justify-between sm:gap-3">
           <div>
-            <p className="fitall-kicker">販売メニュー</p>
-            <h2 className="mt-1 text-2xl font-black text-ink">回数券・月謝</h2>
-            <p className="mt-2 text-base font-medium leading-relaxed text-ink-muted">
-              アプリで作ったメニューが予約ページに出ます。決済は裏側でStripe Checkoutに接続します。
+            <h2 className="text-lg font-bold text-ink">販売メニュー（回数券・月謝）</h2>
+            <p className="mt-1 text-base leading-relaxed text-ink-muted">
+              作ったメニューが予約ページに出ます。決済はStripeで行います。
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-center md:min-w-[220px]">
-            <div className="border border-line bg-white px-3 py-2">
-              <p className="text-xl font-black text-ink">{menus.filter((m) => m.is_public).length}</p>
-              <p className="text-base font-bold text-brand">公開中</p>
-            </div>
-            <div className="border border-line bg-white px-3 py-2">
-              <p className="text-xl font-black text-ink">{menus.length}</p>
-              <p className="text-base font-bold text-brand">全メニュー</p>
-            </div>
-          </div>
+          <span className="fitall-badge" data-tone="accent">
+            公開 {menus.filter((m) => m.is_public).length} / {menus.length}
+          </span>
         </div>
 
-        <div className="mt-5 grid gap-3 border border-ink bg-surface-soft p-3 md:grid-cols-[150px_1fr_130px_120px]">
+        <p className="mt-5 text-base font-semibold text-ink-muted">新しいメニュー</p>
+        <div className="mt-2 grid gap-2 md:grid-cols-[150px_1fr_130px_120px]">
           <select
             value={newDraft.billing_type}
             onChange={(e) =>
@@ -270,7 +260,7 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
                 sessions: e.target.value === 'monthly' ? '4' : '1',
               }))
             }
-            className="h-12 border border-line bg-white px-3 text-base font-bold outline-none focus:border-accent"
+            className="fitall-input"
           >
             <option value="ticket">回数券</option>
             <option value="monthly">月謝</option>
@@ -279,7 +269,7 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
             value={newDraft.name}
             onChange={(e) => setNewDraft((prev) => ({ ...prev, name: e.target.value }))}
             placeholder="メニュー名"
-            className="h-12 border border-line bg-white px-3 text-base font-bold outline-none focus:border-accent"
+            className="fitall-input"
           />
           <input
             type="number"
@@ -287,12 +277,12 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
             value={newDraft.price}
             onChange={(e) => setNewDraft((prev) => ({ ...prev, price: e.target.value }))}
             placeholder="金額"
-            className="h-12 border border-line bg-white px-3 text-base font-bold outline-none focus:border-accent"
+            className="fitall-input"
           />
           <select
             value={newDraft.sessions}
             onChange={(e) => setNewDraft((prev) => ({ ...prev, sessions: e.target.value }))}
-            className="h-12 border border-line bg-white px-3 text-base font-bold outline-none focus:border-accent"
+            className="fitall-input"
           >
             {COUNT_OPTIONS.map((count) => (
               <option key={count} value={count}>
@@ -304,13 +294,13 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
             value={newDraft.description}
             onChange={(e) => setNewDraft((prev) => ({ ...prev, description: e.target.value }))}
             placeholder="予約ページに出す説明文"
-            className="min-h-20 border border-line bg-white px-3 py-2 text-base font-bold outline-none focus:border-accent md:col-span-3"
+            className="fitall-input fitall-textarea md:col-span-3"
           />
           <button
             type="button"
             onClick={() => void onAddMenu()}
             disabled={savingKey === 'new'}
-            className="h-20 rounded-control bg-accent text-base font-bold text-ink disabled:opacity-40"
+            className="fitall-aqua-action disabled:opacity-40 md:col-span-1"
           >
             {savingKey === 'new' ? '追加中...' : 'メニューを作成'}
           </button>
@@ -318,7 +308,7 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
       </section>
 
       {!menus.length ? (
-        <div className="fitall-card border-dashed p-6 text-center text-base font-medium text-ink-muted">
+        <div className="fitall-card p-6 text-center text-base text-ink-muted">
           まだメニューがありません。回数券か月謝を作ると、お客様マイページで選べるようになります。
         </div>
       ) : (
@@ -326,34 +316,28 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
           {menus.map((menu) => {
             const draft = drafts[menu.id] ?? toDraft(menu)
             return (
-              <section key={menu.id} className="fitall-card overflow-hidden">
-                <div className="grid gap-0 md:grid-cols-[170px_1fr]">
-                  <div className="flex min-h-[132px] flex-col justify-between bg-accent p-4 text-ink">
-                    <div>
-                      <p className="text-base font-bold text-ink/70">
-                        {draft.is_public ? '公開中' : '非公開'}
-                      </p>
-                      <p className="mt-3 text-xl font-black leading-tight">
-                        {draft.billing_type === 'monthly' ? '月謝' : '回数券'}
-                      </p>
-                      <p className="text-base font-bold">月{draft.sessions}回</p>
-                    </div>
-                    <p className="text-base font-bold text-white/80">
-                      {formatPrice(Number(draft.price) || 0)}
-                    </p>
-                  </div>
-                  <div className="space-y-3 p-4">
-                    <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-                      <div>
-                        <p className="text-base font-bold text-brand">
-                          {menuKindLabel({
-                            billing_type: draft.billing_type,
-                            sessions: Number(draft.sessions) || 1,
-                          })}
-                        </p>
-                        <h3 className="mt-1 text-lg font-black text-ink">{draft.name}</h3>
+              <section key={menu.id} className="fitall-card">
+                <div>
+                  <div className="space-y-3 p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap gap-1.5">
+                          <span className="fitall-badge" data-tone={draft.is_public ? 'accent' : undefined}>
+                            {draft.is_public ? '公開中' : '非公開'}
+                          </span>
+                          <span className="fitall-badge">
+                            {menuKindLabel({
+                              billing_type: draft.billing_type,
+                              sessions: Number(draft.sessions) || 1,
+                            })}
+                          </span>
+                        </div>
+                        <h3 className="mt-2 text-lg font-semibold text-ink">{draft.name}</h3>
                       </div>
-                      <label className="inline-flex h-10 items-center gap-2 border border-line bg-white px-3 text-base font-bold text-ink">
+                      <p className="fitall-figure shrink-0 text-xl">{formatPrice(Number(draft.price) || 0)}</p>
+                    </div>
+                    <div>
+                      <label className="inline-flex min-h-14 items-center gap-3 text-base font-medium text-ink">
                         <input
                           type="checkbox"
                           checked={draft.is_public}
@@ -371,7 +355,7 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
                             billing_type: e.target.value as TrainerPlanBillingType,
                           })
                         }
-                        className="h-11 border border-line bg-white px-3 text-base font-bold outline-none focus:border-accent"
+                        className="fitall-input"
                       >
                         <option value="ticket">回数券</option>
                         <option value="monthly">月謝</option>
@@ -379,19 +363,19 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
                       <input
                         value={draft.name}
                         onChange={(e) => updateDraft(menu.id, { name: e.target.value })}
-                        className="h-11 border border-line bg-white px-3 text-base font-bold outline-none focus:border-accent"
+                        className="fitall-input"
                       />
                       <input
                         type="number"
                         min={1}
                         value={draft.price}
                         onChange={(e) => updateDraft(menu.id, { price: e.target.value })}
-                        className="h-11 border border-line bg-white px-3 text-base font-bold outline-none focus:border-accent"
+                        className="fitall-input"
                       />
                       <select
                         value={draft.sessions}
                         onChange={(e) => updateDraft(menu.id, { sessions: e.target.value })}
-                        className="h-11 border border-line bg-white px-3 text-base font-bold outline-none focus:border-accent"
+                        className="fitall-input"
                       >
                         {COUNT_OPTIONS.map((count) => (
                           <option key={count} value={count}>
@@ -405,7 +389,7 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
                       value={draft.description}
                       onChange={(e) => updateDraft(menu.id, { description: e.target.value })}
                       placeholder="予約ページに出す説明文"
-                      className="min-h-20 w-full border border-line bg-white px-3 py-2 text-base font-bold outline-none focus:border-accent"
+                      className="fitall-input fitall-textarea w-full"
                     />
 
                     <div className="grid grid-cols-2 gap-2 md:flex md:justify-end">
@@ -413,7 +397,7 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
                         type="button"
                         onClick={() => void onDeleteMenu(menu.id)}
                         disabled={savingKey === menu.id}
-                        className="h-11 border border-line bg-white px-4 text-base font-medium text-ink-muted disabled:opacity-40"
+                        className="fitall-secondary-action !text-danger disabled:opacity-40"
                       >
                         削除
                       </button>
@@ -421,7 +405,7 @@ export function TrainerSettingsForm({ initialSettings, initialMenus }: Props) {
                         type="button"
                         onClick={() => void onUpdateMenu(menu)}
                         disabled={savingKey === menu.id}
-                        className="h-11 bg-ink px-5 text-base font-bold text-white disabled:opacity-40"
+                        className="fitall-primary-action disabled:opacity-40 md:!w-auto"
                       >
                         {savingKey === menu.id ? '保存中...' : '変更を保存'}
                       </button>

@@ -63,7 +63,7 @@ export function MoveBookingForm({
             step={300}
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="mt-2 h-14 w-full rounded-control border border-line bg-white px-3 text-base font-bold text-ink outline-none focus:border-accent"
+            className="fitall-input mt-2 !bg-white"
           />
           {error && <p className="mt-2 text-base font-semibold text-danger">{error}</p>}
           <div className="mt-3 flex gap-2">

@@ -4,6 +4,50 @@ import Link from 'next/link'
 import { BodyWeightChart } from '@/components/charts/BodyWeightChart'
 import { ExerciseWeightChart, type ExerciseChartData } from '@/components/charts/ExerciseWeightChart'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
+import { formatJstDate, formatJstDateTime } from '@/lib/datetime'
+import { DevPreviewNote, PageHeader } from '@/components/ui/PageHeader'
+import { StatusBadge } from '@/components/ui/StatusBadge'
+import { CalendarIcon, LinkIcon, TicketIcon } from '@/components/ui/Icons'
+
+// お客様の顔となる見出しカード。連絡先アプリのように頭文字・名前・よく使う操作を並べる
+function ClientProfileCard({ name, email }: { name: string; email: string }) {
+  const actions = [
+    { href: '/trainer/bookings', label: '予約', Icon: CalendarIcon },
+    { href: '/trainer/settings', label: 'メニュー', Icon: TicketIcon },
+    { href: '/trainer/invite', label: '登録リンク', Icon: LinkIcon },
+  ]
+  return (
+    <section className="fitall-card px-4 pb-4 pt-6 text-center">
+      <span className="fitall-avatar mx-auto !h-20 !w-20 !text-3xl">{name[0] ?? '?'}</span>
+      <h2 className="mt-3 break-words text-2xl font-bold text-ink">{name}</h2>
+      <p className="mt-1 break-all text-base text-ink-muted">{email}</p>
+      <div className="mt-5 grid grid-cols-3 gap-2">
+        {actions.map(({ href, label, Icon }) => (
+          <Link key={label} href={href} className="flex min-h-[72px] flex-col items-center justify-center gap-1 rounded-control bg-surface-soft text-brand">
+            <Icon />
+            <span className="text-base font-semibold">{label}</span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function ClientDetailHeader() {
+  return (
+    <PageHeader title="お客様" back={{ href: '/trainer/clients', label: 'お客様一覧へ戻る' }} />
+  )
+}
+
+// 左に項目名、右に値を置く1行
+function ValueRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="fitall-row">
+      <span className="fitall-row-main text-base text-ink-muted">{label}</span>
+      <span className="text-right text-base font-semibold text-ink">{value}</span>
+    </div>
+  )
+}
 
 function PreviewClientDetailPage({ id }: { id: string }) {
   const previewClients: Record<string, { name: string; email: string; credits: number; goal: string }> = {
@@ -14,65 +58,16 @@ function PreviewClientDetailPage({ id }: { id: string }) {
   const client = previewClients[id] ?? previewClients['preview-1']!
 
   return (
-    <div className="fitall-page fitall-scroll md:bg-surface-soft">
-      <div className="fitall-topbar">
-        <Link href="/trainer/clients" className="w-14 font-bold text-brand">
-          戻る
-        </Link>
-        <h1 className="flex-1 text-center text-[17px] font-black text-ink">お客様詳細</h1>
-        <div className="w-14" />
-      </div>
+    <div className="fitall-page fitall-scroll">
+      <ClientDetailHeader />
+      <div className="fitall-page-pad mx-auto max-w-[720px] space-y-7">
+        <DevPreviewNote>開発用の確認モード（サンプルのお客様）</DevPreviewNote>
+        <ClientProfileCard name={client.name} email={client.email} />
 
-      <div className="fitall-page-pad mx-auto max-w-[980px] space-y-5">
-        <section className="fitall-card-strong overflow-hidden">
-          <div className="bg-accent px-4 py-5 text-ink md:px-5">
-            <p className="text-base font-bold text-ink/70">サンプル</p>
-            <div className="mt-3 flex items-center gap-3">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-control bg-ink text-xl font-black text-white">
-                {client.name[0]}
-              </div>
-              <div className="min-w-0">
-                <h2 className="break-words text-2xl font-black leading-tight">{client.name}</h2>
-                <p className="mt-1 break-all text-base font-bold text-white/85">{client.email}</p>
-              </div>
-            </div>
-          </div>
-          <div className="grid gap-2 p-4 md:grid-cols-3">
-            <Link href="/trainer/bookings" className="fitall-primary-action fitall-tap h-11 text-base">
-              予約を入れる
-            </Link>
-            <Link href="/trainer/settings" className="fitall-secondary-action fitall-tap h-11 text-base">
-              メニュー調整
-            </Link>
-            <Link href="/trainer/invite" className="fitall-secondary-action fitall-tap h-11 text-base">
-              登録リンクを送る
-            </Link>
-          </div>
-        </section>
-
-        <section className="grid gap-3 md:grid-cols-3">
-          <div className="fitall-card p-4">
-            <p className="fitall-kicker">チケット</p>
-            <p className="mt-2 text-4xl font-black text-ink">{client.credits}</p>
-            <p className="mt-1 text-base font-medium text-ink-muted">利用可能</p>
-          </div>
-          <div className="fitall-card p-4">
-            <p className="fitall-kicker">次回</p>
-            <p className="mt-2 text-lg font-black text-ink">7/18 10:00</p>
-            <p className="mt-1 text-base font-medium text-ink-muted">次回予約</p>
-          </div>
-          <div className="fitall-card p-4">
-            <p className="fitall-kicker">目標</p>
-            <p className="mt-2 text-base font-bold leading-relaxed text-ink">{client.goal}</p>
-          </div>
-        </section>
-
-        <section className="fitall-card p-4">
-          <h2 className="fitall-section-title">直近のメモ</h2>
-          <div className="mt-3 space-y-2 text-base font-medium leading-relaxed text-ink-muted">
-            <p>フォーム確認用のプレビューです。実データの保存操作はありません。</p>
-            <p>本番では予約履歴、チケット、トレーニング記録、身体データがここに紐づきます。</p>
-          </div>
+        <section className="fitall-group">
+          <ValueRow label="残りチケット" value={<span className="fitall-figure text-xl">{client.credits}<small>回</small></span>} />
+          <ValueRow label="次回の予約" value="7/18 10:00" />
+          <ValueRow label="目標" value={client.goal} />
         </section>
       </div>
     </div>
@@ -245,127 +240,60 @@ export default async function ClientDetailPage({
   )
   const activeCredits = creditSummary.available + creditSummary.scheduled
 
-  const statusLabel: Record<string, string> = {
-    pending: '承認待ち',
-    confirmed: '確定',
-    cancelled: 'キャンセル',
-    completed: '完了',
-  }
-
-  const statusBadge: Record<string, string> = {
-    pending: 'bg-white text-ink border-ink',
-    confirmed: 'bg-accent text-ink border-accent',
-    cancelled: 'bg-surface-soft text-ink-muted border-line',
-    completed: 'bg-ink text-white border-ink',
-  }
-
   return (
-    <div className="fitall-page fitall-scroll md:bg-surface-soft">
-      <div className="fitall-topbar">
-        <Link href="/trainer/clients" className="w-14 font-bold text-brand">
-          戻る
-        </Link>
-        <h1 className="flex-1 text-center text-[17px] font-black text-ink">お客様詳細</h1>
-        <div className="w-14" />
-      </div>
+    <div className="fitall-page fitall-scroll">
+      <ClientDetailHeader />
 
-      <div className="fitall-page-pad mx-auto max-w-[980px] space-y-5">
-        <section className="fitall-card-strong overflow-hidden">
-          <div className="bg-accent px-4 py-5 text-ink md:px-5">
-            <p className="text-base font-bold text-ink/70">お客様</p>
-            <div className="mt-3 flex items-center gap-3">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-control bg-ink text-xl font-black text-white">
-                {trainee?.name?.[0] ?? '?'}
+      <div className="fitall-page-pad mx-auto max-w-[720px] space-y-7">
+        <ClientProfileCard name={trainee?.name ?? 'お客様'} email={trainee?.email ?? 'メール未登録'} />
+
+        <section>
+          <h3 className="fitall-group-label">チケット</h3>
+          <div className="fitall-card grid grid-cols-3 divide-x divide-line py-4 text-center">
+            {[
+              { label: '未消化', value: activeCredits },
+              { label: '予約済み', value: creditSummary.scheduled },
+              { label: '使用済み', value: creditSummary.used },
+            ].map((item) => (
+              <div key={item.label} className="px-2">
+                <p className="fitall-figure text-[28px]">{item.value}<small>回</small></p>
+                <p className="mt-1 text-base text-ink-muted">{item.label}</p>
               </div>
-              <div className="min-w-0">
-                <h2 className="break-words text-2xl font-black leading-tight">{trainee?.name ?? 'お客様'}</h2>
-                <p className="mt-1 break-all text-base font-bold text-white/85">{trainee?.email ?? 'メール未登録'}</p>
-              </div>
-            </div>
-          </div>
-          <div className="grid gap-2 p-4 md:grid-cols-3">
-            <Link href="/trainer/bookings" className="fitall-primary-action fitall-tap h-11 text-base">
-              予約を入れる
-            </Link>
-            <Link href="/trainer/settings" className="fitall-secondary-action fitall-tap h-11 text-base">
-              メニュー調整
-            </Link>
-            <Link href="/trainer/invite" className="fitall-secondary-action fitall-tap h-11 text-base">
-              登録リンクを送る
-            </Link>
+            ))}
           </div>
         </section>
 
         <section>
-          <div className="mb-3 flex items-center justify-between px-1">
-            <h3 className="fitall-section-title">チケット</h3>
-            <span className="text-base font-bold text-brand">未消化 {activeCredits}回</span>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="fitall-card p-4 text-center">
-              <p className="text-base font-bold text-brand">未消化</p>
-              <p className="text-xl font-black text-ink">{activeCredits}</p>
-              <p className="mt-1 text-base font-medium text-ink-muted">回</p>
-            </div>
-            <div className="fitall-card p-4 text-center">
-              <p className="text-base font-bold text-brand">予約済み</p>
-              <p className="text-xl font-black text-ink">{creditSummary.scheduled}</p>
-              <p className="mt-1 text-base font-medium text-ink-muted">回</p>
-            </div>
-            <div className="fitall-card p-4 text-center">
-              <p className="text-base font-bold text-brand">使用済み</p>
-              <p className="text-xl font-black text-ink">{creditSummary.used}</p>
-              <p className="mt-1 text-base font-medium text-ink-muted">回</p>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h3 className="fitall-section-title mb-3 px-1">身体データ</h3>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="fitall-card p-4 text-center">
-              <p className="text-base font-bold text-brand">身長</p>
-              <p className="text-xl font-black text-ink">
-                {profile?.height ?? '-'}
-              </p>
-              <p className="mt-1 text-base font-medium text-ink-muted">cm</p>
-            </div>
-            <div className="fitall-card p-4 text-center">
-              <p className="text-base font-bold text-brand">体重</p>
-              <p className="text-xl font-black text-ink">
-                {profile?.weight ?? '-'}
-              </p>
-              <p className="mt-1 text-base font-medium text-ink-muted">kg</p>
-            </div>
-            <div className="fitall-card p-4 text-center">
-              <p className="text-base font-bold text-brand">目標</p>
-              <p className="mt-1 line-clamp-3 text-base font-bold text-ink">{profile?.goal ?? '-'}</p>
-            </div>
+          <h3 className="fitall-group-label">からだのデータ</h3>
+          <div className="fitall-group">
+            <ValueRow label="身長" value={profile?.height ? `${profile.height} cm` : '—'} />
+            <ValueRow label="体重" value={profile?.weight ? `${profile.weight} kg` : '—'} />
+            <ValueRow label="目標" value={profile?.goal ?? '—'} />
           </div>
         </section>
 
         {bodyWeightData.length > 0 && (
-          <section className="fitall-card p-5">
-            <h3 className="fitall-section-title mb-4">体重推移</h3>
-            <BodyWeightChart data={bodyWeightData} />
+          <section>
+            <h3 className="fitall-group-label">体重の推移</h3>
+            <div className="fitall-card p-4">
+              <BodyWeightChart data={bodyWeightData} />
+            </div>
           </section>
         )}
 
         {exerciseChartData.length > 0 && (
-          <section className="fitall-card p-5">
-            <h3 className="fitall-section-title mb-4">種目別重量推移</h3>
-            <ExerciseWeightChart exercises={exerciseChartData} />
+          <section>
+            <h3 className="fitall-group-label">種目ごとの重量</h3>
+            <div className="fitall-card p-4">
+              <ExerciseWeightChart exercises={exerciseChartData} />
+            </div>
           </section>
         )}
 
-        <section>
-          <h3 className="fitall-section-title mb-3 px-1">最近のトレーニング</h3>
-          {!logs?.length ? (
-            <div className="fitall-card border-dashed p-6 text-center text-base font-medium text-ink-muted">
-              まだ記録がありません
-            </div>
-          ) : (
-            <div className="space-y-3">
+        {!!logs?.length && (
+          <section>
+            <h3 className="fitall-group-label">最近のトレーニング</h3>
+            <div className="fitall-group">
               {logs.map((log) => {
                 const logSets = setsByLog[log.id] ?? []
                 const exerciseSummary = logSets.reduce<
@@ -381,64 +309,43 @@ export default async function ClientDetailPage({
                 }, {})
 
                 return (
-                  <div
-                    key={log.id}
-                    className="fitall-card p-4"
-                  >
-                    <p className="mb-3 text-base font-bold text-ink">
-                      {new Date(log.logged_at).toLocaleDateString('ja-JP', {
-                        month: 'long',
-                        day: 'numeric',
-                        weekday: 'short',
-                      })}
-                    </p>
-                    <div className="space-y-2">
+                  <div key={log.id} className="fitall-row !items-start">
+                    <div className="fitall-row-main">
+                      <p className="fitall-row-title">
+                        {formatJstDate(log.logged_at, { month: 'long', day: 'numeric', weekday: 'short' })}
+                      </p>
                       {Object.values(exerciseSummary).map((e) => (
-                        <div key={e.name} className="flex justify-between gap-3 border-b border-line pb-2 text-base last:border-0 last:pb-0">
-                          <span className="font-black text-ink">{e.name}</span>
-                          <span className="text-right text-base font-medium text-ink-muted">最大 {e.maxWeight}kg × {e.totalReps}reps</span>
-                        </div>
+                        <p key={e.name} className="fitall-row-meta">
+                          <span>{e.name}</span>
+                          <span>最大 {e.maxWeight}kg × {e.totalReps}回</span>
+                        </p>
                       ))}
+                      {log.memo && <p className="mt-2 text-base leading-relaxed text-ink-muted">{log.memo}</p>}
                     </div>
-                    {log.memo && (
-                      <div className="mt-3 border border-line bg-surface-soft p-3">
-                        <p className="text-base font-medium leading-relaxed text-ink-muted">{log.memo}</p>
-                      </div>
-                    )}
                   </div>
                 )
               })}
             </div>
-          )}
-        </section>
+          </section>
+        )}
 
         <section>
-          <h3 className="fitall-section-title mb-3 px-1">予約履歴</h3>
+          <h3 className="fitall-group-label">予約の履歴</h3>
           {!bookings?.length ? (
-            <div className="fitall-card border-dashed p-6 text-center text-base font-medium text-ink-muted">
+            <div className="fitall-group px-5 py-5 text-base text-ink-muted">
               まだ予約がありません
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="fitall-group">
               {bookings.map((b) => (
-                <div
-                  key={b.id}
-                  className="fitall-card flex items-center justify-between gap-3 px-4 py-3"
-                >
-                  <div>
-                    <p className="text-base font-bold text-ink">
-                      {new Date(b.scheduled_at).toLocaleString('ja-JP', {
-                        month: 'numeric',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                <div key={b.id} className="fitall-row" data-status={b.status}>
+                  <div className="fitall-row-main">
+                    <p className="fitall-row-title">
+                      {formatJstDateTime(b.scheduled_at, { month: 'numeric', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' })}
                     </p>
-                    <p className="mt-0.5 text-base font-medium text-ink-muted">¥{b.price.toLocaleString()}</p>
+                    <p className="fitall-row-meta"><span>¥{b.price.toLocaleString()}</span></p>
                   </div>
-                  <span className={`border px-2.5 py-1 text-base font-medium ${statusBadge[b.status] ?? 'bg-surface-soft text-ink-muted border-line'}`}>
-                    {statusLabel[b.status] ?? b.status}
-                  </span>
+                  <StatusBadge status={b.status} />
                 </div>
               ))}
             </div>

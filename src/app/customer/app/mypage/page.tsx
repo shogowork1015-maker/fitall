@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { loadCustomerAppData } from '@/lib/customer-app'
+import { DevPreviewNote, PageHeader } from '@/components/ui/PageHeader'
+import { CalendarIcon, ChevronRightIcon, TicketIcon } from '@/components/ui/Icons'
 
 interface PageProps {
   searchParams?: Promise<{
@@ -29,132 +31,105 @@ export default async function CustomerMyPage({ searchParams }: PageProps) {
   const message = statusMessage(params?.line)
 
   return (
-    <main className="pb-8">
-      <header className="sticky top-0 z-20 border-b border-line bg-white/95 px-4 pb-3 pt-[calc(12px+var(--fitall-safe-top))] backdrop-blur">
-        <h1 className="text-2xl font-black text-ink">マイページ</h1>
-      </header>
+    <main>
+      <PageHeader title="マイページ" />
 
       {!data ? (
-        <div className="px-4 py-6">
-          <div className="fitall-card p-6 text-center text-base font-medium text-ink-muted">
+        <div className="fitall-page-pad">
+          <div className="fitall-card p-6 text-center text-base text-ink-muted">
             お客様情報が見つかりません
           </div>
         </div>
       ) : (
-        <div className="space-y-4 px-4 py-5">
+        <div className="fitall-page-pad space-y-7">
+          {data.preview && <DevPreviewNote>開発用の確認モード（サンプル表示）</DevPreviewNote>}
           {message && (
-            <div className="border border-line bg-surface-soft px-3 py-3 text-base font-bold text-ink">
+            <p role="status" className="rounded-control bg-accent-soft px-4 py-3 text-base font-semibold text-brand">
               {message}
-            </div>
+            </p>
           )}
 
-          <section className="fitall-card p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-base font-bold text-brand">お客様</p>
-                <h2 className="mt-1 text-xl font-black text-ink">{data.customer.name}さん</h2>
-                <p className="mt-1 break-all text-base font-medium text-ink-muted">{data.customer.email}</p>
-              </div>
-              <span className="bg-accent-soft px-2 py-1 text-base font-bold text-brand">
-                {data.viewer.canConnectLine ? '本人' : '確認用'}
-              </span>
-            </div>
-            <div className="mt-3 border-t border-line pt-3">
-              <p className="text-base font-bold text-brand">目標</p>
-              <p className="mt-1 text-base font-bold leading-relaxed text-ink">{data.customer.goal}</p>
-            </div>
-            <div className="mt-3 border-t border-line pt-3">
-              <p className="text-base font-bold text-brand">担当トレーナー</p>
-              <p className="mt-1 text-base font-bold text-ink">{data.trainer.name}</p>
+          <section className="fitall-card flex items-center gap-4 p-5">
+            <span className="fitall-avatar !h-16 !w-16 !text-2xl">{data.customer.name[0] ?? '?'}</span>
+            <div className="min-w-0">
+              <h2 className="text-xl font-bold text-ink">{data.customer.name}さん</h2>
+              <p className="mt-0.5 break-all text-base text-ink-muted">{data.customer.email}</p>
             </div>
           </section>
 
-          <section className="fitall-card-strong overflow-hidden">
-            <div className="bg-ink px-4 py-5 text-white">
-              <p className="text-base font-bold text-white/70">通知の状態</p>
-              <div className="mt-3 flex items-end justify-between gap-3">
-                <div>
-                  <h2 className="text-2xl font-black">
-                    {data.customer.lineUserId ? 'LINE通知 ON' : 'LINE通知 OFF'}
-                  </h2>
-                  <p className="mt-1 text-base font-bold text-white/80">
-                    {data.customer.lineUserId
-                      ? '予約とチケットの通知をLINEで受け取れます'
-                      : '連携すると予約通知をLINEで受け取れます'}
-                  </p>
-                </div>
-                <span className="h-12 w-12 border-2 border-white bg-accent text-center text-xl font-black leading-[44px] text-ink">
-                  {data.customer.lineUserId ? 'ON' : 'L'}
-                </span>
-              </div>
+          <section className="fitall-group">
+            <div className="fitall-row">
+              <span className="fitall-row-main text-base text-ink-muted">目標</span>
+              <span className="text-right text-base font-semibold text-ink">{data.customer.goal}</span>
             </div>
-            <div className="space-y-3 p-4">
-              <div className="grid grid-cols-[1fr_auto] gap-3 border border-line bg-white px-3 py-3">
-                <div>
-                  <p className="text-base font-bold text-brand">アカウント</p>
-                  <p className="mt-1 text-base font-bold text-ink">{data.customer.name}さん</p>
-                  <p className="mt-0.5 break-all text-base font-medium text-ink-muted">{data.customer.email}</p>
-                </div>
-                <span className="self-start bg-accent-soft px-2 py-1 text-base font-bold text-brand">
-                  {data.viewer.canConnectLine ? '本人' : 'プレビュー'}
-                </span>
-              </div>
-
-              {data.customer.lineUserId ? (
-                <div className="fitall-primary-action h-12 text-base">連携済み</div>
-              ) : data.viewer.canConnectLine ? (
-                <a href="/api/line/customer-connect/start" className="fitall-aqua-action fitall-tap h-12 text-base">
-                  LINE通知を連携する
-                </a>
-              ) : (
-                <div className="border border-line bg-surface-soft px-3 py-3">
-                  <p className="text-base font-bold text-ink">
-                    LINEの登録リンクからマイページを開くと連携できます。
-                  </p>
-                  <p className="mt-1 text-base font-medium leading-relaxed text-ink-muted">
-                    トレーナープレビューではLINEの紐づけは行いません。
-                  </p>
-                </div>
-              )}
+            <div className="fitall-row">
+              <span className="fitall-row-main text-base text-ink-muted">担当トレーナー</span>
+              <span className="text-right text-base font-semibold text-ink">{data.trainer.name}</span>
             </div>
           </section>
 
-          <section className="fitall-card p-4">
-            <h2 className="fitall-section-title">届く通知</h2>
-            <div className="mt-3 grid gap-2">
+          <section>
+            <h2 className="fitall-group-label">LINE通知</h2>
+            <div className="fitall-group">
+              <div className="fitall-row">
+                <span className="fitall-icon-tile" data-tone={data.customer.lineUserId ? 'accent' : undefined}><BellIcon /></span>
+                <div className="fitall-row-main">
+                  <p className="fitall-row-title">{data.customer.lineUserId ? '受け取る設定です' : 'まだ連携していません'}</p>
+                  <p className="fitall-row-meta">
+                    {data.customer.lineUserId ? '予約とチケットのお知らせがLINEに届きます' : '連携すると予約のお知らせがLINEに届きます'}
+                  </p>
+                </div>
+                <span className="fitall-badge" data-tone={data.customer.lineUserId ? 'accent' : undefined}>
+                  {data.customer.lineUserId ? 'ON' : 'OFF'}
+                </span>
+              </div>
               {notificationItems.map((item) => (
-                <div key={item.label} className="flex items-center justify-between border border-line bg-white px-3 py-3">
-                  <p className="text-base font-bold text-ink">{item.label}</p>
-                  <span
-                    className={`px-2 py-1 text-base font-medium ${
-                      item.status === '準備中'
-                        ? 'bg-surface-soft text-ink-muted'
-                        : 'bg-accent-soft text-brand'
-                    }`}
-                  >
-                    {item.status}
-                  </span>
+                <div key={item.label} className="fitall-row">
+                  <span className="fitall-row-main text-base text-ink">{item.label}</span>
+                  <span className="text-base text-ink-muted">{item.status}</span>
                 </div>
               ))}
             </div>
+            {!data.customer.lineUserId && (
+              data.viewer.canConnectLine ? (
+                <a href="/api/line/customer-connect/start" className="fitall-aqua-action mt-3">
+                  LINE通知を連携する
+                </a>
+              ) : (
+                <p className="fitall-group-note">
+                  LINEの登録リンクからマイページを開くと連携できます。
+                </p>
+              )
+            )}
           </section>
 
-          <section className="fitall-card p-4">
-            <h2 className="fitall-section-title">よく使う操作</h2>
-            <p className="mt-2 text-base font-medium leading-relaxed text-ink-muted">
-              予約とチケットはここからすぐ確認できます。iPhoneではホーム画面に追加して使えます。
-            </p>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <Link href="/customer/app/bookings" className="fitall-primary-action fitall-tap h-11 text-base">
-                予約を見る
+          <section>
+            <h2 className="fitall-group-label">よく使う操作</h2>
+            <div className="fitall-group">
+              <Link href="/customer/app/bookings" className="fitall-row">
+                <span className="fitall-icon-tile" data-tone="accent"><CalendarIcon /></span>
+                <span className="fitall-row-main fitall-row-title">予約する</span>
+                <ChevronRightIcon />
               </Link>
-              <Link href="/customer/app/tickets" className="fitall-secondary-action fitall-tap h-11 text-base">
-                チケットを見る
+              <Link href="/customer/app/tickets" className="fitall-row">
+                <span className="fitall-icon-tile" data-tone="accent"><TicketIcon /></span>
+                <span className="fitall-row-main fitall-row-title">チケットを見る</span>
+                <ChevronRightIcon />
               </Link>
             </div>
+            <p className="fitall-group-note">iPhoneではホーム画面に追加すると、アプリのように使えます。</p>
           </section>
         </div>
       )}
     </main>
+  )
+}
+
+function BellIcon() {
+  return (
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+    </svg>
   )
 }

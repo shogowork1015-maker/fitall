@@ -153,7 +153,7 @@ export function QuickReservationModal({
               <p className="fitall-kicker">
                 {preview ? '予約作成プレビュー' : '予約作成'}
               </p>
-              <h2 id="reservation-title" className="mt-1 text-xl font-black text-ink">
+              <h2 id="reservation-title" className="mt-1 text-xl font-bold text-ink">
                 {formatDate(dateKey)} {time}
               </h2>
             </div>
@@ -168,19 +168,19 @@ export function QuickReservationModal({
           </div>
 
           {error && (
-            <div role="alert" className="mb-3 rounded-control border border-danger-line bg-danger-soft px-3 py-2 text-base font-semibold text-danger">
+            <div role="alert" className="mb-3 rounded-control bg-danger-soft px-3 py-2 text-base font-semibold text-danger">
               {error}
             </div>
           )}
 
           {preview && (
-            <div className="mb-3 rounded-control border border-accent bg-accent-soft px-3 py-2 text-base font-bold text-brand">
+            <div className="mb-3 rounded-control bg-accent-soft px-3 py-2 text-base font-semibold text-brand">
               プレビューのため、予約は保存されません。
             </div>
           )}
 
           {!clients.length ? (
-            <div className="rounded-control border-2 border-dashed border-line bg-white p-5 text-center">
+            <div className="rounded-control bg-surface-soft p-5 text-center">
               <p className="text-base font-bold text-ink">先にお客様を登録してください</p>
               <Link
                 href="/trainer/invite"
@@ -191,14 +191,14 @@ export function QuickReservationModal({
             </div>
           ) : (
             <div className="space-y-3">
-              <label htmlFor="reservation-client" className="block text-base font-bold">お客様</label>
+              <label htmlFor="reservation-client" className="block text-base font-semibold text-ink-muted">お客様</label>
               <select
                 id="reservation-client"
                 autoFocus
                 required
                 value={clientId}
                 onChange={(event) => setClientId(event.target.value)}
-                className="h-14 w-full rounded-control border border-line bg-white px-3 text-base font-bold text-ink outline-none focus:border-accent"
+                className="fitall-input"
               >
                 {clients.map((client) => (
                   <option key={client.trainee_id} value={client.trainee_id}>
@@ -207,12 +207,12 @@ export function QuickReservationModal({
                 ))}
               </select>
 
-              <label htmlFor="reservation-menu" className="block text-base font-bold">メニュー</label>
+              <label htmlFor="reservation-menu" className="block text-base font-semibold text-ink-muted">メニュー</label>
               <select
                 id="reservation-menu"
                 value={menuId}
                 onChange={(event) => setMenuId(event.target.value)}
-                className="h-14 w-full rounded-control border border-line bg-white px-3 text-base font-bold text-ink outline-none focus:border-accent"
+                className="fitall-input"
               >
                 {!menus.length && <option value="">メニューなし</option>}
                 {menus.map((menu) => (
@@ -233,11 +233,11 @@ export function QuickReservationModal({
                   step={300}
                   value={time}
                   onChange={(event) => setTime(event.target.value)}
-                  className="h-14 w-full rounded-control border border-line bg-white px-3 text-base font-bold text-ink outline-none focus:border-accent"
+                  className="fitall-input"
                 />
               </div>
 
-              <label className="flex min-h-14 items-center justify-between gap-3 rounded-control border border-line px-4 py-3 has-[:checked]:border-accent has-[:checked]:bg-accent-soft">
+              <label className="flex min-h-14 items-center justify-between gap-3 rounded-control bg-surface-soft px-4 py-3 has-[:checked]:border-accent has-[:checked]:bg-accent-soft">
                 <span>
                   <span className="block text-base font-bold text-ink">毎週固定で予約</span>
                   <span className="text-base font-medium text-ink-muted">同じ曜日・同じ時間でまとめて作成</span>
@@ -260,7 +260,7 @@ export function QuickReservationModal({
                     type="date"
                     value={repeatUntil}
                     onChange={(event) => setRepeatUntil(event.target.value)}
-                  className="h-14 w-full rounded-control border border-line bg-white px-3 text-base font-bold text-ink"
+                  className="fitall-input"
                   />
                 </div>
               )}
@@ -268,12 +268,12 @@ export function QuickReservationModal({
           )}
 
         </fieldset>
-        <div className="sticky bottom-0 mt-5 grid grid-cols-[auto_1fr] gap-2 border-t border-line bg-white pt-3">
+        <div className="sticky bottom-0 mt-5 grid grid-cols-[auto_1fr] gap-2 bg-white pt-3 shadow-[0_-.5px_0_var(--fitall-hairline)]">
           <button
             type="button"
             onClick={requestClose}
             disabled={saving}
-            className="h-12 rounded-control border border-line px-5 text-base font-medium text-ink-muted"
+            className="fitall-secondary-action"
           >
             キャンセル
           </button>

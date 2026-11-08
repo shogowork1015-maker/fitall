@@ -53,28 +53,26 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
   const error = errorMessage(query?.error)
 
   return (
-    <main className="min-h-screen bg-white px-4 py-5">
-      <div className="mx-auto max-w-[430px] space-y-4">
-        <section className="fitall-card-strong overflow-hidden">
-          <div className="bg-accent px-5 py-5 text-ink">
-            <p className="text-base font-bold text-ink/70">LIMITLESS APP</p>
-            <h1 className="mt-2 text-2xl font-black leading-tight">お客様情報の登録</h1>
-            <p className="mt-2 text-base font-bold leading-relaxed text-ink/70">
-              {trainerUser?.name ?? 'トレーナー'}さんの予約・チケット管理アプリを使う準備をします。
-            </p>
-          </div>
-        </section>
+    <main className="min-h-screen px-4 pb-8 pt-[calc(var(--fitall-safe-top)+28px)]">
+      <div className="mx-auto max-w-[430px] space-y-6">
+        <header>
+          <p className="text-base font-semibold text-brand">Limitless App</p>
+          <h1 className="fitall-large-title mt-1">お客様情報の登録</h1>
+          <p className="mt-2 text-base leading-relaxed text-ink-muted">
+            {trainerUser?.name ?? 'トレーナー'}さんの予約・チケット管理アプリを使う準備をします。
+          </p>
+        </header>
 
         {error && (
-          <div className="border border-danger bg-danger-soft px-3 py-3 text-base font-bold text-danger">
+          <div role="alert" className="rounded-control bg-danger-soft px-4 py-3 text-base font-semibold text-danger">
             {error}
           </div>
         )}
 
-        <form action={completeCustomerOnboardingAction.bind(null, token)} className="fitall-card space-y-4 p-4">
+        <form action={completeCustomerOnboardingAction.bind(null, token)} className="fitall-card space-y-4 p-5">
           <div>
-            <h2 className="fitall-section-title">基本情報</h2>
-            <p className="mt-1 text-base font-medium leading-relaxed text-ink-muted">
+            <h2 className="text-lg font-bold text-ink">基本情報</h2>
+            <p className="mt-1 text-base leading-relaxed text-ink-muted">
               入力後、LINE通知連携に進みます。
             </p>
           </div>
@@ -86,7 +84,7 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
               required
               defaultValue={customerUser?.name ?? ''}
               placeholder="山田 太郎"
-              className="fitall-focus-ring mt-1 h-12 w-full rounded-control border border-line px-3 text-base font-bold outline-none focus:border-accent"
+              className="fitall-input mt-1"
             />
           </label>
 
@@ -98,7 +96,7 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
               required
               defaultValue={customerUser?.email ?? ''}
               placeholder="name@example.com"
-              className="fitall-focus-ring mt-1 h-12 w-full rounded-control border border-line px-3 text-base font-bold outline-none focus:border-accent"
+              className="fitall-input mt-1"
             />
           </label>
 
@@ -111,7 +109,7 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
                 inputMode="decimal"
                 defaultValue={profile?.height ?? ''}
                 placeholder="170"
-                className="fitall-focus-ring mt-1 h-12 w-full rounded-control border border-line px-3 text-base font-bold outline-none focus:border-accent"
+                className="fitall-input mt-1"
               />
             </label>
             <label className="block">
@@ -122,7 +120,7 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
                 inputMode="decimal"
                 defaultValue={profile?.weight ?? ''}
                 placeholder="65"
-                className="fitall-focus-ring mt-1 h-12 w-full rounded-control border border-line px-3 text-base font-bold outline-none focus:border-accent"
+                className="fitall-input mt-1"
               />
             </label>
           </div>
@@ -134,16 +132,16 @@ export default async function CustomerOnboardingPage({ params, searchParams }: P
               rows={4}
               defaultValue={profile?.goal ?? ''}
               placeholder="ダイエット、姿勢改善、筋力アップなど"
-              className="fitall-focus-ring mt-1 w-full rounded-control border border-line px-3 py-3 text-base font-bold outline-none focus:border-accent"
+              className="fitall-input fitall-textarea mt-1"
             />
           </label>
 
-          <SubmitButton className="fitall-primary-action fitall-tap h-12 w-full text-base">
+          <SubmitButton className="fitall-primary-action w-full">
             登録してLINE通知へ進む
           </SubmitButton>
         </form>
 
-        <Link href="/customer/app" className="block py-3 text-center text-base font-bold text-brand">
+        <Link href="/customer/app" className="flex min-h-14 items-center justify-center text-base font-semibold text-brand">
           登録済みの方はマイページへ
         </Link>
       </div>

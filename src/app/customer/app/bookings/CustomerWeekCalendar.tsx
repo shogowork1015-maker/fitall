@@ -37,11 +37,11 @@ export function CustomerWeekCalendar({ availability, availableTicketCount, booki
   }, [state, router, preview])
 
   if (success) return <section className="p-5" role="status">
-    <p className="text-base font-bold text-brand">{preview ? 'プレビューでの予約完了' : '予約完了'}</p>
-    <h2 className="mt-2 text-xl font-black">{formatJstDateTime(selected, { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' })}</h2>
+    <p className="text-base font-semibold text-brand">{preview ? 'プレビューでの予約完了' : '予約完了'}</p>
+    <h2 className="mt-2 text-xl font-bold">{formatJstDateTime(selected, { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' })}</h2>
     <p className="mt-3 text-base leading-relaxed">{state.message}</p>
     <p className="mt-2 text-base">チケット1枚を予約に使用しました。</p>
-    <Link href="/customer/app" className="fitall-primary-action mt-5 h-12">ホームに戻る</Link>
+    <Link href="/customer/app" className="fitall-primary-action mt-5">ホームに戻る</Link>
   </section>
 
   return <form action={action} className="p-4" onSubmit={event => {
@@ -50,16 +50,16 @@ export function CustomerWeekCalendar({ availability, availableTicketCount, booki
   }} aria-busy={pending}>
     <input type="hidden" name="scheduled_at" value={chosen?.value ?? ''} />
     <BookingSlotPicker slots={slots} value={selected} onChange={setSelected} disabled={pending} />
-    <section className="mt-5 border-t-2 border-ink pt-4" aria-label="予約内容の確認">
-      <h3 className="text-base font-bold">{chosen ? formatJstDateTime(chosen.value, { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }) : '予約する時間を選んでください'}</h3>
-      <div className="mt-3 flex items-baseline justify-between text-base"><span>使用するチケット</span><strong>1枚</strong></div>
+    <section className="mt-5 rounded-control bg-surface-soft p-4" aria-label="予約内容の確認">
+      <h3 className="text-lg font-semibold">{chosen ? formatJstDateTime(chosen.value, { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }) : '予約する時間を選んでください'}</h3>
+      <div className="mt-2 flex items-baseline justify-between text-base"><span className="text-ink-muted">使用するチケット</span><strong className="font-semibold">1枚</strong></div>
       {!needsPurchase && <p className="mt-2 text-base text-ink-muted">予約後の残り {Math.max(0, availableTicketCount - 1)}枚 · 追加のお支払いはありません</p>}
     </section>
-    {state?.status === 'error' && <p ref={errorRef} tabIndex={-1} role="alert" className="mt-4 bg-danger-soft p-3 text-base text-danger">{state.message}</p>}
+    {state?.status === 'error' && <p ref={errorRef} tabIndex={-1} role="alert" className="mt-4 rounded-control bg-danger-soft p-3 text-base text-danger">{state.message}</p>}
     {needsPurchase ? <div className="mt-4">
       <p className="mb-3 text-base">使えるチケットがありません。</p>
-      <Link href="/customer/app/tickets" className="fitall-primary-action h-12">チケットを購入する</Link>
-    </div> : <button type="submit" disabled={pending || !chosen} className="fitall-primary-action mt-4 h-14 w-full disabled:cursor-not-allowed disabled:opacity-40">
+      <Link href="/customer/app/tickets" className="fitall-primary-action">チケットを購入する</Link>
+    </div> : <button type="submit" disabled={pending || !chosen} className="fitall-primary-action mt-4 w-full disabled:cursor-not-allowed disabled:opacity-40">
       {pending ? '予約しています…' : 'チケット1枚で予約する'}
     </button>}
   </form>

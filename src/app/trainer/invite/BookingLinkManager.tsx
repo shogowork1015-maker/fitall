@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Toast } from '@/components/Toast'
+import { LinkIcon } from '@/components/ui/Icons'
 
 export function BookingLinkManager({ trainerProfileId }: { trainerProfileId: string }) {
   const [toast, setToast] = useState<string | null>(null)
@@ -31,50 +32,48 @@ export function BookingLinkManager({ trainerProfileId }: { trainerProfileId: str
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-7">
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
 
-      <section className="fitall-card-strong overflow-hidden">
-        <div className="fitall-table-head px-4 py-3">
-          <p className="text-base font-bold text-white/70">招待</p>
-          <h2 className="mt-1 text-base font-black text-white">お客様アプリへ招待</h2>
-        </div>
-        <div className="space-y-3 p-4">
-          <button type="button" onClick={shareLine} className="fitall-aqua-action fitall-tap">
-            LINEでアプリ招待を送る
-          </button>
-          <div className="grid grid-cols-2 gap-2">
-            <button type="button" onClick={copyUrl} className="fitall-secondary-action fitall-tap">
-              入口コピー
-            </button>
-            <button type="button" onClick={copyMessage} className="fitall-secondary-action fitall-tap">
-              招待文コピー
-            </button>
+      <section>
+        <h2 className="fitall-group-label">送られるメッセージ</h2>
+        <div className="fitall-card p-4">
+          {/* LINEの吹き出しに近い見た目で、お客様に届く文面を確認できるようにする */}
+          <div className="rounded-[18px] rounded-tl-md bg-surface-soft px-4 py-3">
+            <p className="whitespace-pre-line text-base leading-relaxed text-ink">
+              Limitless Appでメニュー購入と予約ができます。{'\n'}
+              購入後はLINE通知も連携できます。{'\n'}
+              こちらから開いてください。
+            </p>
+            <p className="mt-1 break-all text-base font-medium text-brand">{bookingPath}</p>
           </div>
+          <button type="button" onClick={shareLine} className="fitall-aqua-action mt-4">
+            LINEで招待を送る
+          </button>
         </div>
       </section>
 
-      <section className="fitall-card p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <p className="fitall-section-title">アプリ入口</p>
-          <span className="fitall-pill fitall-pill-aqua">LINE共有用</span>
-        </div>
-        <p className="break-all rounded-control bg-surface-soft px-3 py-3 font-mono text-base font-bold leading-relaxed text-ink">
-          {bookingPath}
-        </p>
-      </section>
-
-      <section className="fitall-card p-4">
-        <p className="fitall-section-title">LINE用テンプレ</p>
-        <div className="mt-3 rounded-control border border-line bg-white px-3 py-3">
-          <p className="whitespace-pre-line text-base font-bold leading-relaxed text-ink">
-            Limitless Appでメニュー購入と予約ができます。{'\n'}
-            購入後はLINE通知も連携できます。{'\n'}
-            こちらから開いてください。{'\n'}
-            {bookingPath}
-          </p>
-        </div>
+      <section className="fitall-group">
+        <button type="button" onClick={copyUrl} className="fitall-row w-full text-left">
+          <span className="fitall-icon-tile"><LinkIcon /></span>
+          <span className="fitall-row-main fitall-row-title">リンクだけコピー</span>
+          <span className="text-base font-semibold text-brand">コピー</span>
+        </button>
+        <button type="button" onClick={copyMessage} className="fitall-row w-full text-left">
+          <span className="fitall-icon-tile"><CopyIcon /></span>
+          <span className="fitall-row-main fitall-row-title">招待文をまとめてコピー</span>
+          <span className="text-base font-semibold text-brand">コピー</span>
+        </button>
       </section>
     </div>
+  )
+}
+
+function CopyIcon() {
+  return (
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="9" y="9" width="12" height="12" rx="2.5" />
+      <path d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5v-9A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5" />
+    </svg>
   )
 }

@@ -4,6 +4,7 @@ import { SubmitButton } from '@/components/SubmitButton'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createClientInviteAction } from './actions'
+import { PageHeader } from '@/components/ui/PageHeader'
 
 interface PageProps {
   searchParams?: Promise<{
@@ -39,32 +40,18 @@ export default async function NewClientPage({ searchParams }: PageProps) {
 
   return (
     <div className="fitall-page fitall-scroll">
-      <div className="fitall-topbar">
-        <Link href="/trainer/clients" className="w-14 font-bold text-brand">
-          戻る
-        </Link>
-        <h1 className="flex-1 text-center text-[17px] font-black text-ink">お客様追加</h1>
-        <div className="w-14" />
-      </div>
+      <PageHeader
+        title="お客様を追加"
+        subtitle="仮登録して、専用リンクでご本人に確認してもらいます"
+        back={{ href: '/trainer/clients', label: 'お客様一覧へ戻る' }}
+      />
 
-      <div className="fitall-page-pad mx-auto max-w-[720px] space-y-5">
-        <section className="fitall-card-strong overflow-hidden">
-          <div className="bg-accent px-4 py-5 text-ink">
-            <p className="text-base font-bold text-ink/70">お客様の登録</p>
-            <h2 className="mt-1 text-2xl font-black">既存のお客様を招待</h2>
-            <p className="mt-2 text-base font-bold leading-relaxed text-ink/70">
-              トレーナー側で仮登録し、専用リンクからお客様本人に情報を確認・登録してもらいます。
-            </p>
-          </div>
-        </section>
+      <div className="fitall-page-pad mx-auto max-w-[720px] space-y-7">
 
         {createdUrl && (
-          <section className="fitall-card p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="fitall-section-title">登録リンク</h2>
-              <span className="fitall-pill fitall-pill-aqua">LINEで送る</span>
-            </div>
-            <p className="break-all border border-line bg-surface-soft px-3 py-3 font-mono text-base font-bold text-ink">
+          <section className="fitall-card p-5">
+            <h2 className="text-lg font-bold text-ink">登録リンクができました</h2>
+            <p className="mt-3 break-all rounded-control bg-surface-soft px-4 py-3 text-base font-medium text-brand">
               {createdUrl}
             </p>
             <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -72,11 +59,11 @@ export default async function NewClientPage({ searchParams }: PageProps) {
                 href={`https://social-plugins.line.me/lineit/share?text=${encodeURIComponent(message)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="fitall-aqua-action fitall-tap h-12 text-base"
+                className="fitall-aqua-action"
               >
                 LINEで送る
               </a>
-              <Link href="/trainer/clients" className="fitall-secondary-action fitall-tap h-12 text-base">
+              <Link href="/trainer/clients" className="fitall-secondary-action">
                 お客様一覧へ
               </Link>
             </div>
@@ -84,15 +71,15 @@ export default async function NewClientPage({ searchParams }: PageProps) {
         )}
 
         {error && (
-          <div className="border border-danger bg-danger-soft px-3 py-3 text-base font-bold text-danger">
+          <div role="alert" className="rounded-control bg-danger-soft px-4 py-3 text-base font-semibold text-danger">
             {error}
           </div>
         )}
 
-        <form action={createClientInviteAction} className="fitall-card space-y-4 p-4">
+        <form action={createClientInviteAction} className="fitall-card space-y-4 p-5">
           <div>
-            <h2 className="fitall-section-title">仮登録する情報</h2>
-            <p className="mt-1 text-base font-medium leading-relaxed text-ink-muted">
+            <h2 className="text-lg font-bold text-ink">仮登録する情報</h2>
+            <p className="mt-1 text-base leading-relaxed text-ink-muted">
               後でお客様本人が登録リンクから確認・修正できます。
             </p>
           </div>
@@ -104,7 +91,7 @@ export default async function NewClientPage({ searchParams }: PageProps) {
                 name="name"
                 required
                 placeholder="山田 太郎"
-                className="fitall-focus-ring mt-1 h-12 w-full rounded-control border border-line px-3 text-base font-bold outline-none focus:border-accent"
+                className="fitall-input mt-1"
               />
             </label>
             <label className="block">
@@ -114,7 +101,7 @@ export default async function NewClientPage({ searchParams }: PageProps) {
                 type="email"
                 required
                 placeholder="name@example.com"
-                className="fitall-focus-ring mt-1 h-12 w-full rounded-control border border-line px-3 text-base font-bold outline-none focus:border-accent"
+                className="fitall-input mt-1"
               />
             </label>
             <label className="block">
@@ -124,7 +111,7 @@ export default async function NewClientPage({ searchParams }: PageProps) {
                 type="number"
                 inputMode="decimal"
                 placeholder="170"
-                className="fitall-focus-ring mt-1 h-12 w-full rounded-control border border-line px-3 text-base font-bold outline-none focus:border-accent"
+                className="fitall-input mt-1"
               />
             </label>
             <label className="block">
@@ -134,7 +121,7 @@ export default async function NewClientPage({ searchParams }: PageProps) {
                 type="number"
                 inputMode="decimal"
                 placeholder="65"
-                className="fitall-focus-ring mt-1 h-12 w-full rounded-control border border-line px-3 text-base font-bold outline-none focus:border-accent"
+                className="fitall-input mt-1"
               />
             </label>
           </div>
@@ -145,25 +132,25 @@ export default async function NewClientPage({ searchParams }: PageProps) {
               name="goal"
               rows={4}
               placeholder="ダイエット、姿勢改善、筋力アップなど"
-              className="fitall-focus-ring mt-1 w-full rounded-control border border-line px-3 py-3 text-base font-bold outline-none focus:border-accent"
+              className="fitall-input fitall-textarea mt-1"
             />
           </label>
 
-          <SubmitButton className="fitall-primary-action fitall-tap h-12 w-full text-base">
+          <SubmitButton className="fitall-primary-action w-full">
             登録リンクを作成
           </SubmitButton>
         </form>
 
-        <section className="fitall-card p-4">
-          <h2 className="fitall-section-title">この後の流れ</h2>
-          <div className="mt-3 space-y-3">
+        <section>
+          <h2 className="fitall-group-label">この後の流れ</h2>
+          <ol className="fitall-group">
             {['LINEで登録リンクを送る', 'お客様が情報を確認・入力する', 'LINE通知を連携してマイページ利用開始'].map((item, index) => (
-              <div key={item} className="fitall-step">
+              <li key={item} className="fitall-row" data-inset="avatar">
                 <span className="fitall-step-num">{index + 1}</span>
-                <p className="text-base font-bold text-ink">{item}</p>
-              </div>
+                <p className="fitall-row-main fitall-row-title">{item}</p>
+              </li>
             ))}
-          </div>
+          </ol>
         </section>
       </div>
     </div>

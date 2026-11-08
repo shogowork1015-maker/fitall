@@ -2,6 +2,8 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
+import { DevPreviewNote, HeaderAction, PageHeader } from '@/components/ui/PageHeader'
+import { ChevronRightIcon, PlusIcon, TicketIcon } from '@/components/ui/Icons'
 
 type ClientRow = {
   id: string
@@ -9,6 +11,27 @@ type ClientRow = {
   last: string
   sessions: number
   credits: number
+}
+
+// お客様の1行。残チケットが1回以下ならオレンジで知らせる
+function ClientRowLink({ client }: { client: ClientRow }) {
+  const low = client.credits <= 1
+  return (
+    <Link href={`/trainer/clients/${client.id}`} className="fitall-row" data-inset="avatar">
+      <span className="fitall-avatar">{client.name[0] ?? '?'}</span>
+      <div className="fitall-row-main">
+        <p className="fitall-row-title">{client.name}</p>
+        <p className="fitall-row-meta">
+          <span>最終 {client.last}</span>
+          <span>今月 {client.sessions}回</span>
+        </p>
+      </div>
+      <span className="fitall-badge" data-tone={low ? 'warn' : 'accent'}>
+        <TicketIcon size={16} />残{client.credits}
+      </span>
+      <ChevronRightIcon />
+    </Link>
+  )
 }
 
 function ClientListScreen({
@@ -23,83 +46,51 @@ function ClientListScreen({
   return (
     <>
     <div className="fitall-mobile-ui fitall-page fitall-scroll">
-      <div className="fitall-topbar">
-        <div className="w-14" />
-        <h1 className="flex-1 text-center text-[17px] font-black text-ink">お客様</h1>
-        <Link href="/trainer/clients/new" className="w-14 font-bold text-brand">
-          追加
-        </Link>
-      </div>
+      <PageHeader
+        title="お客様"
+        subtitle={`${clients.length}名${lowCreditCount > 0 ? `・残り少ない方 ${lowCreditCount}名` : ''}`}
+        actions={
+          <HeaderAction href="/trainer/clients/new" label="お客様を追加" tone="ink">
+            <PlusIcon />
+          </HeaderAction>
+        }
+      />
 
-      <div className="fitall-page-pad space-y-5">
-        {preview && (
-          <div className="fitall-card bg-accent-soft px-4 py-3 text-base font-bold text-brand">
-            開発用UI確認モードです。お客様詳細への保存操作はありません。
-          </div>
-        )}
-
-        <section className="fitall-card-strong overflow-hidden">
-          <div className="grid grid-cols-2 divide-x divide-ink">
-            <div className="p-4">
-              <p className="fitall-kicker">お客様</p>
-              <p className="mt-2 text-[34px] font-black leading-none text-ink">
-                {clients.length}<span className="ml-1 text-base">名</span>
-              </p>
-              <p className="mt-2 text-base font-medium text-ink-muted">管理中のお客様</p>
-            </div>
-            <div className="bg-accent p-4 text-ink">
-              <p className="text-base font-bold text-ink/70">要フォロー</p>
-              <p className="mt-2 text-[34px] font-black leading-none">
-                {lowCreditCount}<span className="ml-1 text-base">名</span>
-              </p>
-              <p className="mt-2 text-base font-bold">残チケット少なめ</p>
-            </div>
-          </div>
-        </section>
+      <div className="fitall-page-pad space-y-7">
+        {preview && <DevPreviewNote>開発用の確認モード（サンプル表示）</DevPreviewNote>}
 
         {!clients.length ? (
-          <section className="fitall-card p-6 text-center">
-            <p className="text-base font-bold text-ink">まだお客様がいません</p>
-            <p className="mt-2 text-base font-medium leading-relaxed text-ink-muted">
+          <section className="fitall-card px-5 py-8 text-center">
+            <p className="text-lg font-semibold text-ink">まだお客様がいません</p>
+            <p className="mt-2 text-base leading-relaxed text-ink-muted">
               お客様を仮登録して、LINEで登録リンクを送れます。
             </p>
-            <Link href="/trainer/clients/new" className="fitall-aqua-action fitall-tap mt-4">
+            <Link href="/trainer/clients/new" className="fitall-primary-action mt-5">
               お客様を追加
             </Link>
           </section>
         ) : (
-          <section>
-            <div className="mb-3 flex items-center justify-between px-1">
-              <h2 className="fitall-section-title">お客様一覧</h2>
-              <span className="text-base font-medium text-ink-muted">残チケットも確認</span>
-            </div>
-            <div className="space-y-2">
-              {clients.map((client, index) => (
-                <Link
-                  key={client.id}
-                  href={`/trainer/clients/${client.id}`}
-                  className="fitall-card fitall-card-pop fitall-tap grid grid-cols-[46px_1fr_auto] items-center gap-3 p-3"
-                  style={{ animationDelay: `${index * 35}ms` }}
-                >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-chip bg-ink text-base font-black text-white">
-                    {client.name[0] ?? '?'}
-                  </div>
-                  <div>
-                    <p className="text-base font-bold text-ink">{client.name}</p>
-                    <p className="mt-0.5 text-base font-medium text-ink-muted">最終: {client.last}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-base font-bold text-ink">今月{client.sessions}回</p>
-                    <p className={`mt-1 rounded-chip px-2 py-1 text-base font-bold ${
-                      client.credits <= 1 ? 'bg-ink text-white' : 'bg-accent-soft text-brand'
-                    }`}>
-                      残{client.credits}回
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </section>
+          <>
+            {lowCreditCount > 0 && (
+              <section>
+                <h2 className="fitall-group-label">チケットが残り少ない方</h2>
+                <div className="fitall-group">
+                  {clients.filter((client) => client.credits <= 1).map((client) => (
+                    <ClientRowLink key={client.id} client={client} />
+                  ))}
+                </div>
+                <p className="fitall-group-note">次回のチケット購入をご案内しましょう。</p>
+              </section>
+            )}
+            <section>
+              <h2 className="fitall-group-label">すべてのお客様</h2>
+              <div className="fitall-group">
+                {clients.map((client) => (
+                  <ClientRowLink key={client.id} client={client} />
+                ))}
+              </div>
+            </section>
+          </>
         )}
       </div>
     </div>
@@ -119,21 +110,19 @@ function ClientListScreen({
         </header>
 
         {preview && (
-          <div className="fitall-desktop-card mb-5 bg-accent-soft px-5 py-3 text-base font-bold text-brand">
-            開発用UI確認モードです。お客様詳細への保存操作はありません。
-          </div>
+          <div className="mb-5"><DevPreviewNote>開発用の確認モード。お客様詳細への保存操作はありません。</DevPreviewNote></div>
         )}
 
         <section className="mb-5 grid grid-cols-3 gap-4">
-          <div className="fitall-desktop-card border-ink p-5">
+          <div className="fitall-desktop-card p-5">
             <p className="fitall-kicker">お客様</p>
             <p className="mt-3 text-5xl font-black text-ink">{clients.length}<span className="ml-1 text-base">名</span></p>
             <p className="mt-2 text-base font-medium text-ink-muted">管理中のお客様</p>
           </div>
-          <div className="fitall-desktop-card p-5 text-white" style={{ backgroundColor: '#12C7BE' }}>
-            <p className="text-base font-bold text-white/80">要フォロー</p>
-            <p className="mt-3 text-5xl font-black">{lowCreditCount}<span className="ml-1 text-base">名</span></p>
-            <p className="mt-2 text-base font-bold">残チケット少なめ</p>
+          <div className="fitall-desktop-card p-5">
+            <p className="text-base font-semibold text-warn">要フォロー</p>
+            <p className="fitall-figure mt-3 text-5xl">{lowCreditCount}<small>名</small></p>
+            <p className="mt-2 text-base text-ink-muted">残チケットが1回以下</p>
           </div>
           <div className="fitall-desktop-card p-5">
             <p className="fitall-kicker">次回</p>
@@ -152,7 +141,7 @@ function ClientListScreen({
           </section>
         ) : (
           <section className="fitall-desktop-card overflow-hidden">
-            <div className="grid grid-cols-[1.4fr_.9fr_.8fr_.8fr_120px] border-b-2 border-ink bg-ink px-5 py-3 text-base font-bold text-white">
+            <div className="fitall-list-head grid grid-cols-[1.4fr_.9fr_.8fr_.8fr_120px] px-5 py-3 text-base">
               <span>お客様</span>
               <span>最終</span>
               <span>今月</span>
@@ -167,16 +156,12 @@ function ClientListScreen({
                   className="grid grid-cols-[1.4fr_.9fr_.8fr_.8fr_120px] items-center px-5 py-4 hover:bg-surface-soft"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-chip bg-ink text-base font-black text-white">
-                      {client.name[0] ?? '?'}
-                    </div>
+                    <span className="fitall-avatar">{client.name[0] ?? '?'}</span>
                     <p className="text-base font-black text-ink">{client.name}</p>
                   </div>
                   <p className="text-base font-medium text-ink-muted">{client.last}</p>
                   <p className="text-base font-bold text-ink">{client.sessions}回</p>
-                  <span className={`w-fit rounded-chip px-3 py-1 text-base font-bold ${
-                    client.credits <= 1 ? 'bg-ink text-white' : 'bg-accent-soft text-brand'
-                  }`}>
+                  <span className="fitall-badge w-fit" data-tone={client.credits <= 1 ? 'warn' : 'accent'}>
                     残{client.credits}回
                   </span>
                   <span className="text-right text-base font-bold text-brand">詳細</span>

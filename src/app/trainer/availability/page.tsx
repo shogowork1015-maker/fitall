@@ -6,6 +6,8 @@ import { readTrainerSettingsFromBio } from '@/lib/trainer-settings'
 import { loadTraineeNameMap } from '@/lib/trainee-display'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
 import { addDaysToDateKey, dayOfWeekForDateKey, formatJstDateKey, jstDayBounds } from '@/lib/datetime'
+import { DevPreviewNote, HeaderAction, PageHeader } from '@/components/ui/PageHeader'
+import { GearIcon } from '@/components/ui/Icons'
 
 function expandWeeklyRowsToDateSlots(rows: { day_of_week: number; start_time: string; end_time: string }[]) {
   const startKey = addDaysToDateKey(formatJstDateKey(), -30)
@@ -37,18 +39,10 @@ export default async function TrainerAvailabilityPage() {
   if (!user && devAuthBypass) {
     return (
       <div className="fitall-page fitall-scroll">
-        <div className="fitall-topbar">
-          <Link href="/trainer/bookings" className="flex items-center gap-1 text-base font-medium text-ink-muted">
-            ‹ 戻る
-          </Link>
-          <h1 className="text-[17px] font-black text-ink">空き時間</h1>
-          <div className="w-14" />
-        </div>
+        <PageHeader title="空き時間" back={{ href: '/trainer/bookings', label: '予約へ戻る' }} />
 
         <div className="px-4 py-6 space-y-4">
-          <div className="fitall-card bg-accent-soft px-4 py-3 text-base font-bold leading-relaxed text-brand">
-            開発用UI確認モードです。空き時間設定の保存はログイン後に有効になります。
-          </div>
+          <div className="mb-5"><DevPreviewNote>開発用の確認モード。空き時間設定の保存はログイン後に有効になります。</DevPreviewNote></div>
           <div className="fitall-card p-5">
             <h2 className="text-base font-bold text-ink">受付時間サンプル</h2>
             <div className="mt-4 space-y-3">
@@ -164,15 +158,15 @@ export default async function TrainerAvailabilityPage() {
 
   return (
     <div className="fitall-page fitall-scroll">
-      <div className="fitall-topbar">
-        <Link href="/trainer/bookings" className="flex items-center gap-1 text-base font-medium text-ink-muted">
-          ‹ 戻る
-        </Link>
-        <h1 className="text-[17px] font-black text-ink">空き時間</h1>
-        <Link href="/trainer/settings" className="text-base font-bold text-brand">
-          設定
-        </Link>
-      </div>
+      <PageHeader
+        title="空き時間"
+        back={{ href: '/trainer/bookings', label: '予約へ戻る' }}
+        actions={
+          <HeaderAction href="/trainer/settings" label="設定">
+            <GearIcon />
+          </HeaderAction>
+        }
+      />
 
       <div className="px-4 py-6 space-y-4">
         <p className="text-base text-ink-muted px-1">

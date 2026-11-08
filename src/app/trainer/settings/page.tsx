@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { signOutAction } from '@/app/auth/login/actions'
 import { getProductionReadinessItems } from '@/lib/production-readiness'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
@@ -11,6 +10,7 @@ import {
   readTrainerSettingsFromBio,
 } from '@/lib/trainer-settings'
 import { TrainerSettingsForm } from './TrainerSettingsForm'
+import { PageHeader } from '@/components/ui/PageHeader'
 
 export default async function TrainerSettingsPage() {
   const supabase = await createServerSupabaseClient()
@@ -66,10 +66,8 @@ export default async function TrainerSettingsPage() {
 
   return (
     <div className="fitall-page fitall-scroll">
-      <div className="fitall-topbar md:hidden">
-        <Link href="/trainer/dashboard" aria-label="ホームへ戻る" className="w-14 text-2xl text-ink-muted">‹</Link>
-        <h1 className="flex-1 text-center text-[17px] font-black text-ink">設定</h1>
-        <div className="w-14" />
+      <div className="md:hidden">
+        <PageHeader title="設定" back={{ href: '/trainer/dashboard', label: 'ホームへ戻る' }} />
       </div>
       <div className="mx-auto max-w-[640px] space-y-4 px-4 py-4">
         <TrainerSettingsForm

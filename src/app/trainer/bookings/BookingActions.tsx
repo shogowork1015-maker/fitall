@@ -46,7 +46,7 @@ export function BookingActions({ bookingId, status, scheduledAt }: BookingAction
   return (
     <div aria-busy={loading}>
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
-      {feedback && <p role="alert" className="my-3 rounded-control border border-danger-line bg-danger-soft p-3 font-bold text-danger">{feedback}</p>}
+      {feedback && <p role="alert" className="my-3 rounded-control bg-danger-soft p-3 font-semibold text-danger">{feedback}</p>}
       {loading && <p role="status" className="mt-2 flex items-center gap-2 font-bold"><span aria-hidden="true" className="fitall-spinner" />処理中…</p>}
       {status === 'pending' && !confirmingReject && (
         <div className="mt-3 grid grid-cols-2 gap-2">
