@@ -1,59 +1,86 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
-import { BookingManagement } from './BookingManagement'
 import type { CustomerBooking } from '@/lib/customer-app'
 import { formatJstDate, formatJstTime } from '@/lib/datetime'
-import { DevPreviewNote, PageHeader } from '@/components/ui/PageHeader'
-import { StatusTag, statusLabel } from '@/components/ui/StatusBadge'
+import { Screen, IconLink, Note } from '@/ui/Screen'
+import { Banner, Empty, statusText } from '@/ui/List'
+import { Segmented } from '@/ui/Segmented'
+import { Sheet } from '@/ui/Sheet'
+import { DateList, DateRow } from '@/ui/DateList'
+import { addMinutes } from '@/ui/Timeline'
+import { Plus } from '@/ui/icons'
+import { BookingManagement } from './BookingManagement'
 
-export function CustomerBookingList({ upcomingBookings, pastBookings = [], managementEnabled = false }: {
-  upcomingBookings: CustomerBooking[]; pastBookings?: CustomerBooking[]; managementEnabled?: boolean
+type Tab = 'upcoming' | 'past'
+
+
+// 予約タブ（A案）。日付を左に大きく並べる。トレーナーの確認待ちだけアクア。
+// 押すと下からシートが出て、日時の変更・キャンセルができる
+export function CustomerBookingList({ upcomingBookings, pastBookings = [], managementEnabled = false, sessionMinutes = 60 }: {
+  upcomingBookings: CustomerBooking[]; pastBookings?: CustomerBooking[]; managementEnabled?: boolean; sessionMinutes?: number
 }) {
+  const [tab, setTab] = useState<Tab>('upcoming')
+  const [openId, setOpenId] = useState<string | null>(null)
   const [notice, setNotice] = useState('')
-  const upcoming = upcomingBookings.filter(booking => ['pending', 'confirmed'].includes(booking.status))
+  const upcoming = upcomingBookings.filter((booking) => ['pending', 'confirmed'].includes(booking.status))
     .sort((a, b) => Date.parse(a.scheduled_at) - Date.parse(b.scheduled_at))
   const past = [...pastBookings].sort((a, b) => Date.parse(b.scheduled_at) - Date.parse(a.scheduled_at))
-  function row(booking: CustomerBooking) {
-    return <li key={booking.id} className="fitall-booking-card" data-status={booking.status}>
-      <div className="flex items-center gap-3">
-        <div className="min-w-0 flex-1">
-          <p className="fitall-row-title">
-            <StatusTag status={booking.status} />
-            <time dateTime={booking.scheduled_at} className="truncate">
-              {formatJstDate(booking.scheduled_at, { month: 'long', day: 'numeric', weekday: 'short' })}
-            </time>
-          </p>
-          <p className={`fitall-row-meta ${booking.status === 'pending' ? '!text-warn' : ''}`}>{statusLabel(booking.status)}</p>
-        </div>
-        <p className="fitall-row-figure">{formatJstTime(booking.scheduled_at)}</p>
+  const list = tab === 'upcoming' ? upcoming : past
+  const opened = [...upcoming, ...past].find((booking) => booking.id === openId)
+
+  return (
+    <Screen
+      caption="変更は前日まで"
+      title="予約"
+      actions={<IconLink href="/customer/app/bookings" label="予約する"><Plus /></IconLink>}
+    >
+      <Segmented
+        label="表示する予約"
+        value={tab}
+        onChange={setTab}
+        options={[{ value: 'upcoming', label: 'これから' }, { value: 'past', label: 'これまで' }]}
+      />
+
+      {notice ? <Banner>{notice}</Banner> : null}
+
+      <div style={{ marginTop: 10 }}>
+        {list.length ? (
+          <DateList>
+            {list.map((booking) => {
+              const start = formatJstTime(booking.scheduled_at)
+              const pending = booking.status === 'pending'
+              return (
+                <DateRow
+                  key={booking.id}
+                  onClick={() => setOpenId(booking.id)}
+                  day={formatJstDate(booking.scheduled_at, { day: 'numeric' }).replace('日', '')}
+                  sub={`${formatJstDate(booking.scheduled_at, { month: 'numeric' })}・${formatJstDate(booking.scheduled_at, { weekday: 'short' })}`}
+                  title={`${start}〜${addMinutes(start, sessionMinutes)}`}
+                  meta={pending ? 'トレーナーの確認待ち' : `パーソナル${sessionMinutes}分`}
+                  right={tab === 'past' ? statusText(booking.status) : undefined}
+                  action={pending}
+                  chevron
+                />
+              )
+            })}
+          </DateList>
+        ) : <Empty>{tab === 'upcoming' ? 'これからの予約はありません' : 'これまでの予約はありません'}</Empty>}
       </div>
-      {managementEnabled && <BookingManagement key={`${booking.id}-${booking.scheduled_at}-${booking.status}`} booking={booking} onSuccess={setNotice} />}
-    </li>
-  }
-  return <main>
-    <PageHeader title="予約一覧" back={{ href: '/customer/app/bookings', label: '予約へ戻る' }} />
-    <div className="fitall-page-pad space-y-7">
-      {!managementEnabled && <DevPreviewNote>開発用の確認モード。変更・キャンセルはできません。</DevPreviewNote>}
-      {notice && <p role="status" className="fitall-card-pop rounded-control bg-accent-soft p-3 font-medium text-brand">{notice}</p>}
-      <section aria-label="これからの予約">
-        <h2 className="fitall-group-label"><span>これからの予約</span><span>{upcoming.length}件</span></h2>
-        {upcoming.length ? <ul className="space-y-2.5">{upcoming.map(row)}</ul> : <p className="fitall-card p-5 text-center text-ink-muted">予約はまだありません。</p>}
-        <Link href="/customer/app/bookings" className="fitall-primary-action mt-4">新しく予約する</Link>
-      </section>
-      {past.length > 0 && <section aria-label="過去の予約">
-        <h2 className="fitall-group-label">過去の予約</h2>
-        <ul className="fitall-group">
-          {past.map(booking => <li key={booking.id} className="fitall-row" data-status={booking.status}>
-            <p className="fitall-row-main fitall-row-title">
-              <StatusTag status={booking.status} />
-              <time dateTime={booking.scheduled_at}>{formatJstDate(booking.scheduled_at, { month: 'long', day: 'numeric', weekday: 'short' })}</time>
-            </p>
-            <span className="text-subhead font-semibold tabular-nums text-ink-muted">{formatJstTime(booking.scheduled_at)}</span>
-          </li>)}
-        </ul>
-      </section>}
-    </div>
-  </main>
+
+      {tab === 'upcoming' ? <Note>開始の24時間前まで、日時の変更と<br />キャンセルができます。</Note> : null}
+      {!managementEnabled ? <Note>確認モード（変更・キャンセルはできません）</Note> : null}
+
+      <Sheet open={Boolean(opened)} onClose={() => setOpenId(null)} title="予約の詳細">
+        {opened ? (
+          <BookingManagement
+            key={`${opened.id}-${opened.scheduled_at}-${opened.status}`}
+            booking={opened}
+            enabled={managementEnabled}
+            onSuccess={(message) => { setNotice(message); setOpenId(null) }}
+          />
+        ) : null}
+      </Sheet>
+    </Screen>
+  )
 }

@@ -1,11 +1,14 @@
 import { loadTrainerRevenue, trainerRevenueErrorMessage } from '@/lib/trainer-revenue'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
-import { SalesBarChart, type MonthlySales } from '@/components/charts/SalesBarChart'
+type MonthlySales = { month: string; amount: number }
 import { loadTraineeNameMap } from '@/lib/trainee-display'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
-import { DevPreviewNote, PageHeader } from '@/components/ui/PageHeader'
-import { TicketIcon } from '@/components/ui/Icons'
+import { loadPurchasePlanNames } from '@/lib/ticket-summary'
+import { Screen, Note } from '@/ui/Screen'
+import { Section, Banner, Empty } from '@/ui/List'
+import { Hero, Bars, Stats } from '@/ui/Hero'
+import { DateList, DateRow } from '@/ui/DateList'
 import {
   addMonthsToDateKey,
   formatJstDate,
@@ -20,6 +23,8 @@ interface SalesRecordView {
   amount: number
   date: string
   quantity: number
+  /** 売れたメニューの名前（例：4回チケット） */
+  planName?: string | null
 }
 
 function yen(amount: number) {
@@ -30,6 +35,8 @@ function monthLabel(dateKeyOrValue: string | Date) {
   return formatJstDate(dateKeyOrValue, { month: 'numeric' })
 }
 
+// 売上タブ（A案）。
+// 主役：今月の売上。6か月の流れを大きな棒で（今月だけアクア）、その下に数字の帯と明細
 function SalesScreen({
   now,
   currentTotal,
@@ -48,178 +55,45 @@ function SalesScreen({
   preview?: boolean
 }) {
   const diff = currentTotal - prevTotal
-  const diffRate = prevTotal > 0 ? Math.round((diff / prevTotal) * 100) : 0
-  const sessionGoal = Math.max(20, Math.ceil(currentSoldSessions / 5) * 5)
-  const progress = Math.min(100, Math.round((currentSoldSessions / sessionGoal) * 100))
-  const remainingSessions = Math.max(0, sessionGoal - currentSoldSessions)
-  const averageTicket = currentSoldSessions > 0 ? Math.round(currentTotal / currentSoldSessions) : 0
+  const diffRate = prevTotal > 0 ? Math.round((diff / prevTotal) * 100) : null
+  const averageTicket = currentSoldSessions > 0 ? Math.round(currentTotal / currentSoldSessions) : null
 
   return (
-    <>
-    <div className="fitall-mobile-ui fitall-page">
-      <PageHeader title="売上" subtitle={`${monthLabel(now)}の実績`} />
+    <Screen caption={monthLabel(now)} title="売上">
+      <Hero
+        value={yen(currentTotal)}
+        note={prevTotal > 0
+          ? <>先月より <b>{diff >= 0 ? '+' : '−'}{yen(Math.abs(diff))}</b>（{diffRate !== null && diffRate >= 0 ? '+' : ''}{diffRate}%）</>
+          : '先月の売上はありません'}
+      />
+      <Bars data={monthlySalesData.map((item) => ({ label: item.month, value: item.amount }))} />
+      <Stats items={[
+        { label: '販売', value: `${currentSoldSessions}回` },
+        { label: '1回あたり', value: averageTicket === null ? '—' : yen(averageTicket) },
+        { label: '先月', value: yen(prevTotal) },
+      ]} />
 
-      <div className="fitall-page-pad space-y-7">
-        {preview && <DevPreviewNote>開発用の確認モード（サンプルの売上）</DevPreviewNote>}
+      <Section title="今月の明細" action={records.length ? `${records.length}件` : undefined}>
+        {records.length ? (
+          <DateList>
+            {records.map((record) => (
+              <DateRow
+                key={record.id}
+                small
+                day={formatJstDate(record.date, { month: 'numeric', day: 'numeric' })}
+                sub={formatJstDate(record.date, { weekday: 'short' })}
+                title={record.name}
+                meta={record.planName || `${record.quantity}回分`}
+                right={yen(record.amount)}
+                strongRight
+              />
+            ))}
+          </DateList>
+        ) : <Empty>今月の売上はまだありません</Empty>}
+      </Section>
 
-        <section className="fitall-card p-5">
-          <p className="text-subhead font-medium text-ink-muted">{monthLabel(now)}の売上</p>
-          <p className="fitall-figure mt-1 text-[40px]">{yen(currentTotal)}</p>
-          <p className="mt-3">
-            <span className="fitall-badge" data-tone={diff >= 0 ? 'accent' : 'danger'}>
-              先月比 {diff >= 0 ? '+' : '−'}{yen(Math.abs(diff))}（{diffRate >= 0 ? '+' : ''}{diffRate}%）
-            </span>
-          </p>
-
-          <div className="mt-6">
-            <div className="flex items-baseline justify-between">
-              <p className="text-subhead font-medium text-ink-muted">販売回数</p>
-              <p className="text-base font-semibold text-ink">
-                <span className="fitall-figure text-xl">{currentSoldSessions}</span>
-                <span className="text-ink-muted"> / 目標{sessionGoal}回</span>
-              </p>
-            </div>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-soft">
-              <div className="fitall-grow-x h-full rounded-full bg-accent" style={{ width: `${progress}%` }} />
-            </div>
-            <p className="mt-2 text-subhead text-ink-muted">
-              {remainingSessions === 0 ? '今月の目標を達成しました' : `あと${remainingSessions}回で目標です`}
-            </p>
-          </div>
-        </section>
-
-        <section className="fitall-group">
-          <div className="fitall-row">
-            <span className="fitall-row-main text-subhead text-ink-muted">平均単価（1回あたり）</span>
-            <span className="fitall-figure text-lg">{yen(averageTicket)}</span>
-          </div>
-          <div className="fitall-row">
-            <span className="fitall-row-main text-subhead text-ink-muted">先月の売上</span>
-            <span className="fitall-figure text-lg">{yen(prevTotal)}</span>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="fitall-group-label">月ごとの売上</h2>
-          <div className="fitall-card px-3 pb-3 pt-5">
-            <SalesBarChart data={monthlySalesData} />
-          </div>
-        </section>
-
-        <section>
-          <h2 className="fitall-group-label">
-            <span>今月の明細</span>
-            <span className="font-medium">{records.length}件</span>
-          </h2>
-          {!records.length ? (
-            <div className="fitall-group px-5 py-6 text-subhead text-ink-muted">
-              今月の売上はまだありません
-            </div>
-          ) : (
-            <div className="fitall-group">
-              {records.map((record) => (
-                <div key={record.id} className="fitall-row" data-inset="avatar">
-                  <span className="fitall-icon-tile" data-tone="accent"><TicketIcon /></span>
-                  <div className="fitall-row-main">
-                    <p className="fitall-row-title">{record.name}</p>
-                    <p className="fitall-row-meta">
-                      <span>{formatJstDate(record.date, { month: 'numeric', day: 'numeric' })}</span>
-                      <span>{record.quantity}回チケット</span>
-                    </p>
-                  </div>
-                  <span className="fitall-figure text-lg">{yen(record.amount)}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-      </div>
-    </div>
-    <div className="fitall-desktop-ui fitall-desktop-page">
-      <div className="fitall-desktop-container">
-        <header className="fitall-desktop-header">
-          <div>
-            <p className="fitall-kicker">売上</p>
-            <h1 className="fitall-desktop-title">売上管理</h1>
-            <p className="mt-2 text-subhead font-medium text-ink-muted">
-              PCでは月次売上、販売回数、明細をまとめて確認できます。
-            </p>
-          </div>
-          <div className="fitall-pill fitall-pill-aqua">{now.getMonth() + 1}月</div>
-        </header>
-
-        {preview && (
-          <div className="mb-5"><DevPreviewNote>開発用の確認モード。売上データはサンプルです。</DevPreviewNote></div>
-        )}
-
-        <section className="grid grid-cols-[1.4fr_.8fr_.8fr] gap-4">
-          <div className="fitall-desktop-card">
-            <div className="px-6 pt-5">
-              <p className="text-subhead font-semibold text-ink-muted">{now.getMonth() + 1}月の売上</p>
-            </div>
-            <div className="p-6">
-              <p className="text-subhead font-medium text-ink-muted">いま入っている金額</p>
-              <h2 className="mt-2 text-6xl font-black leading-none text-ink">{yen(currentTotal)}</h2>
-              <p className={`mt-3 text-base font-black ${diff >= 0 ? 'text-brand' : 'text-danger'}`}>
-                先月比 {diff >= 0 ? '+' : '-'}{yen(Math.abs(diff))} / {diffRate >= 0 ? '+' : ''}{diffRate}%
-              </p>
-            </div>
-          </div>
-
-          <div className="fitall-desktop-card p-5">
-            <p className="fitall-kicker">販売数</p>
-            <p className="mt-4 text-5xl font-black text-ink">{currentSoldSessions}<span className="ml-1 text-base">回</span></p>
-            <p className="mt-2 text-subhead font-medium text-ink-muted">販売回数</p>
-          </div>
-
-          <div className="fitall-desktop-card p-5">
-            <p className="fitall-kicker">平均</p>
-            <p className="mt-4 text-4xl font-black text-ink">{yen(averageTicket)}</p>
-            <p className="mt-2 text-subhead font-medium text-ink-muted">平均単価</p>
-          </div>
-        </section>
-
-        <section className="mt-5 grid grid-cols-[1.15fr_.85fr] gap-4">
-          <div className="fitall-desktop-card p-5">
-            <div className="mb-4">
-              <h2 className="fitall-section-title">6ヶ月の流れ</h2>
-              <p className="mt-1 text-base font-bold text-brand">水色の棒が月ごとの売上です</p>
-            </div>
-            <SalesBarChart data={monthlySalesData} />
-          </div>
-
-          <div className="fitall-desktop-card p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="fitall-section-title">今月の明細</h2>
-              <span className="text-subhead font-medium text-ink-muted">{records.length}件</span>
-            </div>
-            {!records.length ? (
-              <div className="rounded-card border border-dashed border-line bg-white p-6 text-center text-subhead font-medium text-ink-muted">
-                今月の売上はまだありません
-              </div>
-            ) : (
-              <div className="divide-y divide-line">
-                {records.map((record) => (
-                  <div key={record.id} className="grid grid-cols-[40px_1fr_auto] items-center gap-3 py-3 first:pt-0 last:pb-0">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-base font-bold text-ink">
-                      {record.quantity}
-                    </div>
-                    <div>
-                      <p className="text-base font-bold text-ink">{record.name}</p>
-                      <p className="mt-0.5 text-subhead font-medium text-ink-muted">
-                        {new Date(record.date).toLocaleDateString('ja-JP')} / {record.quantity}回
-                      </p>
-                    </div>
-                    <p className="text-base font-black text-ink">{yen(record.amount)}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-      </div>
-    </div>
-    </>
+      {preview ? <Note>確認モード（サンプルの売上）</Note> : null}
+    </Screen>
   )
 }
 
@@ -236,17 +110,19 @@ export default async function TrainerSalesPage() {
   if (!user && devAuthBypass) {
     const now = parseJstDateTime(formatJstDateKey(), '12:00')
     const monthlySalesData: MonthlySales[] = [
-      { month: '2月', amount: 82000 },
-      { month: '3月', amount: 96000 },
-      { month: '4月', amount: 112000 },
-      { month: '5月', amount: 104000 },
-      { month: '6月', amount: 128000 },
-      { month: '7月', amount: 64000 },
+      { month: '6月', amount: 66000 },
+      { month: '7月', amount: 78000 },
+      { month: '8月', amount: 92000 },
+      { month: '9月', amount: 85000 },
+      { month: '10月', amount: 104000 },
+      { month: '11月', amount: 128000 },
     ]
+    // サンプルの明細は、今日・2日前・3日前に並べる
+    const daysAgo = (days: number) => new Date(now.getTime() - days * 86400000).toISOString()
     const records = [
-      { id: 'r1', name: '佐藤さん', amount: 8800, date: now.toISOString(), quantity: 1 },
-      { id: 'r2', name: '田中さん', amount: 32000, date: now.toISOString(), quantity: 4 },
-      { id: 'r3', name: '山本さん', amount: 8800, date: now.toISOString(), quantity: 1 },
+      { id: 'r1', name: '佐藤 美咲', amount: 32000, date: now.toISOString(), quantity: 4, planName: '4回チケット' },
+      { id: 'r2', name: '鈴木 大輔', amount: 30000, date: daysAgo(2), quantity: 4, planName: '月謝（4回）' },
+      { id: 'r3', name: '山本 結衣', amount: 8800, date: daysAgo(3), quantity: 1, planName: 'パーソナル60分' },
     ]
 
     return (
@@ -285,10 +161,9 @@ export default async function TrainerSalesPage() {
     revenue = await loadTrainerRevenue(supabase, trainerIdsForQuery, sixMonthsAgo.toISOString(), monthEnd.toISOString())
   } catch (error) {
     return (
-      <div className="fitall-page fitall-page-pad space-y-4 py-5">
-        <h1 className="text-[17px] font-black text-ink">売上管理</h1>
-        <p role="status" className="fitall-card p-4 text-base leading-relaxed">{trainerRevenueErrorMessage(error)}</p>
-      </div>
+      <Screen title="売上">
+        <Banner>{trainerRevenueErrorMessage(error)}</Banner>
+      </Screen>
     )
   }
   const allRecords = revenue.filter(r => Date.parse(r.paid_at) <= monthEnd.getTime())
@@ -323,6 +198,11 @@ export default async function TrainerSalesPage() {
     ([month, amount]) => ({ month, amount })
   )
 
+  // チケットの購入は、買ったメニューの名前を出す
+  const planNames = await loadPurchasePlanNames(supabase, currentRecords
+    .filter(r => r.id.startsWith('purchase:'))
+    .map(r => r.id.slice('purchase:'.length)))
+
   const recordViews: SalesRecordView[] = currentRecords.map(record => {
     const traineeId = record.trainee_id ?? (record.booking_id ? bookingMap[record.booking_id]?.trainee_id : null)
     return {
@@ -331,6 +211,7 @@ export default async function TrainerSalesPage() {
       amount: record.amount,
       date: record.paid_at,
       quantity: record.quantity,
+      planName: record.id.startsWith('purchase:') ? planNames[record.id.slice('purchase:'.length)] ?? null : null,
     }
   })
 

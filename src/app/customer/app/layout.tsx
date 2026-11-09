@@ -1,5 +1,7 @@
 import { CustomerTabNav } from './CustomerTabNav'
+import s from '@/ui/ui.module.css'
 
+// お客様アプリの枠。どの画面も下部タブの上に収める
 export default function CustomerAppLayout({
   children,
 }: {
@@ -7,7 +9,7 @@ export default function CustomerAppLayout({
 }) {
   return (
     <>
-      <div className="fitall-customer-main">{children}</div>
+      <div className={s.appFrame}>{children}</div>
       <CustomerTabNav />
     </>
   )

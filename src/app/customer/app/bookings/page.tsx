@@ -1,10 +1,9 @@
-import Link from 'next/link'
 import { loadCustomerAppData, loadCustomerAppEntryData } from '@/lib/customer-app'
-import { formatJstDate, formatJstTime } from '@/lib/datetime'
 import { createCustomerBookingAction } from './actions'
 import { CustomerWeekCalendar } from './CustomerWeekCalendar'
-import { DevPreviewNote, PageHeader } from '@/components/ui/PageHeader'
-import { StatusTag } from '@/components/ui/StatusBadge'
+import { Screen } from '@/ui/Screen'
+import { Section, Row, Banner } from '@/ui/List'
+import { Button, Buttons } from '@/ui/Button'
 
 interface PageProps {
   searchParams?: Promise<{
@@ -13,111 +12,35 @@ interface PageProps {
   }>
 }
 
-function formatDate(value: string) {
-  return formatJstDate(value, {
-    month: 'numeric',
-    day: 'numeric',
-    weekday: 'short',
-  })
-}
-
-function formatTime(value: string) {
-  return formatJstTime(value, {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
-
+// 予約する画面（ホームの「予約する」から開く下の階層）
 export default async function CustomerBookingsPage({ searchParams }: PageProps) {
   const params = await searchParams
   const data = await loadCustomerAppData()
   const entryData = data ? null : await loadCustomerAppEntryData(params?.trainer_id)
   const availableTicketCount = data?.tickets.reduce((sum, ticket) => sum + ticket.remaining, 0) ?? 0
 
+  if (!data) {
+    return (
+      <Screen title="日時を選ぶ" back={{ href: '/customer/app', label: 'ホーム' }}>
+        <Section header="はじめての方" group footer="チケットを買うと、空いている日時から予約できます。">
+          {entryData
+            ? <Row title="担当トレーナー" value={`${entryData.trainer.name}さん`} />
+            : <Row title="LINEの登録リンクから開き直してください" />}
+        </Section>
+        {entryData ? <Buttons><Button href={`/book/${entryData.trainer.profileId}`}>チケットを買う</Button></Buttons> : null}
+      </Screen>
+    )
+  }
+
   return (
-    <main>
-      <PageHeader
-        title="予約"
-        subtitle={data ? `使えるチケット ${availableTicketCount}枚` : undefined}
+    <Screen title="日時を選ぶ" back={{ href: '/customer/app', label: 'ホーム' }}>
+      {params?.booked === '1' ? <Banner>予約しました。チケットを1回使う予定にしました。</Banner> : null}
+      <CustomerWeekCalendar
+        availability={data.availability}
+        availableTicketCount={availableTicketCount}
+        bookingAction={data.preview ? undefined : createCustomerBookingAction}
+        preview={data.preview}
       />
-
-      {!data ? (
-        <div className="fitall-page-pad">
-          <section className="fitall-card p-5">
-            <p className="text-subhead font-medium text-ink-muted">はじめての方</p>
-            <h2 className="mt-1 text-xl font-bold text-ink">チケットを購入して予約</h2>
-            <p className="mt-2 text-subhead leading-relaxed text-ink-muted">
-              メニューを購入するとチケットが追加され、予約日時を選べるようになります。
-            </p>
-            {entryData ? (
-              <>
-                <div className="fitall-row mt-4 !px-0">
-                  <span className="fitall-avatar">{entryData.trainer.name[0] ?? '?'}</span>
-                  <div className="fitall-row-main">
-                    <p className="text-subhead text-ink-muted">担当トレーナー</p>
-                    <p className="fitall-row-title">{entryData.trainer.name}さん</p>
-                  </div>
-                </div>
-                <Link href={`/book/${entryData.trainer.profileId}`} className="fitall-primary-action mt-4">
-                  チケットを購入する
-                </Link>
-              </>
-            ) : (
-              <p className="mt-4 rounded-control bg-surface-soft px-4 py-4 text-center text-subhead text-ink-muted">
-                LINEの登録リンクから開き直してください
-              </p>
-            )}
-          </section>
-        </div>
-      ) : (
-        <div className="fitall-page-pad space-y-7">
-          {data.preview && <DevPreviewNote>開発用の確認モード。予約は保存されません。</DevPreviewNote>}
-          {params?.booked === '1' && (
-            <p role="status" className="rounded-control bg-accent-soft px-4 py-3 text-base font-semibold text-brand">
-              予約が確定しました。チケットを1枚使用予定にしました。
-            </p>
-          )}
-
-          <section aria-label="日時を選ぶ">
-            <h2 className="fitall-group-label">
-              <span>{availableTicketCount > 0 ? '日時を選ぶ' : '空いている時間'}</span>
-              <Link href="/customer/app/tickets" className="inline-flex min-h-11 items-center">チケット</Link>
-            </h2>
-            <div className="fitall-card overflow-hidden">
-              <CustomerWeekCalendar
-                availability={data.availability}
-                availableTicketCount={availableTicketCount}
-                bookingAction={data.preview ? undefined : createCustomerBookingAction}
-                preview={data.preview}
-              />
-            </div>
-            {availableTicketCount <= 0 && (
-              <p className="fitall-group-note">チケットを購入すると、この画面から予約できます。</p>
-            )}
-          </section>
-
-          <section aria-label="これからの予約">
-            <h2 className="fitall-group-label">
-              <span>これからの予約</span>
-              <Link href="/customer/app/bookings/list" className="inline-flex min-h-11 items-center">変更・キャンセル</Link>
-            </h2>
-            {data.upcomingBookings.length ? (
-              <div className="fitall-group">
-                {data.upcomingBookings.map((booking) => (
-                  <div key={booking.id} className="fitall-row" data-status={booking.status}>
-                    <div className="fitall-row-main">
-                      <p className="fitall-row-title"><StatusTag status={booking.status} />{formatDate(booking.scheduled_at)}</p>
-                    </div>
-                    <p className="fitall-row-figure !text-[17px]">{formatTime(booking.scheduled_at)}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="fitall-group px-5 py-5 text-subhead text-ink-muted">次回の予約はまだありません</div>
-            )}
-          </section>
-        </div>
-      )}
-    </main>
+    </Screen>
   )
 }

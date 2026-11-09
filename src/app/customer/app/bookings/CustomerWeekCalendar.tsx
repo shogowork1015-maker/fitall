@@ -1,66 +1,126 @@
 'use client'
 
-import Link from 'next/link'
 import { useActionState, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { CustomerAvailabilityDay } from '@/lib/customer-app'
 import type { CustomerBookingActionState } from './actions'
-import { BookingSlotPicker } from '@/components/BookingSlotPicker'
-import { formatJstDateTime } from '@/lib/datetime'
+import { formatJstDate, formatJstTime } from '@/lib/datetime'
+import { Section, Empty } from '@/ui/List'
+import { Button } from '@/ui/Button'
+import { Week } from '@/ui/Week'
+import { Check } from '@/ui/icons'
+import s from '@/ui/ui.module.css'
 
 export type TicketBookingAction = (state: CustomerBookingActionState, data: FormData) => Promise<CustomerBookingActionState>
 
+function dateFromKey(key: string) {
+  return new Date(`${key}T00:00:00+09:00`)
+}
+
+function longDate(value: string | Date) {
+  return formatJstDate(value, { month: 'long', day: 'numeric', weekday: 'short' })
+}
+
+// 日時を選んで、チケット1回で予約する（A案）。
+// 日を選ぶ → 時間を選ぶ → 画面下の黒いボタン。終わったら確認の画面に切り替える
 export function CustomerWeekCalendar({ availability, availableTicketCount, bookingAction, preview = false }: {
   availability: CustomerAvailabilityDay[]; availableTicketCount: number; bookingAction?: TicketBookingAction; preview?: boolean
 }) {
   const router = useRouter()
+  const days = availability.map((day) => ({
+    ...day,
+    cells: day.cells.filter((cell) => cell.value),
+    openCount: day.cells.filter((cell) => cell.status === 'open' && cell.value).length,
+  }))
+  const firstOpen = days.find((day) => day.openCount)?.dateKey ?? days[0]?.dateKey ?? ''
+  const [dayKey, setDayKey] = useState(firstOpen)
   const [selected, setSelected] = useState('')
   const submitting = useRef(false)
-  const errorRef = useRef<HTMLParagraphElement>(null)
   const [state, action, pending] = useActionState<CustomerBookingActionState, FormData>(async (previous, formData) => {
     try {
-      const result = bookingAction ? await bookingAction(previous, formData) : { status: 'error' as const, message: 'この画面からは予約できません。' }
+      const result = bookingAction ? await bookingAction(previous, formData) : { status: 'error' as const, message: '確認モードのため予約できません。' }
       if (result?.status !== 'success') submitting.current = false
       return result
     } catch {
       submitting.current = false
-      return { status: 'error', message: '予約結果を確認できませんでした。予約一覧を確認してから、もう一度お試しください。' }
+      return { status: 'error', message: '予約できたか確認できませんでした。予約一覧を確認してから、もう一度お試しください。' }
     }
   }, null)
-  const slots = availability.flatMap(day => day.cells.filter(cell => cell.status === 'open' && cell.value).map(cell => ({ value: cell.value!, label: cell.availableLabel ?? cell.time })))
-  const chosen = slots.find(slot => slot.value === selected)
   const needsPurchase = availableTicketCount <= 0 || (state?.status === 'error' && state.needsPurchase)
-  const success = state?.status === 'success'
+
   useEffect(() => {
     if (state?.status === 'success' && !preview) router.refresh()
-    if (state?.status === 'error') errorRef.current?.focus()
   }, [state, router, preview])
 
-  if (success) return <section className="p-5" role="status">
-    <p className="text-base font-semibold text-brand">{preview ? 'プレビューでの予約完了' : '予約完了'}</p>
-    <h2 className="mt-2 text-xl font-bold">{formatJstDateTime(selected, { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' })}</h2>
-    <p className="mt-3 text-base leading-relaxed">{state.message}</p>
-    <p className="mt-2 text-base">チケット1枚を予約に使用しました。</p>
-    <Link href="/customer/app" className="fitall-primary-action mt-5">ホームに戻る</Link>
-  </section>
+  if (state?.status === 'success') {
+    return (
+      <div className={s.done} role="status">
+        <span className={s.stateMark}><Check size={34} /></span>
+        <p className={s.stateTitle}>予約しました</p>
+        <p className={s.doneDate}>{longDate(selected)}</p>
+        <p className={s.doneTime}>{formatJstTime(selected)}</p>
+        <p className={s.stateText} style={{ marginTop: 10, marginBottom: 0 }}>{state.message}</p>
+        <div className={s.doneRow}><span>残りのチケット</span><b>{Math.max(0, availableTicketCount - 1)}回</b></div>
+        <div style={{ marginTop: 32 }}><Button href="/customer/app">ホームに戻る</Button></div>
+      </div>
+    )
+  }
 
-  return <form action={action} className="p-4" onSubmit={event => {
-    if (!chosen || needsPurchase || submitting.current) { event.preventDefault(); return }
-    submitting.current = true
-  }} aria-busy={pending}>
-    <input type="hidden" name="scheduled_at" value={chosen?.value ?? ''} />
-    <BookingSlotPicker slots={slots} value={selected} onChange={setSelected} disabled={pending} />
-    <section className="mt-5 rounded-control bg-surface-soft p-4" aria-label="予約内容の確認">
-      <h3 className="text-lg font-semibold">{chosen ? formatJstDateTime(chosen.value, { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }) : '予約する時間を選んでください'}</h3>
-      <div className="mt-2 flex items-baseline justify-between text-base"><span className="text-ink-muted">使用するチケット</span><strong className="font-semibold">1枚</strong></div>
-      {!needsPurchase && <p className="mt-2 text-subhead text-ink-muted">予約後の残り {Math.max(0, availableTicketCount - 1)}枚 · 追加のお支払いはありません</p>}
-    </section>
-    {state?.status === 'error' && <p ref={errorRef} tabIndex={-1} role="alert" className="mt-4 rounded-control bg-danger-soft p-3 text-base text-danger">{state.message}</p>}
-    {needsPurchase ? <div className="mt-4">
-      <p className="mb-3 text-base">使えるチケットがありません。</p>
-      <Link href="/customer/app/tickets" className="fitall-primary-action">チケットを購入する</Link>
-    </div> : <button type="submit" disabled={pending || !chosen} className="fitall-primary-action mt-4 w-full disabled:cursor-not-allowed disabled:opacity-40">
-      {pending ? '予約しています…' : 'チケット1枚で予約する'}
-    </button>}
-  </form>
+  const day = days.find((item) => item.dateKey === dayKey)
+
+  return (
+    <form action={action} aria-busy={pending} onSubmit={(event) => {
+      if (!selected || needsPurchase || submitting.current) { event.preventDefault(); return }
+      submitting.current = true
+    }}>
+      <input type="hidden" name="scheduled_at" value={selected} />
+
+      <Week
+        scroll
+        days={days.map((item) => ({
+          key: item.dateKey,
+          weekday: item.weekday,
+          day: Number(item.dateKey.slice(8, 10)),
+          empty: !item.openCount,
+          disabled: !item.openCount || pending,
+          label: `${longDate(dateFromKey(item.dateKey))} 空き${item.openCount}枠`,
+        }))}
+        selected={dayKey}
+        onSelect={(key) => { setDayKey(key); setSelected('') }}
+      />
+
+      <Section title={day ? longDate(dateFromKey(day.dateKey)) : '空き時間'} action={day ? `空き ${day.openCount}枠` : undefined}>
+        {day?.cells.length ? (
+          <div className={s.slots} role="group" aria-label="時間">
+            {day.cells.map((cell) => (
+              <button
+                key={cell.value}
+                type="button"
+                className={s.slotButton}
+                aria-pressed={cell.value === selected}
+                disabled={cell.status !== 'open' || pending}
+                onClick={() => setSelected(cell.value!)}
+              >
+                {formatJstTime(cell.value!)}
+              </button>
+            ))}
+          </div>
+        ) : <Empty>この日は空いている時間がありません</Empty>}
+      </Section>
+
+      <div className={s.actionSpacer} />
+
+      <div className={s.actionBar}>
+        {state?.status === 'error' ? <p role="alert" className={s.formError} style={{ margin: '0 6px 10px' }}>{state.message}</p> : null}
+        <div className={s.actionSummary}>
+          <b>{selected ? `${longDate(selected)} ${formatJstTime(selected)}` : '時間を選んでください'}</b>
+          <span>{needsPurchase ? 'チケットがありません' : `チケット ${availableTicketCount}回 → ${availableTicketCount - 1}回`}</span>
+        </div>
+        {needsPurchase
+          ? <Button href="/customer/app/tickets">チケットを買う</Button>
+          : <Button type="submit" disabled={!selected || pending}>{pending ? '予約しています…' : 'この日時で予約する'}</Button>}
+      </div>
+    </form>
+  )
 }
+

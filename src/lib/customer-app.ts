@@ -6,6 +6,7 @@ import { addDaysToDateKey, formatJstDate, formatJstDateKey, parseJstDateTime } f
 import {
   getPlanSettings,
   readTrainerPlanSettingsFromBio,
+  readTrainerSettingsFromBio,
   type TrainerPlanBillingType,
 } from './trainer-settings'
 import { customerAvailability } from './customer-availability'
@@ -20,6 +21,8 @@ export interface CustomerTicket {
   used: number
   total: number
   expiresLabel: string
+  /** 買った日（例：10月28日）。分からないときは空 */
+  purchasedLabel?: string
   note: string
 }
 
@@ -57,6 +60,8 @@ export interface CustomerAvailabilityDay {
 
 export interface CustomerAppData {
   preview: boolean
+  /** 1回の長さ（分）。「パーソナル60分」の表示に使う */
+  sessionMinutes: number
   customer: {
     id: string
     name: string
@@ -359,6 +364,7 @@ async function loadCreditTickets(input: {
       used,
       total,
       expiresLabel: expiresAt ? `${formatDateLabel(expiresAt)}まで` : kind === 'monthly' ? '月末まで' : '期限なし',
+      purchasedLabel: purchase?.purchased_at ? formatJstDate(purchase.purchased_at, { month: 'long', day: 'numeric' }) : '',
       note: kind === 'monthly' ? '毎月チケットを自動付与' : 'なくなったらLINEで追加案内',
     } satisfies CustomerTicket
   })
@@ -366,32 +372,40 @@ async function loadCreditTickets(input: {
 
 async function loadAvailability(trainerProfileId: string): Promise<CustomerAvailabilityDay[]> {
   const bookingData = await getPublicBookingData(trainerProfileId)
-  return customerAvailability(bookingData?.slots ?? [], formatJstDateKey())
+  return customerAvailability(bookingData?.slots ?? [], formatJstDateKey(), bookingData?.takenSlots ?? [])
 }
 
 // 開発用の確認モードで表示する固定のサンプル。DBには一切アクセスしない
 function previewCustomerAppData(): CustomerAppData {
   const todayKey = formatJstDateKey()
   const at = (days: number, time: string) => parseJstDateTime(addDaysToDateKey(todayKey, days), time).toISOString()
-  const sampleSlots = [1, 2, 3, 5, 6, 8, 9, 10, 12].flatMap((days) =>
-    ['10:00', '13:00', '18:00'].map((time) => ({ value: at(days, time), label: time }))
+  // 空き枠と、ほかの予約で埋まっている枠（打ち消し線で見せる）
+  const sampleDays = [1, 2, 3, 5, 6, 8, 9, 10, 12]
+  const sampleSlots = sampleDays.flatMap((days) =>
+    ['09:00', '11:00', '13:00', '15:00', '18:00'].map((time) => ({ value: at(days, time), label: time }))
   )
+  const sampleTaken = sampleDays.flatMap((days) =>
+    ['10:00', '17:00'].map((time) => ({ value: at(days, time), label: time }))
+  )
+  const purchased = formatJstDate(at(-12, '12:00'), { month: 'long', day: 'numeric' })
   return {
     preview: true,
-    customer: { id: 'preview-customer', name: '佐藤 花子', email: 'sato@example.com', goal: '週2回で筋力アップ', lineUserId: null },
-    trainer: { name: '山田トレーナー', profileId: 'preview-trainer' },
+    sessionMinutes: 60,
+    customer: { id: 'preview-customer', name: '佐藤 花子', email: 'hanako@example.com', goal: '週2回で筋力アップ', lineUserId: 'preview-line' },
+    trainer: { name: '山田 健二', profileId: 'preview-trainer' },
     viewer: { role: null, canConnectLine: false },
     tickets: [
-      { id: 'preview-ticket-1', title: '4回チケット', kind: 'ticket', remaining: 2, scheduled: 1, used: 1, total: 4, expiresLabel: '期限なし', note: 'なくなったらLINEで追加案内' },
+      { id: 'preview-ticket-1', title: '4回チケット', kind: 'ticket', remaining: 2, scheduled: 1, used: 1, total: 4, expiresLabel: '期限なし', purchasedLabel: purchased, note: 'なくなったらLINEで追加案内' },
     ],
     upcomingBookings: [
-      { id: 'preview-booking-1', scheduled_at: at(2, '10:00'), status: 'confirmed', price: 8000, title: statusTitle('confirmed') },
-      { id: 'preview-booking-2', scheduled_at: at(9, '18:00'), status: 'pending', price: 8000, title: statusTitle('pending') },
+      { id: 'preview-booking-1', scheduled_at: at(1, '10:00'), status: 'confirmed', price: 8000, title: statusTitle('confirmed') },
+      { id: 'preview-booking-2', scheduled_at: at(8, '18:00'), status: 'pending', price: 8000, title: statusTitle('pending') },
+      { id: 'preview-booking-3', scheduled_at: at(15, '13:00'), status: 'confirmed', price: 8000, title: statusTitle('confirmed') },
     ],
     pastBookings: [
       { id: 'preview-booking-0', scheduled_at: at(-5, '13:00'), status: 'completed', price: 8000, title: statusTitle('completed') },
     ],
-    availability: customerAvailability(sampleSlots, todayKey),
+    availability: customerAvailability(sampleSlots, todayKey, sampleTaken),
     menus: [
       { id: 'preview-menu-1', name: '4回チケット', price: 32000, sessions: 4, billing_type: 'ticket', description: '1回あたり8,000円' },
       { id: 'preview-menu-2', name: '8回チケット', price: 60000, sessions: 8, billing_type: 'ticket', description: '1回あたり7,500円' },
@@ -473,6 +487,7 @@ export async function loadCustomerAppData(): Promise<CustomerAppData | null> {
 
   return {
     preview,
+    sessionMinutes: readTrainerSettingsFromBio(trainerProfile?.bio).session_duration_minutes,
     customer: {
       id: customerUser.id,
       name: customerUser.name ?? 'お客様',

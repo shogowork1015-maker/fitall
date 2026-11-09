@@ -2,10 +2,13 @@
 
 import { useActionState, useEffect, useRef } from 'react'
 import type { CustomerTicketCheckoutState } from './actions'
+import { Button } from '@/ui/Button'
 
 export type TicketCheckoutAction = (state: CustomerTicketCheckoutState, data: FormData) => Promise<CustomerTicketCheckoutState>
-export function TicketPurchaseForm({ planId, checkoutAction, preview = false }: {
-  planId: string; checkoutAction: TicketCheckoutAction; preview?: boolean
+
+// 購入ボタン。押すとStripeの決済画面へ移る
+export function TicketPurchaseForm({ planId, checkoutAction, preview = false, label = '購入する' }: {
+  planId: string; checkoutAction: TicketCheckoutAction; preview?: boolean; label?: string
 }) {
   const submitting = useRef(false)
   const [state, action, pending] = useActionState<CustomerTicketCheckoutState, FormData>(async (previous, data) => {
@@ -20,14 +23,17 @@ export function TicketPurchaseForm({ planId, checkoutAction, preview = false }: 
   }, null)
   const redirecting = Boolean(state && 'checkoutUrl' in state)
   useEffect(() => { if (state && 'checkoutUrl' in state) window.location.assign(state.checkoutUrl) }, [state])
-  return <form action={action} className="mt-3" onSubmit={event => {
-    if (submitting.current) event.preventDefault()
-    else submitting.current = true
-  }}>
-    <input type="hidden" name="plan_id" value={planId} />
-    {state && 'error' in state && <p role="alert" className="mb-3 rounded-control bg-danger-soft p-3 text-base text-danger">{state.error}</p>}
-    <button type="submit" disabled={pending || redirecting} className="fitall-primary-action w-full disabled:opacity-40">
-      {pending || redirecting ? '処理中…' : preview ? '購入する（確認モード）' : 'このメニューを購入する'}
-    </button>
-  </form>
+
+  return (
+    <form action={action} onSubmit={(event) => {
+      if (submitting.current) event.preventDefault()
+      else submitting.current = true
+    }}>
+      <input type="hidden" name="plan_id" value={planId} />
+      {state && 'error' in state ? <p role="alert" style={{ color: 'var(--ui-red)', fontSize: 15, marginBottom: 12 }}>{state.error}</p> : null}
+      <Button type="submit" disabled={pending || redirecting}>
+        {pending || redirecting ? '決済画面を開いています…' : preview ? `${label}（確認モード）` : label}
+      </Button>
+    </form>
+  )
 }

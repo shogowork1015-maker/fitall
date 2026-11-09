@@ -1,10 +1,12 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { SubmitButton } from '@/components/SubmitButton'
+import { SubmitButton } from '@/ui/SubmitButton'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createClientInviteAction } from './actions'
-import { PageHeader } from '@/components/ui/PageHeader'
+import { Screen } from '@/ui/Screen'
+import { Section, Row, Banner } from '@/ui/List'
+import { Button } from '@/ui/Button'
+import s from '@/ui/ui.module.css'
 
 interface PageProps {
   searchParams?: Promise<{
@@ -39,119 +41,52 @@ export default async function NewClientPage({ searchParams }: PageProps) {
   const error = errorMessage(params?.error)
 
   return (
-    <div className="fitall-page fitall-scroll">
-      <PageHeader
-        title="お客様を追加"
-        back={{ href: '/trainer/clients', label: 'お客様一覧へ戻る' }}
-      />
-
-      <div className="fitall-page-pad mx-auto max-w-[720px] space-y-7">
-
-        {createdUrl && (
-          <section className="fitall-card p-5">
-            <h2 className="text-lg font-bold text-ink">登録リンクができました</h2>
-            <p className="mt-3 break-all rounded-control bg-surface-soft px-4 py-3 text-base font-medium text-brand">
-              {createdUrl}
-            </p>
-            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <a
-                href={`https://social-plugins.line.me/lineit/share?text=${encodeURIComponent(message)}`}
-                target="_blank"
-                rel="noreferrer"
-                className="fitall-aqua-action"
-              >
-                LINEで送る
-              </a>
-              <Link href="/trainer/clients" className="fitall-secondary-action">
-                お客様一覧へ
-              </Link>
-            </div>
-          </section>
-        )}
-
-        {error && (
-          <div role="alert" className="rounded-control bg-danger-soft px-4 py-3 text-base font-semibold text-danger">
-            {error}
+    <Screen title="お客様を追加" back={{ href: '/trainer/clients', label: 'お客様' }}>
+      {createdUrl ? (
+        <>
+          <Section group header="登録リンクができました" footer="お客様がこのリンクから情報を確認すると、マイページが使えるようになります。">
+            <Row title={<span style={{ wordBreak: 'break-all' }}>{createdUrl}</span>} />
+          </Section>
+          <div style={{ display: 'grid', gap: 10, marginTop: 16 }}>
+            <Button href={`https://social-plugins.line.me/lineit/share?text=${encodeURIComponent(message)}`}>LINEで送る</Button>
+            <Button variant="secondary" href="/trainer/clients">お客様の一覧へ</Button>
           </div>
-        )}
+        </>
+      ) : null}
 
-        <form action={createClientInviteAction} className="fitall-card space-y-4 p-5">
-          <div>
-            <h2 className="text-lg font-bold text-ink">仮登録する情報</h2>
-            <p className="mt-1 text-subhead leading-relaxed text-ink-muted">
-              後でお客様本人が登録リンクから確認・修正できます。
-            </p>
+      {error ? <div style={{ marginTop: 16 }}><Banner tone="error">{error}</Banner></div> : null}
+
+      <form action={createClientInviteAction}>
+        <Section group header="お客様" footer="あとでお客様本人が登録リンクから確認・修正できます。">
+          <div className={s.field}>
+            <label htmlFor="client-name">お名前</label>
+            <input id="client-name" name="name" required placeholder="山田 太郎" autoComplete="off" />
           </div>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label className="block">
-              <span className="text-subhead font-medium text-ink-muted">お名前</span>
-              <input
-                name="name"
-                required
-                placeholder="山田 太郎"
-                className="fitall-input mt-1"
-              />
-            </label>
-            <label className="block">
-              <span className="text-subhead font-medium text-ink-muted">メールアドレス</span>
-              <input
-                name="email"
-                type="email"
-                required
-                placeholder="name@example.com"
-                className="fitall-input mt-1"
-              />
-            </label>
-            <label className="block">
-              <span className="text-subhead font-medium text-ink-muted">身長 cm</span>
-              <input
-                name="height"
-                type="number"
-                inputMode="decimal"
-                placeholder="170"
-                className="fitall-input mt-1"
-              />
-            </label>
-            <label className="block">
-              <span className="text-subhead font-medium text-ink-muted">体重 kg</span>
-              <input
-                name="weight"
-                type="number"
-                inputMode="decimal"
-                placeholder="65"
-                className="fitall-input mt-1"
-              />
-            </label>
+          <div className={s.field}>
+            <label htmlFor="client-email">メール</label>
+            <input id="client-email" name="email" type="email" inputMode="email" required placeholder="name@example.com" autoComplete="off" />
           </div>
+        </Section>
 
-          <label className="block">
-            <span className="text-subhead font-medium text-ink-muted">目的・メモ</span>
-            <textarea
-              name="goal"
-              rows={4}
-              placeholder="ダイエット、姿勢改善、筋力アップなど"
-              className="fitall-input fitall-textarea mt-1"
-            />
-          </label>
+        <Section group header="任意">
+          <div className={s.field}>
+            <label htmlFor="client-height">身長 cm</label>
+            <input id="client-height" name="height" type="number" inputMode="decimal" placeholder="170" />
+          </div>
+          <div className={s.field}>
+            <label htmlFor="client-weight">体重 kg</label>
+            <input id="client-weight" name="weight" type="number" inputMode="decimal" placeholder="65" />
+          </div>
+        </Section>
 
-          <SubmitButton className="fitall-primary-action w-full">
-            登録リンクを作成
-          </SubmitButton>
-        </form>
+        <Section header="目的・メモ">
+          <textarea name="goal" rows={4} placeholder="ダイエット、姿勢改善、筋力アップなど" className={s.textarea} />
+        </Section>
 
-        <section>
-          <h2 className="fitall-group-label">この後の流れ</h2>
-          <ol className="fitall-group">
-            {['LINEで登録リンクを送る', 'お客様が情報を確認・入力する', 'LINE通知を連携してマイページ利用開始'].map((item, index) => (
-              <li key={item} className="fitall-row" data-inset="avatar">
-                <span className="fitall-step-num">{index + 1}</span>
-                <p className="fitall-row-main fitall-row-title">{item}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
-      </div>
-    </div>
+        <Section footer="作成したリンクをLINEで送ると、お客様が登録できます。">
+          <SubmitButton pendingLabel="作成しています…">登録リンクを作る</SubmitButton>
+        </Section>
+      </form>
+    </Screen>
   )
 }

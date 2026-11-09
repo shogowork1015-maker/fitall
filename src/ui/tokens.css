@@ -1,0 +1,38 @@
+/* ==========================================================================
+   Limitless App のデザイントークン（新UI）
+   iPhone純正アプリ（Inset Grouped）の寸法と色をそのまま使う。
+   値の意味と使い分けは .claude/skills/refined-ios-ui/SKILL.md を参照。
+   ========================================================================== */
+:root {
+  /* 面 */
+  --ui-bg: #FFFFFF;
+  --ui-soft: #F4F4F5;
+  --ui-surface: #FFFFFF;
+  --ui-fill: rgb(118 118 128 / 12%);
+  --ui-fill-press: rgb(118 118 128 / 20%);
+  --ui-press: #E5E5EA;
+
+  /* 文字 */
+  --ui-label: #000000;
+  --ui-label-2: #6E6E73;
+  --ui-label-3: #B4B4B9;
+  --ui-separator: rgb(60 60 67 / 18%);
+
+  /* 主な操作の色（黒）と、チケットの面にだけ使うアクア */
+  --ui-tint: #0B0B0C;
+  --ui-aqua: #12C7BE;
+
+  /* エラーの文字だけに使う赤（それ以外の状態色は使わない） */
+  --ui-red: #D70015;
+
+  /* 形 */
+  --ui-radius-group: 12px;
+  --ui-radius-card: 20px;
+  --ui-tap: 44px;
+  --ui-tabbar: 50px;
+  --ui-safe-top: env(safe-area-inset-top, 0px);
+  --ui-safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* 動き */
+  --ui-ease: cubic-bezier(.32, .72, 0, 1);
+}

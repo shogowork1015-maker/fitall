@@ -28,12 +28,12 @@ export function SalesBarChart({ data, dark }: { data: MonthlySales[]; dark?: boo
         <CartesianGrid stroke={dark ? '#2F3A3A' : '#ECEDEF'} vertical={false} />
         <XAxis
           dataKey="month"
-          tick={{ fill: dark ? '#B7F3EF' : '#5E5E66', fontSize: 12, fontWeight: 500 }}
+          tick={{ fill: dark ? '#B7F3EF' : '#6D6D72', fontSize: 13, fontWeight: 500 }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: dark ? '#B7F3EF' : '#707076', fontSize: 11, fontWeight: 500 }}
+          tick={{ fill: dark ? '#B7F3EF' : '#6D6D72', fontSize: 13, fontWeight: 500 }}
           axisLine={false}
           tickLine={false}
           width={36}
@@ -47,7 +47,7 @@ export function SalesBarChart({ data, dark }: { data: MonthlySales[]; dark?: boo
             border: 'none',
             borderRadius: '10px',
             color: '#fff',
-            fontSize: '12px',
+            fontSize: '13px',
             fontWeight: '600',
           }}
           labelStyle={{ color: '#12C7BE' }}

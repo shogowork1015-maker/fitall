@@ -16,12 +16,31 @@ function load(file, dependencies = {}) {
   return exports
 }
 const revenue = load('src/lib/trainer-revenue.ts')
+const trainerSettings = load('src/lib/trainer-settings.ts')
+// チケットの残り・名前は本物の読み込み処理を使う（偽のDBから読む）
+const ticketSummary = load('src/lib/ticket-summary.ts', { './datetime': load('src/lib/datetime.ts') })
 // 画面が使う共通UI部品は本物を読み込み、画面の描画結果まで確認できるようにする
-const uiDependencies = (jsxRuntime, link) => ({
-  '@/components/ui/PageHeader': load('src/components/ui/PageHeader.tsx', { 'react/jsx-runtime': jsxRuntime, 'next/link': link }),
-  '@/components/ui/StatusBadge': load('src/components/ui/StatusBadge.tsx', { 'react/jsx-runtime': jsxRuntime }),
-  '@/components/ui/Icons': load('src/components/ui/Icons.tsx', { 'react/jsx-runtime': jsxRuntime }),
-})
+// CSSモジュールはクラス名をそのまま返す
+const cssModule = { default: new Proxy({}, { get: (_, key) => String(key) }) }
+const uiDependencies = (jsxRuntime, link) => {
+  const base = { 'react/jsx-runtime': jsxRuntime, 'next/link': link, './ui.module.css': cssModule }
+  const icons = load('src/ui/icons.tsx', base)
+  const withIcons = { ...base, './icons': icons }
+  return {
+    '@/ui/icons': icons,
+    '@/ui/Screen': load('src/ui/Screen.tsx', withIcons),
+    '@/ui/List': load('src/ui/List.tsx', withIcons),
+    '@/ui/Button': load('src/ui/Button.tsx', base),
+    '@/ui/Hero': load('src/ui/Hero.tsx', base),
+    '@/ui/Card': load('src/ui/Card.tsx', base),
+    '@/ui/Timeline': load('src/ui/Timeline.tsx', base),
+    '@/ui/DateList': load('src/ui/DateList.tsx', withIcons),
+    // ボタンの中でサーバー処理を呼ぶ部品は、描画の確認では空にする
+    '@/app/trainer/bookings/ApproveButton': { ApproveButton: () => null },
+    '@/lib/ticket-summary': ticketSummary,
+    '@/lib/trainer-settings': trainerSettings,
+  }
+}
 const from = '2026-09-30T15:00:00.000Z'
 const paidAt = '2026-10-01T01:00:00.000Z'
 const purchase = (overrides = {}) => ({ id: 'p1', amount: 28000, quantity: 4,
@@ -202,7 +221,8 @@ test('ambiguous revenue hides only dashboard sales and gives explicit sales-page
   Object.assign(dependencies, uiDependencies(jsxRuntime, dependencies['next/link']))
   // スマホのホーム画面も本物を描画し、売上エラーやお客様名が出ることまで確認する
   dependencies['./TrainerHomeMobile'] = load('src/app/trainer/dashboard/TrainerHomeMobile.tsx', {
-    'react/jsx-runtime': jsxRuntime, react: await import('react'), 'next/link': dependencies['next/link'], '@/lib/datetime': datetime,
+    ...uiDependencies(jsxRuntime, dependencies['next/link']),
+    'react/jsx-runtime': jsxRuntime, 'next/link': dependencies['next/link'], '@/lib/datetime': datetime,
   })
   const dashboard = await load('src/app/trainer/dashboard/page.tsx', dependencies).default()
   assert.equal(dashboard.props.totalSales, null)

@@ -139,3 +139,46 @@ for (const stage of ['purchase', 'credits']) {
     assert.equal((await webhookSetup(stage).run()).status, 500)
   })
 }
+
+test('customer availability shows booked start times as closed cells without counting them as open', () => {
+  const datetime = load('src/lib/datetime.ts', {})
+  const { customerAvailability } = load('src/lib/customer-availability.ts', { './datetime': datetime })
+  const open = ['2026-10-01T09:00:00+09:00', '2026-10-01T11:00:00+09:00'].map(value => ({ value, label: '' }))
+  const taken = ['2026-10-01T10:00:00+09:00', '2026-10-01T11:00:00+09:00'].map(value => ({ value, label: '' }))
+  const [day] = customerAvailability(open, '2026-10-01', taken)
+  assert.equal(day.openCount, 2)
+  assert.equal(day.cells.map(cell => `${cell.time}:${cell.status}`).join(' '), '09:00:open 10:00:closed 11:00:open')
+})
+
+test('ticket summary counts credits per customer and names the latest purchased plan', async () => {
+  const datetime = load('src/lib/datetime.ts', {})
+  const summary = load('src/lib/ticket-summary.ts', { './datetime': datetime })
+  const tables = {
+    session_credits: [
+      { trainer_id: 't', trainee_id: 'a', status: 'available', purchase_id: 'old', expires_at: null },
+      { trainer_id: 't', trainee_id: 'a', status: 'available', purchase_id: 'new', expires_at: null },
+      { trainer_id: 't', trainee_id: 'a', status: 'scheduled', purchase_id: 'new', expires_at: null },
+      { trainer_id: 't', trainee_id: 'a', status: 'used', purchase_id: 'old', expires_at: null },
+      { trainer_id: 'other', trainee_id: 'a', status: 'available', purchase_id: 'x', expires_at: null },
+    ],
+    session_credit_purchases: [
+      { id: 'old', plan_id: 'p1', purchased_at: '2026-09-01T00:00:00Z' },
+      { id: 'new', plan_id: 'p2', purchased_at: '2026-10-01T00:00:00Z' },
+    ],
+    plans: [{ id: 'p1', name: '1回チケット' }, { id: 'p2', name: '4回チケット' }],
+  }
+  const client = { from(table) {
+    const filters = []
+    const builder = {
+      select() { return builder },
+      in(column, values) { filters.push(row => values.includes(row[column])); return builder },
+      eq(column, value) { filters.push(row => row[column] === value); return builder },
+      then(resolve) { return Promise.resolve({ data: (tables[table] ?? []).filter(row => filters.every(f => f(row))) }).then(resolve) },
+    }
+    return builder
+  } }
+  const result = await summary.loadTicketSummaries(client, ['t'], ['a'])
+  assert.equal(result.a.remaining, 2); assert.equal(result.a.scheduled, 1); assert.equal(result.a.used, 1)
+  assert.equal(result.a.ticketName, '4回チケット'); assert.equal(result.a.expiresLabel, '期限なし')
+  assert.equal(summary.sessionLabel(60), 'パーソナル60分')
+})

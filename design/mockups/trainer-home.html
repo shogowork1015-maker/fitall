@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trainer Home Mockups</title>
+<style>
+  /* トレーナーのホーム画面・デザイン3案（画像書き出し用の見本）
+     色は白・黒・Limitlessのアクアだけ。札・色帯・色の点・丸いボタンは使わない */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #0B0B0C;
+    --ink2: #6E6E73;
+    --ink3: #B4B4B9;
+    --line: rgba(0,0,0,.08);
+    --soft: #F4F4F5;
+    --aqua: #12C7BE;
+  }
+  body {
+    background: #E9E9EC;
+    color: var(--ink);
+    font-family: -apple-system, "SF Pro Text", "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
+    font-feature-settings: "palt";
+    -webkit-font-smoothing: antialiased;
+  }
+  .board { display: flex; gap: 56px; justify-content: center; padding: 64px 56px 72px; }
+  .col { display: flex; flex-direction: column; gap: 22px; align-items: center; }
+  .label { text-align: center; }
+  .label b { display: block; font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+  .label span { display: block; color: var(--ink2); font-size: 15px; margin-top: 4px; }
+  .phone {
+    background: #fff;
+    border-radius: 54px;
+    box-shadow: 0 0 0 10px #111, 0 0 0 11px #3a3a3c, 0 40px 80px rgba(0,0,0,.18);
+    height: 844px;
+    overflow: hidden;
+    position: relative;
+    width: 390px;
+  }
+  body.only { background: #fff; }
+  body.only .board { padding: 0; display: block; }
+  body.only .col { display: none; }
+  body.only .col.show { display: block; }
+  body.only .label { display: none; }
+  body.only .phone { border-radius: 0; box-shadow: none; }
+
+  /* ---- 共通 ---- */
+  .status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 6px 30px 0 46px; z-index: 5; font-size: 17px; font-weight: 600; letter-spacing: -.02em; }
+  .status .r { display: flex; gap: 6px; align-items: center; }
+  .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 124px; height: 36px; background: #000; border-radius: 20px; z-index: 6; }
+  .tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: rgba(255,255,255,.96); backdrop-filter: blur(20px); box-shadow: inset 0 .5px 0 rgba(0,0,0,.14); display: grid; grid-template-columns: repeat(5,1fr); padding-top: 7px; z-index: 5; }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #A1A1A6; font-size: 10px; font-weight: 500; }
+  .tab.on { color: var(--ink); }
+  .homebar { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #000; z-index: 7; }
+  /* 見出し横の操作は丸で囲まず、記号だけを置く */
+  .icons { display: flex; gap: 2px; margin-right: -10px; }
+  .ic { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); }
+  .num { font-feature-settings: "tnum"; letter-spacing: -.02em; }
+  .btn { background: var(--ink); color: #fff; font-size: 14px; font-weight: 700; padding: 9px 16px; border-radius: 99px; white-space: nowrap; }
+  .btn.aqua { background: var(--aqua); color: var(--ink); }
+
+  /* ================= A：タイムライン型 ================= */
+  .a .head { padding: 58px 22px 0; }
+  .a .head .top { display: flex; justify-content: space-between; align-items: center; height: 44px; }
+  .a .date { color: var(--ink2); font-size: 15px; font-weight: 600; }
+  .a h1 { font-size: 34px; font-weight: 800; letter-spacing: -.02em; }
+  .a .next { margin: 16px 16px 0; background: var(--ink); color: #fff; border-radius: 26px; padding: 20px 20px 18px; }
+  .a .next .row1 { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: rgba(255,255,255,.6); font-weight: 600; }
+  .a .pill { background: var(--aqua); color: var(--ink); font-size: 13px; font-weight: 800; padding: 5px 11px; border-radius: 99px; }
+  .a .next .time { font-size: 56px; font-weight: 800; margin-top: 8px; line-height: 1; }
+  .a .next .who { font-size: 22px; font-weight: 700; margin-top: 10px; letter-spacing: -.01em; }
+  .a .next .meta { font-size: 14px; color: rgba(255,255,255,.6); margin-top: 4px; }
+  .a .next .tick { display: flex; gap: 4px; margin-top: 18px; }
+  .a .next .tick span { height: 4px; flex: 1; border-radius: 2px; background: rgba(255,255,255,.18); }
+  .a .next .tick span.done { background: var(--aqua); }
+  .a .sec { display: flex; justify-content: space-between; align-items: baseline; padding: 26px 22px 10px; }
+  .a .sec b { font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
+  .a .sec span { color: var(--ink2); font-size: 15px; }
+  .a .tl { padding: 0 16px 0 22px; position: relative; }
+  .a .slot { display: grid; grid-template-columns: 54px 1fr; gap: 14px; position: relative; }
+  .a .slot .t { font-size: 15px; font-weight: 700; padding-top: 14px; }
+  .a .slot .t small { display: block; color: var(--ink3); font-size: 12px; font-weight: 500; margin-top: 2px; }
+  .a .rail { position: absolute; left: 63px; top: 8px; bottom: 0; width: 1.5px; background: #ECECEE; }
+  .a .card { margin: 6px 0; border-radius: 18px; padding: 13px 15px 13px 16px; background: var(--soft); position: relative; }
+  .a .card .n { font-size: 17px; font-weight: 700; }
+  .a .card .m { font-size: 13px; color: var(--ink2); margin-top: 3px; }
+  .a .card.p { background: var(--aqua); }
+  .a .card.p .m { color: rgba(0,0,0,.62); font-weight: 600; }
+  .a .card .btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); }
+  .a .gap { margin: 2px 0; padding: 9px 15px; color: var(--ink3); font-size: 13px; font-weight: 600; }
+  .a .dot { position: absolute; left: 59px; top: 20px; width: 10px; height: 10px; border-radius: 50%; background: var(--ink); z-index: 1; box-shadow: 0 0 0 3px #fff; }
+  .a .dot.p { background: var(--aqua); }
+
+  /* ================= B：カシカリ帳に近い一覧型 ================= */
+  .b .nav { padding: 54px 12px 0; display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; }
+  .b .nav h1 { text-align: center; font-size: 17px; font-weight: 700; }
+  .b .seg { margin: 12px 16px 0; background: var(--soft); border-radius: 99px; padding: 3px; display: grid; grid-template-columns: repeat(3,1fr); }
+  .b .seg span { text-align: center; padding: 8px 0; border-radius: 99px; font-size: 14px; font-weight: 700; color: #3A3A3C; }
+  .b .seg span.on { background: var(--ink); color: #fff; }
+  .b .seg small { font-size: 12px; opacity: .55; margin-left: 3px; font-weight: 600; }
+  .b .sum { margin: 20px 22px 0; display: grid; grid-template-columns: 1fr auto; gap: 0 14px; align-items: end; }
+  .b .sum .l b { font-size: 22px; font-weight: 800; letter-spacing: -.01em; }
+  .b .sum .l p { font-size: 13px; color: var(--ink2); margin-top: 6px; }
+  .b .sum .r { text-align: right; font-size: 13px; color: var(--ink2); line-height: 1.6; }
+  .b .sum .r b { color: var(--ink); font-size: 17px; font-weight: 800; }
+  .b .list { margin-top: 16px; border-top: 1px solid var(--line); }
+  .b .it { padding: 16px 22px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; }
+  .b .nm { font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+  .b .tm { font-size: 22px; font-weight: 800; text-align: right; }
+  .b .mt { font-size: 13px; color: var(--ink2); }
+  .b .mt2 { font-size: 13px; color: var(--ink2); text-align: right; }
+  .b .it.p { background: var(--aqua); border-bottom-color: transparent; }
+  .b .it.p .mt { color: rgba(0,0,0,.62); font-weight: 600; }
+  .b .it.p .btn { justify-self: end; padding: 6px 14px; font-size: 13px; }
+  .b .later { padding: 26px 22px 8px; font-size: 13px; color: var(--ink2); font-weight: 700; }
+
+  /* ================= C：大胆な型 ================= */
+  .c { background: #F6F6F7; }
+  .c .hero { background: var(--aqua); padding: 56px 22px 92px; color: var(--ink); position: relative; }
+  .c .hero .top { display: flex; justify-content: space-between; align-items: center; }
+  .c .hero .date { font-size: 15px; font-weight: 700; color: rgba(0,0,0,.6); }
+  .c .hero h1 { font-size: 46px; font-weight: 800; letter-spacing: -.03em; margin-top: 10px; line-height: 1.05; }
+  .c .hero h1 small { font-size: 22px; font-weight: 800; margin-left: 4px; }
+  .c .hero p { font-size: 15px; font-weight: 600; margin-top: 8px; color: rgba(0,0,0,.7); }
+  .c .cards { display: flex; gap: 12px; padding: 0 0 0 16px; margin-top: -70px; position: relative; z-index: 2; }
+  .c .cd { flex: none; width: 236px; background: #fff; border-radius: 24px; padding: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 12px 28px rgba(0,0,0,.07); }
+  .c .cd .t { font-size: 34px; font-weight: 800; line-height: 1; }
+  .c .cd .n { font-size: 18px; font-weight: 700; margin-top: 12px; }
+  .c .cd .m { font-size: 13px; color: var(--ink2); margin-top: 3px; }
+  .c .cd .s { font-size: 13px; font-weight: 700; margin-top: 14px; color: var(--ink2); }
+  .c .cd.p { background: var(--ink); color: #fff; }
+  .c .cd.p .m { color: rgba(255,255,255,.6); }
+  .c .cd.p .s { color: var(--aqua); }
+  .c .h2 { padding: 26px 22px 10px; font-size: 20px; font-weight: 800; letter-spacing: -.01em; display: flex; justify-content: space-between; align-items: baseline; }
+  .c .h2 span { font-size: 15px; font-weight: 500; color: var(--ink2); }
+  .c .todo { margin: 0 16px; background: #fff; border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 12px; }
+  .c .todo .tx { flex: 1; }
+  .c .todo .tx b { font-size: 16px; font-weight: 700; display: block; }
+  .c .todo .tx span { font-size: 13px; color: var(--ink2); }
+  .c .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 16px; }
+  .c .tile { background: #fff; border-radius: 20px; padding: 14px 16px 12px; }
+  .c .tile .k { font-size: 13px; color: var(--ink2); font-weight: 600; }
+  .c .tile .v { font-size: 24px; font-weight: 800; margin-top: 4px; }
+  .c .tile .d { font-size: 12px; font-weight: 700; color: var(--ink); margin-top: 2px; }
+  .c .bars { display: flex; align-items: end; gap: 5px; height: 30px; margin-top: 8px; }
+  .c .bars i { flex: 1; border-radius: 3px; background: #E7E7EA; }
+  .c .bars i:last-child { background: var(--aqua); }
+</style>
+</head>
+<body>
+<template id="status"><div class="island"></div><div class="status"><span>9:41</span><span class="r">
+  <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+  <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5 5.7 9a3.2 3.2 0 0 1 4.6 0Z"/><path d="M3.4 6.7a6.6 6.6 0 0 1 9.2 0l-1.5 1.5a4.5 4.5 0 0 0-6.2 0Z"/><path d="M1 4.3a10 10 0 0 1 14 0l-1.5 1.5a7.9 7.9 0 0 0-11 0Z"/></svg>
+  <svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="20" height="9" rx="2"/><rect x="24.5" y="4.5" width="1.6" height="4" rx=".8" opacity=".4"/></svg>
+</span></div></template>
+<template id="tabs"><div class="tabbar">
+  <div class="tab on"><svg width="27" height="27" viewBox="0 0 24 24"><path d="M3.5 10.2 12 3.5l8.5 6.7V19a1.5 1.5 0 0 1-1.5 1.5h-4.2v-5.6H9.2v5.6H5A1.5 1.5 0 0 1 3.5 19Z" fill="currentColor"/></svg>ホーム</div>
+  <div class="tab"><svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4.5" width="18" height="16.5" rx="3.5"/><path d="M8 2.5v4M16 2.5v4M3 9.5h18"/></svg>予約</div>
+  <div class="tab"><svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3.6"/><path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2ZM15.5 4.7a3.4 3.4 0 0 1 0 6.6M17.5 13.9c2.4.6 4 2.9 4 6.1"/></svg>お客様</div>
+  <div class="tab"><svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="12" width="4" height="8.5" rx="1.2"/><rect x="10" y="7.5" width="4" height="13" rx="1.2"/><rect x="16.5" y="3.5" width="4" height="17" rx="1.2"/></svg>売上</div>
+  <div class="tab"><svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M21 3 3.5 10.4l7 2.6 2.6 7ZM21 3 10.5 13"/></svg>招待</div>
+</div><div class="homebar"></div></template>
+<template id="gear"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.8 1.2V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-2.8-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3 14H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 10 4.1V4a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.8 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.6 1.6 0 0 0 21 10h.1a2 2 0 1 1 0 4H21a1.6 1.6 0 0 0-1.6 1Z"/></svg></template>
+<template id="plus"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4.5v15M4.5 12h15"/></svg></template>
+
+<div class="board">
+
+  <!-- ===================== A ===================== -->
+  <div class="col" data-k="a">
+    <div class="label"><b>A　タイムライン型</b><span>「次のセッション」を主役に、今日を時間の流れで見せる</span></div>
+    <div class="phone a">
+      <slot data-t="status"></slot>
+      <div class="head">
+        <div class="top">
+          <span class="date">11月8日 日曜日</span>
+          <span class="icons"><span class="ic" data-t="gear"></span><span class="ic" data-t="plus"></span></span>
+        </div>
+        <h1>今日</h1>
+      </div>
+
+      <div class="next">
+        <div class="row1"><span>次のセッション</span><span class="pill">あと45分</span></div>
+        <div class="time num">10:00</div>
+        <div class="who">佐藤 美咲さん</div>
+        <div class="meta">パーソナル60分 ・ チケット残り2回</div>
+        <div class="tick"><span class="done"></span><span></span><span></span></div>
+      </div>
+
+      <div class="sec"><b>今日の流れ</b><span>3件</span></div>
+      <div class="tl">
+        <div class="rail"></div>
+        <div class="slot"><div class="t num">10:00<small>〜11:00</small></div><div class="card"><div class="n">佐藤 美咲さん</div><div class="m">パーソナル60分 ・ ¥8,800</div></div><span class="dot"></span></div>
+        <div class="slot"><div class="t"></div><div class="gap">空き 2時間</div></div>
+        <div class="slot"><div class="t num">13:00<small>〜14:00</small></div><div class="card p"><div class="n">田中 健太さん</div><div class="m">承認待ち ・ はじめて</div><span class="btn">承認</span></div><span class="dot p"></span></div>
+        <div class="slot"><div class="t"></div><div class="gap">空き 4時間</div></div>
+        <div class="slot"><div class="t num">18:00<small>〜19:00</small></div><div class="card"><div class="n">山本 結衣さん</div><div class="m">4回チケット ・ 残り1回</div></div><span class="dot"></span></div>
+      </div>
+      <slot data-t="tabs"></slot>
+    </div>
+  </div>
+
+  <!-- ===================== B ===================== -->
+  <div class="col" data-k="b">
+    <div class="label"><b>B　一覧型</b><span>切り替えと合計の下に、名前と時刻を大きく並べる</span></div>
+    <div class="phone b">
+      <slot data-t="status"></slot>
+      <div class="nav">
+        <span class="ic" data-t="gear"></span>
+        <h1>今日の予約</h1>
+        <span class="ic" data-t="plus"></span>
+      </div>
+
+      <div class="seg"><span class="on">全て<small>3</small></span><span>確定<small>2</small></span><span>承認待ち<small>1</small></span></div>
+
+      <div class="sum">
+        <div class="l"><b>11月8日（日）　3件</b><p>確定 2件 ・ 承認待ち 1件</p></div>
+        <div class="r">今月の売上<br><b class="num">¥128,000</b></div>
+      </div>
+
+      <div class="list">
+        <div class="it"><div class="nm">佐藤 美咲</div><div class="tm num">10:00</div>
+          <div class="mt">パーソナル60分 ・ 残り2回</div><div class="mt2 num">¥8,800</div></div>
+        <div class="it p"><div class="nm">田中 健太</div><div class="tm num">13:00</div>
+          <div class="mt">承認待ち ・ はじめて</div><span class="btn">承認</span></div>
+        <div class="it"><div class="nm">山本 結衣</div><div class="tm num">18:00</div>
+          <div class="mt">4回チケット ・ 残り1回</div><div class="mt2 num">¥8,000</div></div>
+      </div>
+      <div class="later">明日 11月9日（月）</div>
+      <div class="list" style="margin-top:0">
+        <div class="it"><div class="nm">鈴木 大輔</div><div class="tm num">09:00</div>
+          <div class="mt">月謝 ・ 今月3回目</div><div class="mt2 num">¥8,800</div></div>
+      </div>
+      <slot data-t="tabs"></slot>
+    </div>
+  </div>
+
+  <!-- ===================== C ===================== -->
+  <div class="col" data-k="c">
+    <div class="label"><b>C　大胆な型</b><span>アクアの面と大きな数字。今日のセッションは横にめくるカード</span></div>
+    <div class="phone c">
+      <slot data-t="status"></slot>
+      <div class="hero">
+        <div class="top"><span class="date">11月8日 日曜日</span>
+          <span class="icons"><span class="ic" data-t="gear"></span><span class="ic" data-t="plus"></span></span>
+        </div>
+        <h1>今日は<span class="num">3</span><small>件</small></h1>
+        <p>次は 10:00 佐藤 美咲さん</p>
+      </div>
+
+      <div class="cards">
+        <div class="cd"><div class="t num">10:00</div><div class="n">佐藤 美咲さん</div><div class="m">パーソナル60分 ・ 残り2回</div><div class="s">¥8,800</div></div>
+        <div class="cd p"><div class="t num">13:00</div><div class="n">田中 健太さん</div><div class="m">パーソナル60分 ・ はじめて</div><div class="s">承認待ち</div></div>
+        <div class="cd"><div class="t num">18:00</div><div class="n">山本 結衣さん</div><div class="m">4回チケット ・ 残り1回</div><div class="s">¥8,000</div></div>
+      </div>
+
+      <div class="h2">対応が必要<span>1件</span></div>
+      <div class="todo">
+        <span class="tx"><b>田中 健太さんの予約</b><span>11月8日（日）13:00 ・ 承認待ち</span></span>
+        <span class="btn">承認</span>
+      </div>
+
+      <div class="h2">今月<span>11月</span></div>
+      <div class="tiles">
+        <div class="tile"><div class="k">売上</div><div class="v num">¥128,000</div><div class="d">先月より +23%</div><div class="bars"><i style="height:45%"></i><i style="height:55%"></i><i style="height:62%"></i><i style="height:58%"></i><i style="height:80%"></i><i style="height:100%"></i></div></div>
+        <div class="tile"><div class="k">お客様</div><div class="v num">12<span style="font-size:15px;font-weight:700"> 名</span></div><div class="d">今月 +2名</div><div class="bars"><i style="height:30%"></i><i style="height:40%"></i><i style="height:40%"></i><i style="height:55%"></i><i style="height:70%"></i><i style="height:85%"></i></div></div>
+      </div>
+      <slot data-t="tabs"></slot>
+    </div>
+  </div>
+</div>
+<script>
+  // 共通部品（ステータスバー・タブ・記号）を差し込む
+  for (const el of document.querySelectorAll('[data-t]')) {
+    const tpl = document.getElementById(el.dataset.t)
+    if (el.tagName === 'SLOT') el.replaceWith(tpl.content.cloneNode(true))
+    else el.append(tpl.content.cloneNode(true))
+  }
+  // ?only=a のように指定すると、その案だけを枠なしで表示する（1枚ずつ書き出す用）
+  const only = new URLSearchParams(location.search).get('only')
+  if (only) {
+    document.body.classList.add('only')
+    document.querySelector(`.col[data-k="${only}"]`)?.classList.add('show')
+  }
+</script>
+</body>
+</html>

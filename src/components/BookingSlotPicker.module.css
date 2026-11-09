@@ -1,20 +1,21 @@
 .picker { border: 0; margin: 0; min-width: 0; padding: 0; }
-.period { align-items: center; display: flex; font-size: 18px; font-weight: 700; justify-content: space-between; margin-bottom: 8px; }
-/* 週送りは丸いボタン。白い面の上なので影ではなく淡い地色で示す */
-.period button { align-items: center; background: var(--fitall-surface-soft); border-radius: 999px; color: var(--fitall-ink); display: inline-flex; font-size: 22px; height: 56px; justify-content: center; line-height: 1; width: 56px; }
+.period { align-items: center; display: flex; font-size: 17px; font-weight: 700; justify-content: space-between; margin-bottom: 8px; }
+/* 週送りは記号だけのボタン（iPhone標準と同じく囲みを付けない） */
+.period button { align-items: center; background: transparent; color: var(--fitall-ink); display: inline-flex; font-size: 24px; height: 44px; justify-content: center; line-height: 1; width: 44px; }
+.period button:active { opacity: .4; }
 .days { animation: show-times 200ms var(--fitall-ease-out); display: grid; gap: 2px; grid-template-columns: repeat(7, minmax(0, 1fr)); }
-.days button { align-content: center; background: transparent; border-radius: var(--fitall-radius-control); display: grid; gap: 4px; justify-items: center; min-height: 84px; padding: 6px 0; }
-.days small { color: var(--fitall-ink-muted); font-size: 16px; font-weight: 500; }
-.days strong { align-items: center; border-radius: 999px; display: flex; font-size: 18px; font-weight: 600; height: 36px; justify-content: center; line-height: 1; transition: background-color var(--fitall-motion-fast) ease, color var(--fitall-motion-fast) ease; width: 36px; }
+.days button { align-content: center; background: transparent; border-radius: var(--fitall-radius-control); display: grid; gap: 4px; justify-items: center; min-height: 70px; padding: 4px 0; }
+.days small { color: var(--fitall-ink-muted); font-size: 13px; font-weight: 500; }
+.days strong { align-items: center; border-radius: 999px; display: flex; font-size: 20px; font-weight: 600; height: 36px; justify-content: center; line-height: 1; transition: background-color var(--fitall-motion-fast) ease, color var(--fitall-motion-fast) ease; width: 36px; }
 .days i { background: transparent; border-radius: 999px; height: 6px; width: 6px; }
 .days i[data-open="true"] { background: var(--fitall-accent); }
 /* 選んだ日は数字だけを黒い丸にする */
 .days button[aria-pressed="true"] strong { background: var(--fitall-ink); color: #fff; }
-.dateTitle { align-items: center; display: flex; font-size: 16px; font-weight: 600; justify-content: space-between; margin: 20px 0 8px; }
-.dateTitle small { color: var(--fitall-ink-muted); font-size: 16px; font-weight: 400; }
+.dateTitle { align-items: center; display: flex; font-size: 15px; font-weight: 600; justify-content: space-between; margin: 20px 0 8px; }
+.dateTitle small { color: var(--fitall-ink-muted); font-size: 13px; font-weight: 400; }
 .times { animation: show-times 200ms var(--fitall-ease-out); display: grid; gap: 8px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.times button { background: var(--fitall-surface-soft); border-radius: var(--fitall-radius-control); font-size: 17px; font-feature-settings: "tnum"; font-weight: 600; min-height: 56px; }
+.times button { background: var(--fitall-surface-soft); border-radius: var(--fitall-radius-control); font-size: 17px; font-feature-settings: "tnum"; font-weight: 600; min-height: 44px; }
 .times button[aria-pressed="true"] { background: var(--fitall-ink); color: #fff; }
 @keyframes show-times { from { opacity: 0; transform: translateY(6px); } }
 .picker button:disabled { cursor: not-allowed; opacity: .35; }
-.empty { background: var(--fitall-surface-soft); border-radius: var(--fitall-radius-control); color: var(--fitall-ink-muted); font-size: 16px; padding: 16px; }
+.empty { color: var(--fitall-ink-muted); font-size: 15px; padding: 12px 0; }

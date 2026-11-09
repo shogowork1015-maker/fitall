@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation'
 import { signOutAction } from '@/app/auth/login/actions'
 import { getProductionReadinessItems } from '@/lib/production-readiness'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
-import { createAdminSupabaseClient } from '@/lib/supabase-admin'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import {
   getPlanSettings,
@@ -10,7 +9,17 @@ import {
   readTrainerSettingsFromBio,
 } from '@/lib/trainer-settings'
 import { TrainerSettingsForm } from './TrainerSettingsForm'
-import { PageHeader } from '@/components/ui/PageHeader'
+import { Screen } from '@/ui/Screen'
+import ui from '@/ui/ui.module.css'
+import { Section, Row } from '@/ui/List'
+import { Button } from '@/ui/Button'
+
+// 確認モードで見せる料金メニュー
+const PREVIEW_PLANS = [
+  { id: 'preview-plan-4', name: '4回チケット', price: 32000, sessions: 4 },
+  { id: 'preview-plan-8', name: '8回チケット', price: 60000, sessions: 8 },
+  { id: 'preview-plan-monthly', name: '月謝 4回', price: 30000, sessions: 4 },
+]
 
 export default async function TrainerSettingsPage() {
   const supabase = await createServerSupabaseClient()
@@ -21,165 +30,80 @@ export default async function TrainerSettingsPage() {
 
   if (!user && !devAuthBypass) redirect('/auth/login')
 
-  const readSupabase = user ? supabase : createAdminSupabaseClient()
+  // 確認モード（ログインなし）では本物のDBを読まず、サンプルを出す。保存もしない
+  const preview = !user
   const { data: profile } = user
-    ? await readSupabase
+    ? await supabase
         .from('trainer_profiles')
         .select('id, bio')
         .eq('user_id', user.id)
         .maybeSingle()
-    : await readSupabase
-        .from('trainer_profiles')
-        .select('id, bio')
-        .order('created_at')
-        .limit(1)
-        .maybeSingle()
+    : { data: { id: 'preview-trainer', bio: null } }
 
   if (!profile) {
     return (
-      <div className="fitall-page fitall-scroll px-4 pt-6 pb-4">
-        <h1 className="text-2xl font-black text-ink">設定</h1>
-        <div className="fitall-card mt-4 p-6 text-center text-subhead font-medium text-ink-muted">
-          トレーナープロフィールが見つかりません
-        </div>
-      </div>
+      <Screen title="設定" back={{ href: '/trainer/dashboard', label: 'ホーム' }}>
+        <Section group footer="プロフィールを作成すると、受付時間と料金メニューを設定できます。">
+          <Row title="トレーナープロフィールが見つかりません" />
+        </Section>
+      </Screen>
     )
   }
 
-  const { data: plans } = await readSupabase
-    .from('plans')
-    .select('id, name, price, sessions')
-    .eq('trainer_id', profile.id)
-    .order('created_at')
+  const { data: plans } = preview
+    ? { data: PREVIEW_PLANS }
+    : await supabase
+        .from('plans')
+        .select('id, name, price, sessions')
+        .eq('trainer_id', profile.id)
+        .order('created_at')
 
   const settings = readTrainerSettingsFromBio(profile.bio)
   const planSettings = readTrainerPlanSettingsFromBio(profile.bio)
   const readinessItems = getProductionReadinessItems()
-  const missingCount = readinessItems.filter((item) => item.level === 'missing').length
-  const warnCount = readinessItems.filter((item) => item.level === 'warn').length
   const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') || 'http://localhost:3000'
+  const stripeItem = readinessItems.find((item) => item.label.includes('Stripe'))
   const lineItems = [
     { label: 'LINE Login Channel ID', env: 'LINE_LOGIN_CHANNEL_ID' },
     { label: 'LINE Login Channel Secret', env: 'LINE_LOGIN_CHANNEL_SECRET' },
     { label: 'Messaging API Access Token', env: 'LINE_CHANNEL_ACCESS_TOKEN' },
   ]
+  const lineReady = lineItems.every((item) => Boolean(process.env[item.env]?.trim()))
 
   return (
-    <div className="fitall-page fitall-scroll">
-      <div className="md:hidden">
-        <PageHeader title="設定" back={{ href: '/trainer/dashboard', label: 'ホームへ戻る' }} />
-      </div>
-      <div className="mx-auto max-w-[640px] space-y-4 px-4 py-4">
-        <TrainerSettingsForm
-          initialSettings={settings}
-          initialMenus={(plans ?? []).map((p) => ({
-            id: p.id,
-            name: p.name,
-            price: p.price,
-            sessions: p.sessions ?? 1,
-            ...getPlanSettings(planSettings, p.id),
-          }))}
-        />
-        <details className="fitall-details">
-          <summary>
-            <span className="flex flex-1 items-center justify-between gap-3">
-              <span>接続の確認（管理者向け）</span>
-            <span
-              className={`rounded-control px-2.5 py-1 text-base font-bold ${
-                missingCount
-                  ? 'bg-danger-soft text-danger'
-                  : warnCount
-                    ? 'bg-accent-soft text-brand'
-                    : 'bg-accent-soft text-brand'
-              }`}
-            >
-              {missingCount ? `${missingCount}件不足` : warnCount ? `${warnCount}件確認` : '準備OK'}
-            </span>
-            </span>
-          </summary>
-          <div className="grid gap-2 p-4 pt-0 md:grid-cols-2">
-            {readinessItems.map((item) => (
-              <div
-                key={item.label}
-                className="rounded-control border border-line bg-white px-3 py-3"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-base font-bold text-ink">{item.label}</p>
-                  <span
-                    className={`rounded-chip px-2 py-0.5 text-base font-bold ${
-                      item.level === 'ok'
-                        ? 'bg-accent-soft text-brand'
-                        : item.level === 'warn'
-                          ? 'bg-accent-soft text-brand'
-                          : 'bg-danger-soft text-danger'
-                    }`}
-                  >
-                    {item.level === 'ok' ? 'OK' : item.level === 'warn' ? '確認' : '不足'}
-                  </span>
-                </div>
-                <p className="mt-1 text-subhead font-medium leading-relaxed text-ink-muted">
-                  {item.detail}
-                </p>
-              </div>
-            ))}
-          </div>
-        </details>
-        <details className="fitall-details">
-          <summary>LINE連携</summary>
-          <div className="space-y-4 p-4 pt-0">
-            <p className="text-subhead font-medium leading-relaxed text-ink-muted">
-              お客様はLINEログインでアプリに入り、予約確認・チケット残数・通知を受け取る設計にします。
-            </p>
-            <div className="grid gap-2 md:grid-cols-3">
-              {lineItems.map((item) => {
-                const ready = !!process.env[item.env]?.trim()
-                return (
-                  <div key={item.env} className="rounded-control border border-line bg-white px-3 py-3">
-                    <p className="text-base font-bold text-brand">{item.label}</p>
-                    <p className="mt-1 text-base font-bold text-ink">
-                      {ready ? '設定済み' : '未設定'}
-                    </p>
-                    <p className="mt-1 font-mono text-subhead font-medium text-ink-muted">{item.env}</p>
-                  </div>
-                )
-              })}
-            </div>
-            <div className="rounded-control border border-line bg-surface-soft px-3 py-3">
-              <p className="text-base font-bold text-brand">LINE Login Callback URLs</p>
-              <div className="mt-2 space-y-2">
-                <p className="break-all font-mono text-base font-bold text-ink">
-                  {appUrl}/api/line/connect/callback
-                </p>
-                <p className="break-all font-mono text-base font-bold text-ink">
-                  {appUrl}/api/line/customer-connect/callback
-                </p>
-                <p className="break-all font-mono text-base font-bold text-ink">
-                  {appUrl}/api/line/app/callback
-                </p>
-              </div>
-            </div>
-            <div className="grid gap-2 md:grid-cols-2">
-              <a
-                href="https://developers.line.biz/console/"
-                target="_blank"
-                rel="noreferrer"
-                className="fitall-aqua-action fitall-tap"
-              >
-                LINE Developersを開く
-              </a>
-              <a
-                href="/customer/app"
-                className="fitall-secondary-action fitall-tap"
-              >
-                お客様アプリを確認
-              </a>
-            </div>
-          </div>
-        </details>
-        <form action={signOutAction}>
-          <button type="submit" className="fitall-secondary-action w-full text-danger">ログアウト</button>
+    <Screen title="設定" back={{ href: '/trainer/dashboard', label: 'ホーム' }}>
+      <TrainerSettingsForm
+        initialSettings={settings}
+        initialMenus={(plans ?? []).map((p, index) => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          sessions: p.sessions ?? 1,
+          ...getPlanSettings(planSettings, p.id, {
+            billing_type: preview && p.name.startsWith('月謝') ? 'monthly' : 'ticket',
+            sort_order: index,
+          }),
+        }))}
+        preview={preview}
+      />
+
+      <Section group header="連携">
+        <Row title="LINE通知" trailing={<span className={ui.switch} data-on={lineReady} role="img" aria-label={lineReady ? 'オン' : 'オフ'} />} />
+        <Row title="カード決済（Stripe）" value={stripeItem?.level === 'ok' ? '接続済み' : '未設定'} />
+      </Section>
+
+      <Section group header="管理者向けの確認" footer={`LINEのコールバックURL：${appUrl}/api/line/connect/callback ほか2件`}>
+        {readinessItems.map((item) => (
+          <Row key={item.label} title={item.label} subtitle={item.detail} value={item.level === 'ok' ? 'OK' : item.level === 'warn' ? '確認' : '不足'} />
+        ))}
+        <Row href="https://developers.line.biz/console/" external title="LINE Developersを開く" />
+      </Section>
+
+      <Section>
+        <form action={signOutAction} style={{ margin: '0 16px' }}>
+          <Button type="submit" variant="destructive">ログアウト</Button>
         </form>
-      </div>
-    </div>
+      </Section>
+    </Screen>
   )
 }

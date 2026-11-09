@@ -40,6 +40,8 @@ export interface PublicBookingData {
   }
   menus: PublicBookingMenu[]
   slots: PublicBookingSlot[]
+  /** ほかの予約がちょうど始まる時刻（お客様の画面で「埋まっている」と打ち消し線で見せる） */
+  takenSlots?: PublicBookingSlot[]
 }
 
 function timeToMinutes(time: string) {
@@ -195,6 +197,7 @@ export async function getPublicBookingData(trainerProfileId: string, moveBooking
   })
   const unavailableIntervals = [...bookedIntervals, ...holdIntervals]
   const slots: PublicBookingSlot[] = []
+  const takenSlots: PublicBookingSlot[] = []
 
   for (const row of availability) {
     const start = Math.max(timeToMinutes(row.start_time), timeToMinutes(settings.business_open))
@@ -211,7 +214,13 @@ export async function getPublicBookingData(trainerProfileId: string, moveBooking
       const overlaps = unavailableIntervals.some(
         (booking) => slotDate < booking.end && slotEnd > booking.start
       )
-      if (overlaps) continue
+      if (overlaps) {
+        // 誰の予約かは出さず、その時刻が埋まっていることだけ伝える
+        if (bookedIntervals.some((booking) => booking.start.getTime() === slotDate.getTime())) {
+          takenSlots.push({ value, label: formatSlotLabel(slotDate) })
+        }
+        continue
+      }
       slots.push({ value, label: formatSlotLabel(slotDate) })
     }
   }
@@ -224,6 +233,7 @@ export async function getPublicBookingData(trainerProfileId: string, moveBooking
     },
     menus,
     slots,
+    takenSlots,
   }
 }
 

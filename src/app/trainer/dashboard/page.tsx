@@ -1,16 +1,14 @@
 import { loadTrainerRevenue, trainerRevenueErrorMessage } from '@/lib/trainer-revenue'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { loadTraineeNameMap } from '@/lib/trainee-display'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
-import { DevPreviewNote } from '@/components/ui/PageHeader'
-import { StatusBadge } from '@/components/ui/StatusBadge'
+import { readTrainerSettingsFromBio } from '@/lib/trainer-settings'
+import { loadTicketSummaries, loadVisitedTrainees } from '@/lib/ticket-summary'
 import { TrainerHomeMobile } from './TrainerHomeMobile'
 import {
   formatJstDate,
   formatJstDateKey,
-  formatJstTime,
   jstDayBounds,
   jstMonthBounds,
   parseJstDateTime,
@@ -23,29 +21,12 @@ type DashboardBooking = {
   trainee_id: string
   trainee_name: string
   price?: number | null
+  remaining?: number | null
+  first_time?: boolean
 }
 
-function formatTime(dateStr: string) {
-  return formatJstTime(dateStr, {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
-
-function yen(amount: number) {
-  return `¥${amount.toLocaleString()}`
-}
-
-function DashboardScreen({
-  monthLabel,
-  todayLabel,
-  totalSales,
-  salesError,
-  clientCount,
-  pendingCount,
-  todayBookings,
-  preview = false,
-}: {
+// ホーム画面。データの取得はこのファイルで行い、見た目は TrainerHomeMobile に任せる
+function DashboardScreen(props: {
   monthLabel: string
   todayLabel: string
   totalSales: number | null
@@ -53,147 +34,11 @@ function DashboardScreen({
   clientCount: number
   pendingCount: number
   todayBookings: DashboardBooking[]
+  sessionMinutes?: number
+  closeTime?: string
   preview?: boolean
 }) {
-  const nextBooking = todayBookings[0]
-
-  return (
-    <>
-    <div className="fitall-mobile-ui">
-      <TrainerHomeMobile
-        todayLabel={todayLabel}
-        monthLabel={monthLabel}
-        totalSales={totalSales}
-        salesError={salesError}
-        clientCount={clientCount}
-        pendingCount={pendingCount}
-        todayBookings={todayBookings}
-        preview={preview}
-      />
-    </div>
-    <div className="fitall-desktop-ui fitall-desktop-page">
-      <div className="fitall-desktop-container">
-        <header className="fitall-desktop-header flex-wrap">
-          <div>
-            <p className="fitall-kicker">{todayLabel}</p>
-            <h1 className="fitall-desktop-title">ホーム</h1>
-            <p className="mt-2 text-subhead font-medium text-ink-muted">
-              今日の予約、売上、承認待ちをまとめて確認できます。
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/trainer/invite" className="fitall-aqua-action fitall-tap !w-auto shrink-0 whitespace-nowrap">
-              登録リンクを送る
-            </Link>
-            <Link href="/trainer/bookings" className="fitall-secondary-action fitall-tap shrink-0 whitespace-nowrap">
-              カレンダー
-            </Link>
-          </div>
-        </header>
-
-        {preview && (
-          <div className="mb-5"><DevPreviewNote>開発用の確認モード。ログインなしで表示しています。</DevPreviewNote></div>
-        )}
-
-        <section className="grid grid-cols-[1.2fr_1fr_.8fr] gap-4">
-          <div className="fitall-desktop-card">
-            <div className="flex items-center justify-between px-6 pt-5">
-              <p className="text-subhead font-semibold text-ink-muted">次の予約</p>
-              <span className="fitall-badge">今日 {todayBookings.length}件</span>
-            </div>
-            <div className="p-6">
-              {nextBooking ? (
-                <div className="flex flex-wrap items-end justify-between gap-3">
-                  <div>
-                    <p className="text-5xl font-black leading-none text-ink">
-                      {formatTime(nextBooking.scheduled_at)}
-                    </p>
-                    <p className="mt-3 text-xl font-black text-ink">
-                      {nextBooking.trainee_name}
-                    </p>
-                  </div>
-                  <StatusBadge status={nextBooking.status} />
-                </div>
-              ) : (
-                <div className="rounded-control border border-dashed border-line px-5 py-8 text-center">
-                  <p className="text-base font-black text-ink">今日は予約なし</p>
-                <p className="mt-1 text-subhead font-medium text-ink-muted">登録リンクや空き枠を整えられます</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <Link href="/trainer/sales" className="fitall-desktop-card fitall-tap p-5">
-            <p className="fitall-kicker">売上</p>
-            <p className="mt-5 whitespace-nowrap text-3xl font-black text-ink">{totalSales === null ? '—' : yen(totalSales)}</p>
-            <p className="mt-2 text-base font-bold text-brand">{monthLabel}の売上</p>
-            {salesError && <p role="status" className="mt-2 text-subhead leading-relaxed text-ink-muted">{salesError}</p>}
-          </Link>
-
-          <div className="grid gap-4">
-            <Link href="/trainer/clients" className="fitall-desktop-card fitall-tap p-5">
-              <p className="text-subhead font-medium text-ink-muted">お客様</p>
-              <p className="mt-2 text-4xl font-black text-ink">{clientCount}<span className="ml-1 text-base">名</span></p>
-            </Link>
-            <Link href="/trainer/bookings" className="fitall-desktop-card fitall-tap relative p-5">
-              <p className="text-subhead font-medium text-ink-muted">承認待ち</p>
-              <p className="mt-2 text-4xl font-black text-ink">{pendingCount}<span className="ml-1 text-base">件</span></p>
-              {pendingCount > 0 && <span className="absolute right-5 top-5 h-3 w-3 rounded-full bg-accent" />}
-            </Link>
-          </div>
-        </section>
-
-        <section className="mt-5 grid grid-cols-[1.2fr_.8fr] gap-4">
-          <div className="fitall-desktop-card p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="fitall-section-title">今日のスケジュール</h2>
-              <Link href="/trainer/bookings" className="text-base font-bold text-brand">予約管理へ</Link>
-            </div>
-            {!todayBookings.length ? (
-              <div className="rounded-control bg-surface-soft px-5 py-6 text-subhead font-medium text-ink-muted">
-                今日の予約はありません。
-              </div>
-            ) : (
-              <div className="divide-y divide-line">
-                {todayBookings.map((booking) => (
-                  <Link
-                    key={booking.id}
-                    href="/trainer/bookings"
-                    className="grid grid-cols-[90px_1fr_120px] items-center gap-4 py-4 first:pt-0 last:pb-0"
-                  >
-                    <div className="fitall-figure text-lg">
-                      {formatTime(booking.scheduled_at)}
-                    </div>
-                    <div>
-                      <p className="text-base font-black text-ink">{booking.trainee_name}</p>
-                      <p className="mt-1 text-subhead font-medium text-ink-muted">セッション予約</p>
-                    </div>
-                    <span className="justify-self-end"><StatusBadge status={booking.status} /></span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="fitall-desktop-card p-5">
-            <h2 className="fitall-section-title">次にやること</h2>
-            <div className="mt-4 space-y-3">
-              <Link href="/trainer/invite" className="fitall-aqua-action fitall-tap">
-                お客様に登録リンクを送る
-              </Link>
-              <Link href="/trainer/availability" className="fitall-secondary-action fitall-tap">
-                空き枠を設定する
-              </Link>
-              <Link href="/trainer/settings" className="fitall-secondary-action fitall-tap">
-                料金メニューを確認
-              </Link>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-    </>
-  )
+  return <TrainerHomeMobile {...props} />
 }
 
 export default async function TrainerDashboardPage() {
@@ -207,12 +52,10 @@ export default async function TrainerDashboardPage() {
   if (!user && !devAuthBypass) redirect('/auth/login')
 
   const todayKey = formatJstDateKey()
-  const todayLabel = formatJstDate(parseJstDateTime(todayKey, '00:00'), {
-    month: 'numeric',
-    day: 'numeric',
-    weekday: 'short',
-  })
-  const monthLabel = formatJstDate(parseJstDateTime(todayKey, '00:00'), { month: 'numeric' })
+  const dayStart = parseJstDateTime(todayKey, '00:00')
+  // 「11月8日 日曜日」のように、日付と曜日のあいだを空ける
+  const todayLabel = `${formatJstDate(dayStart, { month: 'long', day: 'numeric' })} ${formatJstDate(dayStart, { weekday: 'long' })}`
+  const monthLabel = `${formatJstDate(parseJstDateTime(todayKey, '00:00'), { month: 'numeric' })}の実績`
 
   if (!user && devAuthBypass) {
     return (
@@ -228,24 +71,27 @@ export default async function TrainerDashboardPage() {
             scheduled_at: parseJstDateTime(todayKey, '10:00').toISOString(),
             status: 'confirmed',
             trainee_id: 'preview-client-1',
-            trainee_name: '佐藤さん',
+            trainee_name: '佐藤 美咲',
             price: 8800,
+            remaining: 2,
           },
           {
             id: 'preview-2',
             scheduled_at: parseJstDateTime(todayKey, '13:00').toISOString(),
             status: 'pending',
             trainee_id: 'preview-client-2',
-            trainee_name: '田中さん',
+            trainee_name: '田中 健太',
             price: 8800,
+            first_time: true,
           },
           {
             id: 'preview-3',
             scheduled_at: parseJstDateTime(todayKey, '18:00').toISOString(),
             status: 'confirmed',
             trainee_id: 'preview-client-3',
-            trainee_name: '山本さん',
+            trainee_name: '山本 結衣',
             price: 8000,
+            remaining: 1,
           },
         ]}
         preview
@@ -255,9 +101,10 @@ export default async function TrainerDashboardPage() {
 
   const { data: myTrainerProfile } = await supabase
     .from('trainer_profiles')
-    .select('id')
+    .select('id, bio')
     .eq('user_id', user!.id)
     .maybeSingle()
+  const settings = readTrainerSettingsFromBio(myTrainerProfile?.bio)
 
   const trainerIdsForQuery = [user!.id, myTrainerProfile?.id].filter(Boolean) as string[]
 
@@ -276,6 +123,10 @@ export default async function TrainerDashboardPage() {
     supabase,
     (todayBookings ?? []).map((b) => b.trainee_id)
   )
+  // 予約ごとに「チケット残り2回」「はじめて」を出すため、お客様のチケットと来店歴を読む
+  const todayTraineeIds = (todayBookings ?? []).map((b) => b.trainee_id)
+  const tickets = await loadTicketSummaries(supabase, trainerIdsForQuery, todayTraineeIds)
+  const visited = await loadVisitedTrainees(supabase, trainerIdsForQuery, todayTraineeIds)
 
   const { end: monthEnd } = jstMonthBounds(todayKey)
   let totalSales: number | null = null
@@ -303,7 +154,7 @@ export default async function TrainerDashboardPage() {
 
   return (
     <DashboardScreen
-            monthLabel={monthLabel}
+      monthLabel={monthLabel}
       todayLabel={todayLabel}
       totalSales={totalSales}
       salesError={salesError}
@@ -312,7 +163,11 @@ export default async function TrainerDashboardPage() {
       todayBookings={(todayBookings ?? []).map((booking) => ({
         ...booking,
         trainee_name: traineeMap[booking.trainee_id] ?? '不明',
+        remaining: tickets[booking.trainee_id]?.remaining ?? null,
+        first_time: !visited.has(booking.trainee_id),
       }))}
+      sessionMinutes={settings.session_duration_minutes}
+      closeTime={settings.business_close}
     />
   )
 }

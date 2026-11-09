@@ -1,0 +1,42 @@
+/* 予約画面の細かい部分（シートの中のボタンの並び・結果の文字） */
+
+.message {
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 16px 32px 0;
+}
+
+.message[data-tone="error"] {
+  color: var(--ui-red);
+}
+
+/* 週の帯の下の1行：「承認待ち」と「空き時間 ›」は押せる */
+.lineButton {
+  color: inherit;
+  font: inherit;
+  margin: -14px 0;
+  min-height: var(--ui-tap);
+}
+
+.lineLink {
+  align-items: center;
+  color: var(--ui-label-2);
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 2px;
+  margin: -14px 0;
+  min-height: var(--ui-tap);
+  padding-left: 8px;
+}
+
+.lineButton:active,
+.lineLink:active {
+  opacity: .4;
+}
+
+.actions {
+  display: grid;
+  gap: 10px;
+  margin: 0 16px;
+}

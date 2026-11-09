@@ -1,24 +1,26 @@
 import Link from 'next/link'
 import type { ComponentProps } from 'react'
 import { PublicBookingForm } from './PublicBookingForm'
+import { Banner } from '@/ui/List'
+import s from '@/ui/ui.module.css'
 
+// LINEの招待から開く、はじめてのチケット購入の入口
 export function BookingPageContent({ data, checkoutAction, cancelled = false }: ComponentProps<typeof PublicBookingForm> & { cancelled?: boolean }) {
   return (
-    <main className="min-h-screen bg-white px-4 py-6">
-      <div className="mx-auto w-full max-w-[430px]">
-        <header className="mb-7 border-b-2 border-ink pb-5">
-          <p className="text-base font-bold text-brand">Limitless Booking</p>
-          <h1 className="mt-2 text-2xl font-black leading-tight">{data.trainer.name}さんのチケット</h1>
-          <p className="mt-3 text-subhead text-ink-muted">先にチケットを購入して、お好きな日時に予約。</p>
-          <Link href="/customer/app/bookings" className="mt-3 inline-flex min-h-11 items-center text-base font-bold text-brand underline underline-offset-4">
-            チケットをお持ちの方は予約へ
-          </Link>
-        </header>
-        {cancelled && <p role="status" className="mb-5 rounded-control bg-danger-soft px-4 py-3 text-base leading-relaxed text-danger">
-          購入をキャンセルしました。チケットは追加されていません。
-        </p>}
+    <div className={s.screen}>
+      <main className={s.entry} style={{ paddingTop: 'calc(var(--ui-safe-top) + 40px)' }}>
+        <span className={s.wordmark}>Limitless</span>
+        <h1 className={s.entryTitle}>{data.trainer.name}さんの<br />チケット</h1>
+        <p className={s.entryLead}>先にチケットを買って、好きな日時に予約できます。</p>
+
+        {cancelled ? <div style={{ marginTop: 20 }}><Banner tone="error">購入をキャンセルしました。チケットは追加されていません。</Banner></div> : null}
+
         <PublicBookingForm data={data} checkoutAction={checkoutAction} />
-      </div>
-    </main>
+
+        <p className={s.entryLinks}>
+          チケットをお持ちの方は<Link href="/customer/app/bookings">予約へ</Link>
+        </p>
+      </main>
+    </div>
   )
 }

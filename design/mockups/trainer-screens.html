@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Trainer Screens</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+  /* 画面ごとの細かい調整 */
+  .tick { display: flex; gap: 4px; margin-top: 18px; }
+  .tick span { height: 4px; flex: 1; border-radius: 2px; background: rgba(255,255,255,.18); }
+  .tick span.done { background: var(--aqua); }
+  .search { margin: 14px 16px 0; height: 40px; border-radius: 12px; background: var(--soft); display: flex; align-items: center; gap: 8px; padding: 0 12px; color: var(--ink2); font-size: 17px; }
+  .who { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; }
+  .who + .who { border-top: 1px solid rgba(255,255,255,.12); }
+  .who b { font-size: 17px; font-weight: 700; }
+  .who span { font-size: 13px; color: rgba(255,255,255,.6); display: block; margin-top: 2px; }
+  .plist { padding: 0 22px; }
+  .pr { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .pr .m { flex: 1; }
+  .pr .m b { font-size: 17px; font-weight: 700; display: block; }
+  .pr .m span { font-size: 13px; color: var(--ink2); }
+  .pr .rem { text-align: right; }
+  .pr .rem b { font-size: 22px; font-weight: 800; }
+  .pr .rem small { font-size: 13px; font-weight: 600; color: var(--ink2); margin-left: 2px; }
+  .punch { display: flex; gap: 8px; margin-top: 16px; }
+  .punch i { width: 18px; height: 18px; border-radius: 50%; }
+  .punch i.left { background: var(--aqua); }
+  .punch i.book { box-shadow: inset 0 0 0 2px var(--aqua); }
+  .punch i.used { background: rgba(255,255,255,.18); }
+  .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 16px 0; }
+  .acts .bigbtn { height: 50px; font-size: 16px; }
+  .hist { padding: 0 22px; }
+  .hi { display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); align-items: center; }
+  .hi .d { font-size: 15px; font-weight: 700; }
+  .hi .d small { display: block; font-size: 12px; color: var(--ink2); font-weight: 500; }
+  .hi .x { font-size: 15px; }
+  .hi .x small { display: block; font-size: 13px; color: var(--ink2); }
+  .hi .s { font-size: 13px; color: var(--ink2); }
+  .hero { padding: 6px 22px 0; }
+  .hero .k { font-size: 15px; color: var(--ink2); font-weight: 600; }
+  .hero .v { font-size: 46px; font-weight: 800; letter-spacing: -.03em; margin-top: 2px; }
+  .hero .d { font-size: 15px; color: var(--ink2); margin-top: 2px; }
+  .hero .d b { color: var(--ink); }
+  .chart { margin: 18px 22px 0; height: 150px; display: grid; grid-template-columns: repeat(6,1fr); gap: 12px; align-items: end; }
+  .chart div { display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+  .chart i { width: 100%; border-radius: 8px; background: #EBEBED; }
+  .chart div.now i { background: var(--aqua); }
+  .chart span { font-size: 12px; color: var(--ink2); font-weight: 600; }
+  .chart div.now span { color: var(--ink); font-weight: 800; }
+  .stats { display: grid; grid-template-columns: repeat(3,1fr); margin: 22px 16px 0; background: var(--soft); border-radius: 20px; }
+  .stats div { padding: 14px 14px 13px; }
+  .stats div + div { box-shadow: inset 1px 0 0 rgba(0,0,0,.06); }
+  .stats small { font-size: 12px; color: var(--ink2); font-weight: 600; display: block; }
+  .stats b { font-size: 18px; font-weight: 800; display: block; margin-top: 4px; }
+  .bubblewrap { margin: 16px 16px 0; background: var(--soft); border-radius: 24px; padding: 18px 16px 20px; }
+  .bubblewrap .from { font-size: 12px; color: var(--ink2); font-weight: 600; margin: 0 0 8px 4px; }
+  .bubble { background: var(--aqua); color: var(--ink); border-radius: 20px 20px 20px 6px; padding: 12px 15px; font-size: 15px; line-height: 1.55; max-width: 92%; }
+  .bubble u { text-decoration: underline; text-underline-offset: 3px; font-weight: 600; }
+  .steps { padding: 0 22px; }
+  .stp { display: grid; grid-template-columns: 28px 1fr; gap: 12px; padding: 10px 0; position: relative; }
+  .stp b { font-size: 15px; font-weight: 800; color: var(--ink); }
+  .stp p { font-size: 15px; font-weight: 600; }
+  .stp p small { display: block; font-size: 13px; color: var(--ink2); font-weight: 500; margin-top: 2px; }
+  .avl { padding: 4px 22px 0; }
+  .ar { display: grid; grid-template-columns: 24px 1fr 108px; gap: 12px; align-items: center; height: 46px; border-bottom: 1px solid var(--line); }
+  .ar b { font-size: 17px; font-weight: 700; }
+  .ar .track { height: 10px; border-radius: 5px; background: #EFEFF1; position: relative; }
+  .ar .track i { position: absolute; top: 0; bottom: 0; border-radius: 5px; background: var(--aqua); }
+  .ar span { text-align: right; font-size: 15px; font-weight: 600; white-space: nowrap; letter-spacing: -.02em; }
+  .ar.off b, .ar.off span { color: var(--ink3); }
+  .axis { display: grid; grid-template-columns: 24px 1fr 108px; gap: 12px; padding: 6px 22px 0; }
+  .axis div { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink3); font-weight: 600; }
+  .ex { padding: 0 22px; }
+  .ex .r { display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--line); font-size: 17px; }
+  .ex .r span { color: var(--ink2); }
+  .gh { font-size: 13px; color: var(--ink2); font-weight: 600; margin: 24px 32px 8px; }
+  .weekline { font-size: 13px; color: var(--ink2); padding: 12px 22px 0; display: flex; justify-content: space-between; }
+  .weekline b { color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="board">
+
+<!-- 1 ホーム（A案） -->
+<div class="col" data-k="home">
+  <div class="label"><b>ホーム</b><span>次のセッションと今日の流れ</span></div>
+  <div class="phone" data-tabs="trainer" data-tab="0">
+    <div class="hd"><div class="top"><span class="cap">11月8日 日曜日</span><span class="icons"><span class="ic" data-i="gear"></span><span class="ic" data-i="plus"></span></span></div><h1 class="lt">今日</h1></div>
+    <div class="blk">
+      <div class="k"><span>次のセッション</span><span class="pill">あと45分</span></div>
+      <div class="big num">10:00</div>
+      <div class="t2">佐藤 美咲さん</div>
+      <div class="sub">パーソナル60分 ・ チケット残り2回</div>
+      <div class="tick"><span class="done"></span><span></span><span></span></div>
+    </div>
+    <div class="sec"><b>今日の流れ</b><span>3件</span></div>
+    <div class="tl"><div class="rail"></div>
+      <div class="slot"><div class="t num">10:00<small>〜11:00</small></div><div class="card"><div class="n">佐藤 美咲さん</div><div class="m">パーソナル60分 ・ ¥8,800</div></div><span class="dot"></span></div>
+      <div class="slot"><div class="t"></div><div class="gapx">空き 2時間</div></div>
+      <div class="slot"><div class="t num">13:00<small>〜14:00</small></div><div class="card p"><div class="n">田中 健太さん</div><div class="m">承認待ち ・ はじめて</div><span class="btn">承認</span></div><span class="dot p"></span></div>
+      <div class="slot"><div class="t"></div><div class="gapx">空き 4時間</div></div>
+      <div class="slot"><div class="t num">18:00<small>〜19:00</small></div><div class="card"><div class="n">山本 結衣さん</div><div class="m">4回チケット ・ 残り1回</div></div><span class="dot"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 2 予約 -->
+<div class="col" data-k="bookings">
+  <div class="label"><b>予約</b><span>週の帯で日を選び、その日を時間の流れで見る</span></div>
+  <div class="phone" data-tabs="trainer" data-tab="1">
+    <div class="hd"><div class="top"><span class="cap">2026年11月</span><span class="icons"><span class="ic" data-i="plus"></span></span></div><h1 class="lt">予約</h1></div>
+    <div class="week">
+      <div class="wd sel"><small>日</small><b>8</b></div><div class="wd"><small>月</small><b>9</b></div><div class="wd"><small>火</small><b>10</b></div><div class="wd"><small>水</small><b>11</b></div><div class="wd off"><small>木</small><b>12</b></div><div class="wd"><small>金</small><b>13</b></div><div class="wd off"><small>土</small><b>14</b></div>
+    </div>
+    <div class="weekline"><span>今週 <b>9件</b> ・ 承認待ち <b>1件</b></span><span>空き時間 ›</span></div>
+    <div class="sec"><b>11月8日（日）</b><span>3件</span></div>
+    <div class="tl"><div class="rail"></div>
+      <div class="slot"><div class="t num">10:00<small>〜11:00</small></div><div class="card"><div class="n">佐藤 美咲さん</div><div class="m">パーソナル60分 ・ 残り2回</div><span class="rt num">¥8,800</span></div><span class="dot"></span></div>
+      <div class="slot"><div class="t num">13:00<small>〜14:00</small></div><div class="card p"><div class="n">田中 健太さん</div><div class="m">承認待ち ・ はじめて</div><span class="btn">承認</span></div><span class="dot p"></span></div>
+      <div class="slot"><div class="t num">18:00<small>〜19:00</small></div><div class="card"><div class="n">山本 結衣さん</div><div class="m">4回チケット ・ 残り1回</div><span class="rt num">¥8,000</span></div><span class="dot"></span></div>
+      <div class="slot"><div class="t"></div><div class="gapx">19:00以降は空いています</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 3 お客様 -->
+<div class="col" data-k="clients">
+  <div class="label"><b>お客様</b><span>声をかけるべき人を黒い面に。一覧は残り回数を大きく</span></div>
+  <div class="phone" data-tabs="trainer" data-tab="2">
+    <div class="hd"><div class="top"><span class="cap">12名</span><span class="icons"><span class="ic" data-i="plus"></span></span></div><h1 class="lt">お客様</h1></div>
+    <div class="search"><span data-i="search"></span>名前で探す</div>
+    <div class="blk" style="padding:18px 20px 8px">
+      <div class="k"><span>チケットが残り少ない</span><span>2名</span></div>
+      <div class="who" style="margin-top:6px"><div><b>山本 結衣さん</b><span>4回チケット ・ 最終 11/2</span></div><span class="btn aqua">案内する</span></div>
+      <div class="who"><div><b>高橋 優さん</b><span>月謝 ・ 最終 10/30</span></div><span class="btn aqua">案内する</span></div>
+    </div>
+    <div class="sec"><b>すべて</b><span>最近来た順</span></div>
+    <div class="plist">
+      <div class="pr"><div class="m"><b>佐藤 美咲</b><span>今日 10:00 ・ 今月 3回</span></div><div class="rem"><b class="num">2</b><small>回</small></div></div>
+      <div class="pr"><div class="m"><b>鈴木 大輔</b><span>11/6 ・ 今月 2回</span></div><div class="rem"><b class="num">5</b><small>回</small></div></div>
+      <div class="pr"><div class="m"><b>山本 結衣</b><span>11/2 ・ 今月 1回</span></div><div class="rem"><b class="num">1</b><small>回</small></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 4 お客様の詳細 -->
+<div class="col" data-k="client">
+  <div class="label"><b>お客様の詳細</b><span>チケットを黒い面で。使った回は穴で見せる</span></div>
+  <div class="phone" data-tabs="trainer" data-tab="2">
+    <div class="hd"><div class="top"><span class="back"><span data-i="back"></span>お客様</span></div>
+      <h1 class="lt" style="font-size:30px;margin-top:6px">佐藤 美咲</h1><p class="cap" style="font-weight:500;margin-top:2px">sato@example.com ・ 週2回で筋力アップ</p></div>
+    <div class="blk">
+      <div class="k"><span>4回チケット</span><span>期限なし</span></div>
+      <div class="big num">2<small>回</small><span class="of">／ 4回</span></div>
+      <div class="punch"><i class="used"></i><i class="book"></i><i class="left"></i><i class="left"></i></div>
+      <div class="sub" style="margin-top:14px">次回 11月10日（火）10:00</div>
+    </div>
+    <div class="acts"><span class="bigbtn">予約を入れる</span><span class="bigbtn soft2">LINEで連絡</span></div>
+    <div class="sec"><b>最近の予約</b><span>5件</span></div>
+    <div class="hist">
+      <div class="hi"><div class="d num">11/10<small>火</small></div><div class="x num">10:00〜11:00<small>パーソナル60分</small></div><div class="s">予定</div></div>
+      <div class="hi"><div class="d num">11/8<small>日</small></div><div class="x num">10:00〜11:00<small>パーソナル60分</small></div><div class="s">今日</div></div>
+      <div class="hi"><div class="d num">11/3<small>火</small></div><div class="x num">18:00〜19:00<small>パーソナル60分</small></div><div class="s">完了</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 5 売上 -->
+<div class="col" data-k="sales">
+  <div class="label"><b>売上</b><span>金額を主役に、6か月の流れを大きな棒で</span></div>
+  <div class="phone" data-tabs="trainer" data-tab="3">
+    <div class="hd"><div class="top"><span class="cap">11月</span></div><h1 class="lt">売上</h1></div>
+    <div class="hero"><div class="v num">¥128,000</div><div class="d">先月より <b>+¥24,000</b>（+23%）</div></div>
+    <div class="chart">
+      <div><i style="height:52%"></i><span>6月</span></div><div><i style="height:61%"></i><span>7月</span></div><div><i style="height:72%"></i><span>8月</span></div><div><i style="height:66%"></i><span>9月</span></div><div><i style="height:81%"></i><span>10月</span></div><div class="now"><i style="height:100%"></i><span>11月</span></div>
+    </div>
+    <div class="stats"><div><small>販売</small><b class="num">18回</b></div><div><small>1回あたり</small><b class="num">¥7,111</b></div><div><small>先月</small><b class="num">¥104,000</b></div></div>
+    <div class="sec"><b>今月の明細</b><span>6件</span></div>
+    <div class="hist">
+      <div class="hi"><div class="d num">11/8<small>日</small></div><div class="x">佐藤 美咲<small>4回チケット</small></div><div class="x num" style="font-weight:700">¥32,000</div></div>
+      <div class="hi"><div class="d num">11/6<small>金</small></div><div class="x">鈴木 大輔<small>月謝（4回）</small></div><div class="x num" style="font-weight:700">¥30,000</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 6 招待 -->
+<div class="col" data-k="invite">
+  <div class="label"><b>招待</b><span>届くメッセージをそのまま見せ、ボタン1つで送る</span></div>
+  <div class="phone" data-tabs="trainer" data-tab="4">
+    <div class="hd"><div class="top"><span class="cap">LINEでお客様をご案内</span></div><h1 class="lt">招待</h1></div>
+    <div class="bubblewrap">
+      <p class="from">お客様に届くメッセージ</p>
+      <div class="bubble">Limitless Appでチケットの購入と予約ができます。購入後はLINEで予約のお知らせも届きます。<br><u>limitless.app/book/yamada</u></div>
+    </div>
+    <div style="margin:14px 16px 0"><span class="bigbtn">LINEで招待を送る</span></div>
+    <div class="rows" style="margin-top:12px">
+      <div class="r1"><span data-i="link"></span><div class="m"><div class="tt n">リンクをコピー</div></div></div>
+      <div class="r1"><span data-i="copy"></span><div class="m"><div class="tt n">招待文をコピー</div></div></div>
+    </div>
+    <div class="sec"><b>このあとの流れ</b></div>
+    <div class="steps">
+      <div class="stp"><b class="num">1</b><p>お客様がLINEから開く<small>登録はいりません</small></p></div>
+      <div class="stp"><b class="num">2</b><p>チケットを買う<small>カード決済（Stripe）</small></p></div>
+      <div class="stp"><b class="num">3</b><p>空いている日時を予約する<small>あなたに通知が届きます</small></p></div>
+    </div>
+  </div>
+</div>
+
+<!-- 7 空き時間 -->
+<div class="col" data-k="availability">
+  <div class="label"><b>空き時間</b><span>1週間の受付時間を帯で一目に</span></div>
+  <div class="phone" data-tabs="trainer" data-tab="1">
+    <div class="hd"><div class="top"><span class="back"><span data-i="back"></span>予約</span></div><h1 class="lt" style="margin-top:6px">空き時間</h1></div>
+    <div class="axis"><span></span><div><span>6</span><span>12</span><span>18</span><span>24</span></div><span></span></div>
+    <div class="avl">
+      <div class="ar"><b>月</b><div class="track"><i style="left:22%;width:56%"></i></div><span class="num">10:00–20:00</span></div>
+      <div class="ar"><b>火</b><div class="track"><i style="left:17%;width:50%"></i></div><span class="num">9:00–18:00</span></div>
+      <div class="ar off"><b>水</b><div class="track"></div><span>休み</span></div>
+      <div class="ar"><b>木</b><div class="track"><i style="left:28%;width:50%"></i></div><span class="num">11:00–20:00</span></div>
+      <div class="ar"><b>金</b><div class="track"><i style="left:22%;width:56%"></i></div><span class="num">10:00–20:00</span></div>
+      <div class="ar"><b>土</b><div class="track"><i style="left:17%;width:28%"></i></div><span class="num">9:00–14:00</span></div>
+      <div class="ar off"><b>日</b><div class="track"></div><span>休み</span></div>
+    </div>
+    <div class="sec"><b>いつもと違う日</b><span>追加</span></div>
+    <div class="ex">
+      <div class="r"><b style="font-weight:600">11月12日（木）</b><span>休み</span></div>
+      <div class="r"><b style="font-weight:600">11月21日（土）</b><span class="num">13:00〜18:00</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 8 設定 -->
+<div class="col" data-k="settings">
+  <div class="label"><b>設定</b><span>設定アプリと同じ形で、項目をまとまりに</span></div>
+  <div class="phone">
+    <div class="hd"><div class="top"><span class="back"><span data-i="back"></span>ホーム</span></div><h1 class="lt" style="margin-top:6px">設定</h1></div>
+    <p class="gh">予約の受付</p>
+    <div class="rows">
+      <div class="r1"><div class="m"><div class="tt n">受付時間</div></div><span class="v num">09:00〜21:00</span><span class="chev" data-i="chev"></span></div>
+      <div class="r1"><div class="m"><div class="tt n">1回の時間</div></div><span class="v">60分</span><span class="chev" data-i="chev"></span></div>
+    </div>
+    <p class="gh">料金メニュー</p>
+    <div class="rows">
+      <div class="r1"><div class="m"><div class="tt">4回チケット</div><div class="st">回数券 ・ 1回あたり¥8,000</div></div><span class="v b num">¥32,000</span></div>
+      <div class="r1"><div class="m"><div class="tt">8回チケット</div><div class="st">回数券 ・ 1回あたり¥7,500</div></div><span class="v b num">¥60,000</span></div>
+      <div class="r1"><div class="m"><div class="tt">月謝 4回</div><div class="st">毎月自動で4回分</div></div><span class="v b num">¥30,000</span></div>
+      <div class="r1"><div class="m"><div class="tt" style="font-weight:700">メニューを追加</div></div><span data-i="plus"></span></div>
+    </div>
+    <p class="gh">連携</p>
+    <div class="rows">
+      <div class="r1"><div class="m"><div class="tt n">LINE通知</div></div><span class="sw"></span></div>
+      <div class="r1"><div class="m"><div class="tt n">カード決済（Stripe）</div></div><span class="v">接続済み</span></div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script src="kit.js"></script>
+</body>
+</html>

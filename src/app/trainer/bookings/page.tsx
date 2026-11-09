@@ -1,100 +1,50 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { addDaysToDateKey, formatJstDateKey, parseJstDateTime } from '@/lib/datetime'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
-import { TrainerBookingCalendar } from './TrainerBookingCalendar'
+import { TrainerBookings } from './TrainerBookings'
 import { loadTraineeNameMap } from '@/lib/trainee-display'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
-import { DevPreviewNote, HeaderAction, PageHeader } from '@/components/ui/PageHeader'
-import { ClockIcon, LinkIcon } from '@/components/ui/Icons'
+import { Screen } from '@/ui/Screen'
+import { Section, Row } from '@/ui/List'
+import { readTrainerSettingsFromBio } from '@/lib/trainer-settings'
+import { loadTicketSummaries, loadVisitedTrainees } from '@/lib/ticket-summary'
 
-function addDays(date: Date, days: number) {
-  const d = new Date(date)
-  d.setDate(d.getDate() + days)
-  return d
+function atTime(dayOffset: number, time: string) {
+  return parseJstDateTime(addDaysToDateKey(formatJstDateKey(), dayOffset), time).toISOString()
 }
 
-function atHour(date: Date, hour: number) {
-  const d = new Date(date)
-  d.setHours(hour, 0, 0, 0)
-  return d.toISOString()
-}
-
+// 確認モードのサンプル（見本の画像と同じ並び）。DBには触らない
 function mockCalendarData() {
-  const today = new Date()
-  const tomorrow = addDays(today, 1)
-  const inThreeDays = addDays(today, 3)
-  const nextWeek = addDays(today, 7)
+  const base = { price: 8800, status: 'confirmed' as const, credit_status: 'scheduled' }
+  const sato = { trainee_id: 'preview-client-1', trainee_name: '佐藤 美咲', remaining: 2 }
+  const tanaka = { trainee_id: 'preview-client-2', trainee_name: '田中 健太', remaining: 0 }
+  const yamamoto = { trainee_id: 'preview-client-3', trainee_name: '山本 結衣', remaining: 1 }
+  const suzuki = { trainee_id: 'preview-client-4', trainee_name: '鈴木 大輔', remaining: 5 }
 
   return {
     bookings: [
-      {
-        id: 'preview-booking-1',
-        scheduled_at: atHour(today, 10),
-        trainee_id: 'preview-client-1',
-        trainee_name: '佐藤さん',
-        price: 8800,
-        status: 'confirmed' as const,
-        credit_status: 'scheduled',
-      },
-      {
-        id: 'preview-booking-2',
-        scheduled_at: atHour(tomorrow, 13),
-        trainee_id: 'preview-client-2',
-        trainee_name: '田中さん',
-        price: 8800,
-        status: 'pending' as const,
-        credit_status: null,
-      },
-      {
-        id: 'preview-booking-3',
-        scheduled_at: atHour(inThreeDays, 18),
-        trainee_id: 'preview-client-3',
-        trainee_name: '山本さん',
-        price: 32000,
-        status: 'confirmed' as const,
-        credit_status: 'scheduled',
-      },
-      {
-        id: 'preview-booking-4',
-        scheduled_at: atHour(nextWeek, 11),
-        trainee_id: 'preview-client-1',
-        trainee_name: '佐藤さん',
-        price: 8800,
-        status: 'completed' as const,
-        credit_status: 'used',
-      },
+      { ...base, ...sato, id: 'preview-booking-1', scheduled_at: atTime(0, '10:00') },
+      { ...base, ...tanaka, id: 'preview-booking-2', scheduled_at: atTime(0, '13:00'), status: 'pending' as const, credit_status: null, first_time: true },
+      { ...base, ...yamamoto, id: 'preview-booking-3', scheduled_at: atTime(0, '18:00'), price: 8000 },
+      { ...base, ...suzuki, id: 'preview-booking-4', scheduled_at: atTime(1, '11:00') },
+      { ...base, ...sato, id: 'preview-booking-5', scheduled_at: atTime(2, '10:00') },
+      { ...base, ...suzuki, id: 'preview-booking-6', scheduled_at: atTime(2, '19:00') },
+      { ...base, ...yamamoto, id: 'preview-booking-7', scheduled_at: atTime(4, '18:00'), price: 8000 },
+      { ...base, ...sato, id: 'preview-booking-8', scheduled_at: atTime(5, '10:00') },
+      { ...base, ...suzuki, id: 'preview-booking-9', scheduled_at: atTime(5, '15:00') },
+      { ...base, ...sato, id: 'preview-booking-0', scheduled_at: atTime(-5, '18:00'), status: 'completed' as const, credit_status: 'used' },
     ],
     clients: [
-      { trainee_id: 'preview-client-1', name: '佐藤さん' },
-      { trainee_id: 'preview-client-2', name: '田中さん' },
-      { trainee_id: 'preview-client-3', name: '山本さん' },
+      { trainee_id: 'preview-client-1', name: '佐藤 美咲' },
+      { trainee_id: 'preview-client-2', name: '田中 健太' },
+      { trainee_id: 'preview-client-3', name: '山本 結衣' },
+      { trainee_id: 'preview-client-4', name: '鈴木 大輔' },
     ],
     menus: [
       { id: 'preview-menu-1', name: '通常セッション', price: 8800 },
       { id: 'preview-menu-4', name: '4回チケット', price: 32000 },
     ],
   }
-}
-
-// スマホの見出し。右上に「空き枠」と「予約リンクを送る」を置く
-function MobileBookingsHeader() {
-  return (
-    <div className="fitall-mobile-ui">
-      <PageHeader
-        title="予約"
-        actions={
-          <>
-            <HeaderAction href="/trainer/availability" label="空き枠を設定">
-              <ClockIcon />
-            </HeaderAction>
-            <HeaderAction href="/trainer/invite" label="予約リンクを送る">
-              <LinkIcon />
-            </HeaderAction>
-          </>
-        }
-      />
-    </div>
-  )
 }
 
 export default async function TrainerBookingsPage() {
@@ -108,64 +58,22 @@ export default async function TrainerBookingsPage() {
 
   if (!user && devAuthBypass) {
     const mock = mockCalendarData()
-    return (
-      <div className="fitall-page fitall-scroll md:bg-surface-soft">
-        <MobileBookingsHeader />
-
-        <div className="hidden px-8 pt-8 md:block">
-          <div className="fitall-desktop-container">
-            <header className="fitall-desktop-header">
-              <div>
-                <p className="fitall-kicker">カレンダー</p>
-                <h1 className="fitall-desktop-title">予約管理</h1>
-                <p className="mt-2 text-subhead font-medium text-ink-muted">PCでは週・月カレンダーを広く見ながら予約を管理できます。</p>
-              </div>
-              <div className="flex gap-3">
-                <Link href="/trainer/invite" className="fitall-aqua-action fitall-tap w-auto min-w-[170px]">リンク送信</Link>
-                <Link href="/trainer/availability" className="fitall-secondary-action fitall-tap min-w-[150px]">空き設定</Link>
-              </div>
-            </header>
-          </div>
-        </div>
-
-        <div className="px-4 pt-2 md:px-8 md:pt-0">
-          <div className="fitall-desktop-container">
-          <DevPreviewNote>開発用の確認モード。予約の作成・移動・完了は保存されません。</DevPreviewNote>
-          </div>
-        </div>
-
-        <div className="px-4 pb-6 pt-4 md:px-8 md:py-6">
-          <div className="fitall-desktop-container">
-          <TrainerBookingCalendar
-            bookings={mock.bookings}
-            clients={mock.clients}
-            menus={mock.menus}
-            preview
-          />
-          </div>
-        </div>
-      </div>
-    )
+    return <TrainerBookings bookings={mock.bookings} clients={mock.clients} menus={mock.menus} preview />
   }
 
   const { data: trainerProfile } = await supabase
     .from('trainer_profiles')
-    .select('id, price_per_session')
+    .select('id, price_per_session, bio')
     .eq('user_id', user!.id)
     .maybeSingle()
 
   if (!trainerProfile) {
     return (
-      <div className="fitall-page fitall-scroll md:bg-surface-soft">
-        <MobileBookingsHeader />
-        <div className="px-4 py-8 md:px-8">
-          <div className="fitall-desktop-container">
-          <div className="fitall-card p-6 text-center text-subhead font-medium text-ink-muted">
-            トレーナープロフィールが見つかりません
-          </div>
-          </div>
-        </div>
-      </div>
+      <Screen title="予約">
+        <Section group footer="設定画面でプロフィールを作成すると、予約を管理できます。">
+          <Row title="トレーナープロフィールが見つかりません" />
+        </Section>
+      </Screen>
     )
   }
 
@@ -192,6 +100,12 @@ export default async function TrainerBookingsPage() {
     (credits ?? []).map((c) => [c.booking_id, c.status])
   )
 
+  // 予約ごとに「残り2回」「はじめて」を出すため、お客様のチケットと来店歴を読む
+  const bookedTraineeIds = (bookings ?? []).map((b) => b.trainee_id)
+  const tickets = await loadTicketSummaries(supabase, [trainerProfile.id], bookedTraineeIds)
+  const visited = await loadVisitedTrainees(supabase, [trainerProfile.id], bookedTraineeIds)
+  const settings = readTrainerSettingsFromBio(trainerProfile.bio)
+
   const calendarBookings = (bookings ?? []).map((b) => ({
     id: b.id,
     scheduled_at: b.scheduled_at,
@@ -200,6 +114,8 @@ export default async function TrainerBookingsPage() {
     price: b.price,
     status: b.status as 'pending' | 'confirmed' | 'completed' | 'cancelled',
     credit_status: creditByBooking[b.id] ?? null,
+    remaining: tickets[b.trainee_id]?.remaining ?? null,
+    first_time: !visited.has(b.trainee_id),
   }))
 
   const { data: activeRelations } = await supabase
@@ -236,33 +152,12 @@ export default async function TrainerBookingsPage() {
       : [{ id: '', name: '通常セッション', price: trainerProfile.price_per_session ?? 0 }]
 
   return (
-    <div className="fitall-page fitall-scroll md:bg-surface-soft">
-      <MobileBookingsHeader />
-
-      <div className="hidden px-8 pt-8 md:block">
-        <div className="fitall-desktop-container">
-          <header className="fitall-desktop-header">
-            <div>
-              <p className="fitall-kicker">カレンダー</p>
-              <h1 className="fitall-desktop-title">予約管理</h1>
-              <p className="mt-2 text-subhead font-medium text-ink-muted">カレンダーから予約作成、移動、完了処理まで行えます。</p>
-            </div>
-            <div className="flex gap-3">
-              <Link href="/trainer/invite" className="fitall-aqua-action fitall-tap w-auto min-w-[170px]">リンク送信</Link>
-              <Link href="/trainer/availability" className="fitall-secondary-action fitall-tap min-w-[150px]">空き設定</Link>
-            </div>
-          </header>
-        </div>
-      </div>
-      <div className="px-4 pb-6 pt-2 md:px-8 md:pt-0">
-        <div className="fitall-desktop-container">
-        <TrainerBookingCalendar
-          bookings={calendarBookings}
-          clients={clientOptions}
-          menus={menuOptions}
-        />
-        </div>
-      </div>
-    </div>
+    <TrainerBookings
+      bookings={calendarBookings}
+      clients={clientOptions}
+      menus={menuOptions}
+      sessionMinutes={settings.session_duration_minutes}
+      closeTime={settings.business_close}
+    />
   )
 }

@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import { TrainerTabNav } from './TrainerTabNav'
 import { isDevAuthBypassEnabled } from '@/lib/dev-preview'
+import s from '@/ui/ui.module.css'
 
 export default async function TrainerLayout({
   children,
@@ -21,10 +22,10 @@ export default async function TrainerLayout({
 
   if (!user && devAuthBypass) {
     return (
-      <div className="fitall-trainer-shell">
-        <main className="fitall-trainer-main">{children}</main>
+      <>
+        <div className={s.trainerFrame}>{children}</div>
         <TrainerTabNav />
-      </div>
+      </>
     )
   }
 
@@ -41,9 +42,9 @@ export default async function TrainerLayout({
   }
 
   return (
-    <div className="fitall-trainer-shell">
-      <main className="fitall-trainer-main">{children}</main>
+    <>
+      <div className={s.trainerFrame}>{children}</div>
       <TrainerTabNav />
-    </div>
+    </>
   )
 }

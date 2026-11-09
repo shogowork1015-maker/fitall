@@ -1,11 +1,18 @@
 import { loadCustomerAppData } from '@/lib/customer-app'
 import { CustomerHome } from './CustomerHome'
+import { Screen } from '@/ui/Screen'
+import { Section, Row } from '@/ui/List'
 
 export default async function CustomerAppHomePage() {
   const data = await loadCustomerAppData()
-  if (!data) return <main className="px-4 py-10">
-    <h1 className="text-xl font-black">マイページを開いてください</h1>
-    <p className="mt-3 text-subhead leading-relaxed text-ink-muted">LINEの登録リンクから開くと、残りチケットと予約を確認できます。</p>
-  </main>
+  if (!data) {
+    return (
+      <Screen title="ホーム">
+        <Section group footer="LINEの登録リンクから開くと、残りのチケットと予約を確認できます。">
+          <Row title="マイページを開いてください" />
+        </Section>
+      </Screen>
+    )
+  }
   return <CustomerHome data={data} />
 }

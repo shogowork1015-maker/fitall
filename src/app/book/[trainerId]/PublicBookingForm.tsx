@@ -3,16 +3,24 @@
 import { useActionState, useEffect, useRef, useState } from 'react'
 import type { PublicBookingState } from './actions'
 import type { PublicBookingData } from '@/lib/public-booking'
-import styles from './PublicBookingForm.module.css'
+import { Section } from '@/ui/List'
+import { Button } from '@/ui/Button'
+import { Check } from '@/ui/icons'
+import s from '@/ui/ui.module.css'
 
 type CheckoutAction = (state: PublicBookingState, data: FormData) => Promise<PublicBookingState>
 
+function yen(amount: number) {
+  return `¥${amount.toLocaleString('ja-JP')}`
+}
+
+// はじめてのチケット購入。メニューを1つ選び、名前とメールを入れて決済へ進む
 export function PublicBookingForm({ data, checkoutAction }: {
   data: PublicBookingData
-  // Omitted only on the isolated development preview: no server action is imported here.
+  // 開発用プレビューでは省略する（サーバー処理を読み込まない）
   checkoutAction?: CheckoutAction
 }) {
-  const menus = data.menus.filter(menu => menu.billing_type === 'ticket' && menu.price > 0)
+  const menus = data.menus.filter((menu) => menu.billing_type === 'ticket' && menu.price > 0)
   const [menuId, setMenuId] = useState(menus[0]?.id ?? '')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -31,7 +39,7 @@ export function PublicBookingForm({ data, checkoutAction }: {
   }, null)
   const redirecting = Boolean(state && 'checkoutUrl' in state)
   const locked = pending || redirecting
-  const selectedMenu = menus.find(menu => menu.id === menuId)
+  const selectedMenu = menus.find((menu) => menu.id === menuId)
   const error = state && 'error' in state ? state.error : null
 
   useEffect(() => {
@@ -40,61 +48,58 @@ export function PublicBookingForm({ data, checkoutAction }: {
   }, [state])
 
   return (
-    <form className={styles.form} action={checkoutAction ? formAction : undefined} onChange={() => setPreviewChecked(false)}
-      onSubmit={event => {
-        if (!selectedMenu || submitting.current) {
-          event.preventDefault()
-          return
-        }
-        if (!checkoutAction) {
-          event.preventDefault()
-          setPreviewChecked(true)
-          return
-        }
+    <form
+      action={checkoutAction ? formAction : undefined}
+      onChange={() => setPreviewChecked(false)}
+      onSubmit={(event) => {
+        if (!selectedMenu || submitting.current) { event.preventDefault(); return }
+        if (!checkoutAction) { event.preventDefault(); setPreviewChecked(true); return }
         submitting.current = true
-      }} aria-busy={locked}>
+      }}
+      aria-busy={locked}
+    >
       <input type="hidden" name="trainer_id" value={data.trainer.profileId} />
       <input type="hidden" name="plan_id" value={selectedMenu?.id ?? ''} />
 
-      <fieldset disabled={locked} className={styles.section}>
-        <legend><span>1</span>メニューを選ぶ</legend>
-        {menus.length ? <div className={styles.menus}>
-          {menus.map(menu => <button type="button" key={menu.id} aria-pressed={menuId === menu.id}
-            className={styles.menu} onClick={() => { setMenuId(menu.id); setPreviewChecked(false) }}>
-            <span><strong>{menu.name}</strong><small>{menu.sessions}回分のチケット</small>
-              {menu.description && <small>{menu.description}</small>}</span>
-            <span className={styles.price}>¥{menu.price.toLocaleString('ja-JP')}<small>合計</small></span>
-          </button>)}
-        </div> : <p className={styles.empty}>現在、購入できるメニューがありません。トレーナーへお問い合わせください。</p>}
-      </fieldset>
+      <Section group header="チケットを選ぶ" label="チケットを選ぶ">
+        {menus.length ? menus.map((menu) => (
+          <button
+            key={menu.id}
+            type="button"
+            className={s.row}
+            aria-pressed={menuId === menu.id}
+            disabled={locked}
+            onClick={() => { setMenuId(menu.id); setPreviewChecked(false) }}
+          >
+            <span className={s.rowMain}>
+              <span className={s.rowTitle} data-strong="true" style={{ display: 'block' }}>{menu.name}</span>
+              <span className={s.rowSubtitle} style={{ display: 'block' }}>{menu.sessions}回分{menu.description ? `・${menu.description}` : ''}</span>
+            </span>
+            <span className={s.rowValue} data-tone="strong">{yen(menu.price)}</span>
+            <span style={{ color: 'var(--ui-tint)', display: 'inline-flex', opacity: menuId === menu.id ? 1 : 0, width: 22 }}><Check size={20} /></span>
+          </button>
+        )) : <p className={s.empty}>購入できるチケットがありません。トレーナーへお問い合わせください。</p>}
+      </Section>
 
-      <fieldset disabled={locked} className={styles.section}>
-        <legend><span>2</span>購入者情報</legend>
-        <label className={styles.label} htmlFor="booking-name">お名前
-          <input id="booking-name" name="customer_name" autoComplete="name" required maxLength={80}
-            value={name} onChange={event => setName(event.target.value)} />
-        </label>
-        <label className={styles.label} htmlFor="booking-email">メールアドレス
-          <input id="booking-email" name="customer_email" type="email" autoComplete="email" required maxLength={254}
-            value={email} onChange={event => setEmail(event.target.value)} aria-describedby="booking-email-help" />
-        </label>
-        <p id="booking-email-help" className={styles.hint}>購入内容のご案内に使用します。</p>
-      </fieldset>
+      <Section group header="お客様" footer="メールアドレスは購入内容のご案内に使います。">
+        <div className={s.field}>
+          <label htmlFor="booking-name">お名前</label>
+          <input id="booking-name" name="customer_name" autoComplete="name" required maxLength={80} placeholder="山田 花子" disabled={locked} value={name} onChange={(event) => setName(event.target.value)} />
+        </div>
+        <div className={s.field}>
+          <label htmlFor="booking-email">メール</label>
+          <input id="booking-email" name="customer_email" type="email" inputMode="email" autoComplete="email" required maxLength={254} placeholder="name@example.com" disabled={locked} value={email} onChange={(event) => setEmail(event.target.value)} />
+        </div>
+      </Section>
 
-      <section className={styles.summary} aria-label="お支払い内容">
-        <h2>購入内容の確認</h2>
-        <dl>
-          <div><dt>メニュー</dt><dd>{selectedMenu?.name ?? '選択できるメニューがありません'}</dd></div>
-          <div className={styles.total}><dt>お支払い合計</dt><dd>{selectedMenu ? `¥${selectedMenu.price.toLocaleString('ja-JP')}` : '—'}</dd></div>
-        </dl>
-        {selectedMenu && <p className={styles.hint}>{selectedMenu.sessions}回分のチケットが追加されます。予約日時は購入後に選べます。</p>}
-      </section>
-      {error && <p ref={errorRef} tabIndex={-1} role="alert" className={styles.error}>{error}</p>}
-      {previewChecked && <p role="status" className={styles.notice}>入力内容を確認しました。開発プレビューのため、予約・決済・通知は行いません。</p>}
-      <button type="submit" className={styles.submit} disabled={locked || !selectedMenu}>
-        {locked ? '決済画面を開いています…' : checkoutAction ? 'この内容で決済へ進む' : '入力内容を確認する'}
-      </button>
-      <p className={styles.footnote}>{checkoutAction ? '次の画面でStripeによるお支払いに進みます。' : '開発プレビュー · 外部への送信はありません'}</p>
+      {error ? <p ref={errorRef} tabIndex={-1} role="alert" className={s.formError}>{error}</p> : null}
+      {previewChecked ? <p role="status" className={s.formError} style={{ color: 'var(--ui-label-2)' }}>入力内容を確認しました。開発プレビューのため、決済・通知は行いません。</p> : null}
+
+      <Section footer={checkoutAction ? '次の画面でStripeのカード決済に進みます。購入後、空いている日時から予約できます。' : '開発プレビュー・外部への送信はありません'}>
+        <Button type="submit" disabled={locked || !selectedMenu}>
+          {locked ? '決済画面を開いています…' : selectedMenu ? `${yen(selectedMenu.price)}を支払う` : 'チケットを選んでください'}
+        </Button>
+      </Section>
     </form>
   )
 }

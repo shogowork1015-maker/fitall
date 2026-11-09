@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Customer Screens</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+  /* お客様側の画面ごとの調整 */
+  .punch { display: flex; gap: 8px; margin-top: 16px; }
+  .punch i { width: 18px; height: 18px; border-radius: 50%; }
+  .punch i.left { background: var(--aqua); }
+  .punch i.book { box-shadow: inset 0 0 0 2px var(--aqua); }
+  .punch i.used { background: rgba(255,255,255,.18); }
+  .blk .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.12); }
+  .blk .foot span { font-size: 14px; color: rgba(255,255,255,.6); }
+  .blk .foot b { font-size: 15px; color: #fff; display: block; margin-top: 2px; }
+  .blk .bigbtn { margin-top: 18px; }
+  .up { padding: 0 22px; }
+  .ur { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: center; }
+  .ur .d { font-size: 22px; font-weight: 800; line-height: 1; }
+  .ur .d small { display: block; font-size: 12px; color: var(--ink2); font-weight: 600; margin-top: 4px; }
+  .ur .x b { font-size: 17px; font-weight: 700; display: block; }
+  .ur .x span { font-size: 13px; color: var(--ink2); }
+  .ur .s { font-size: 13px; color: var(--ink2); }
+  .ur.p { background: var(--aqua); margin: 0 -22px; padding: 14px 22px; border-bottom: 0; }
+  .ur.p .x span, .ur.p .d small, .ur.p .s { color: rgba(0,0,0,.62); }
+  .slots { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; padding: 0 16px; }
+  .slots span { height: 50px; border-radius: 14px; background: var(--soft); display: grid; place-items: center; font-size: 17px; font-weight: 700; }
+  .slots span.sel { background: var(--ink); color: #fff; }
+  .slots span.off { background: #fff; color: var(--ink3); box-shadow: inset 0 0 0 1px var(--line); font-weight: 500; text-decoration: line-through; }
+  .bar { position: absolute; left: 0; right: 0; bottom: 84px; background: rgba(255,255,255,.97); box-shadow: 0 -1px 0 var(--line); padding: 14px 16px 14px; z-index: 4; }
+  .bar .sm { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; padding: 0 6px; }
+  .bar .sm b { font-size: 17px; font-weight: 700; }
+  .bar .sm span { font-size: 13px; color: var(--ink2); }
+  .done { padding: 120px 28px 0; text-align: center; }
+  .done .mark { width: 76px; height: 76px; border-radius: 50%; background: var(--aqua); display: grid; place-items: center; margin: 0 auto; }
+  .done h1 { font-size: 26px; font-weight: 800; margin-top: 24px; letter-spacing: -.01em; }
+  .done .whend { font-size: 20px; font-weight: 700; margin-top: 14px; }
+  .done .when { font-size: 56px; font-weight: 800; letter-spacing: -.03em; line-height: 1.05; }
+  .done p { font-size: 15px; color: var(--ink2); margin-top: 10px; line-height: 1.6; }
+  .done .tk { margin: 28px auto 0; background: var(--soft); border-radius: 18px; padding: 14px 18px; display: flex; justify-content: space-between; font-size: 15px; }
+  .done .tk b { font-weight: 800; }
+  .seg { margin: 14px 16px 0; background: var(--soft); border-radius: 99px; padding: 3px; display: grid; grid-template-columns: 1fr 1fr; }
+  .seg span { text-align: center; padding: 8px 0; border-radius: 99px; font-size: 14px; font-weight: 700; color: #3A3A3C; }
+  .seg span.on { background: var(--ink); color: #fff; }
+  .plans { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px; }
+  .plan { background: var(--soft); border-radius: 22px; padding: 16px 16px 14px; }
+  .plan .q { font-size: 34px; font-weight: 800; line-height: 1; }
+  .plan .q small { font-size: 15px; font-weight: 700; margin-left: 2px; }
+  .plan .nm { font-size: 13px; color: var(--ink2); font-weight: 600; margin-top: 6px; }
+  .plan .pr { font-size: 20px; font-weight: 800; margin-top: 14px; }
+  .plan .per { font-size: 12px; color: var(--ink2); margin-top: 2px; }
+  .sheetbg { position: absolute; inset: 0; background: rgba(0,0,0,.42); z-index: 8; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 28px 28px 0 0; z-index: 9; padding: 10px 20px 40px; }
+  .sheet .grab { width: 36px; height: 5px; border-radius: 3px; background: #D1D1D6; margin: 0 auto 18px; }
+  .sheet .ttl { display: flex; justify-content: space-between; align-items: center; }
+  .sheet .ttl b { font-size: 17px; font-weight: 700; }
+  .sheet .q { font-size: 15px; color: var(--ink2); font-weight: 600; margin-top: 24px; }
+  .sheet .p { font-size: 48px; font-weight: 800; letter-spacing: -.03em; margin-top: 2px; }
+  .sheet .rowsx { margin-top: 18px; background: var(--soft); border-radius: 18px; }
+  .sheet .rowsx div { display: flex; justify-content: space-between; padding: 14px 16px; font-size: 16px; }
+  .sheet .rowsx div + div { box-shadow: inset 0 1px 0 rgba(0,0,0,.06); }
+  .sheet .rowsx span { color: var(--ink2); }
+  .sheet .note { font-size: 13px; color: var(--ink2); text-align: center; margin-top: 12px; }
+  .prof { padding: 8px 22px 0; }
+  .prof b { font-size: 26px; font-weight: 800; letter-spacing: -.01em; }
+  .prof p { font-size: 15px; color: var(--ink2); margin-top: 2px; }
+  .gh { font-size: 13px; color: var(--ink2); font-weight: 600; margin: 24px 32px 8px; }
+  .login { padding: 130px 24px 0; }
+  .login .wm { font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
+  .login h1 { font-size: 34px; font-weight: 800; margin-top: 18px; letter-spacing: -.02em; }
+  .login .lead { font-size: 15px; color: var(--ink2); margin-top: 6px; }
+  .login .fs { margin-top: 32px; background: var(--soft); border-radius: 18px; }
+  .login .fs .field label { width: 88px; }
+  .login .alt { text-align: center; font-size: 15px; color: var(--ink2); margin-top: 22px; }
+  .login .alt b { color: var(--ink); }
+  .login .foot { position: absolute; left: 24px; right: 24px; bottom: 48px; text-align: center; font-size: 13px; color: var(--ink2); line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="board">
+
+<!-- 1 ホーム -->
+<div class="col" data-k="c-home">
+  <div class="label"><b>ホーム</b><span>チケットを黒い面に。残り回数とボタン1つ</span></div>
+  <div class="phone" data-tabs="customer" data-tab="0">
+    <div class="hd"><div class="top"><span class="cap">11月8日 日曜日</span></div><h1 class="lt">花子さん</h1></div>
+    <div class="blk">
+      <div class="k"><span>4回チケット</span><span>担当 山田 健二</span></div>
+      <div class="big num">2<small>回</small><span class="of">／ 4回</span></div>
+      <div class="punch"><i class="used"></i><i class="book"></i><i class="left"></i><i class="left"></i></div>
+      <span class="bigbtn aqua">予約する</span>
+    </div>
+    <div class="sec"><b>これからの予約</b><span>2件</span></div>
+    <div class="up">
+      <div class="ur"><div class="d num">10<small>11月・火</small></div><div class="x"><b class="num">10:00〜11:00</b><span>パーソナル60分</span></div><div class="s">確定</div></div>
+      <div class="ur p"><div class="d num">17<small>11月・火</small></div><div class="x"><b class="num">18:00〜19:00</b><span>トレーナーの確認待ち</span></div><div class="s"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 2 予約する -->
+<div class="col" data-k="c-book">
+  <div class="label"><b>予約する</b><span>日を選ぶ → 時間を選ぶ → 下のボタン</span></div>
+  <div class="phone" data-tabs="customer" data-tab="1">
+    <div class="hd"><div class="top"><span class="back"><span data-i="back"></span>ホーム</span></div><h1 class="lt" style="margin-top:6px">日時を選ぶ</h1></div>
+    <div class="week">
+      <div class="wd off"><small>日</small><b>8</b></div><div class="wd"><small>月</small><b>9</b></div><div class="wd sel"><small>火</small><b>10</b></div><div class="wd"><small>水</small><b>11</b></div><div class="wd off"><small>木</small><b>12</b></div><div class="wd"><small>金</small><b>13</b></div><div class="wd"><small>土</small><b>14</b></div>
+    </div>
+    <div class="sec"><b>11月10日（火）</b><span>空き 4枠</span></div>
+    <div class="slots"><span class="num">9:00</span><span class="off num">10:00</span><span class="num">11:00</span><span class="sel num">13:00</span><span class="num">15:00</span><span class="off num">17:00</span><span class="num">18:00</span></div>
+    <div class="bar"><div class="sm"><b>11月10日（火）13:00</b><span>チケット 2回 → 1回</span></div><span class="bigbtn">この日時で予約する</span></div>
+  </div>
+</div>
+
+<!-- 3 予約完了 -->
+<div class="col" data-k="c-done">
+  <div class="label"><b>予約完了</b><span>決まった日時を大きく。チケットの変化も見せる</span></div>
+  <div class="phone" data-tabs="customer" data-tab="1">
+    <div class="done">
+      <div class="mark"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#0B0B0C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg></div>
+      <h1>予約しました</h1>
+      <div class="whend">11月10日（火）</div><div class="when num">13:00</div>
+      <p>山田 健二さんに届きました。<br>前日にLINEでお知らせします。</p>
+      <div class="tk"><span>残りのチケット</span><b class="num">1回</b></div>
+    </div>
+    <div style="position:absolute;left:16px;right:16px;bottom:118px"><span class="bigbtn">ホームに戻る</span></div>
+  </div>
+</div>
+
+<!-- 4 予約一覧 -->
+<div class="col" data-k="c-list">
+  <div class="label"><b>予約</b><span>これからの予約。押すと変更・キャンセル</span></div>
+  <div class="phone" data-tabs="customer" data-tab="1">
+    <div class="hd"><div class="top"><span class="cap">変更は前日まで</span><span class="icons"><span class="ic" data-i="plus"></span></span></div><h1 class="lt">予約</h1></div>
+    <div class="seg"><span class="on">これから</span><span>これまで</span></div>
+    <div class="up" style="margin-top:10px">
+      <div class="ur"><div class="d num">10<small>11月・火</small></div><div class="x"><b class="num">13:00〜14:00</b><span>パーソナル60分</span></div><span class="chev" data-i="chev"></span></div>
+      <div class="ur p"><div class="d num">17<small>11月・火</small></div><div class="x"><b class="num">18:00〜19:00</b><span>トレーナーの確認待ち</span></div><span class="chev" data-i="chev" style="color:rgba(0,0,0,.4)"></span></div>
+      <div class="ur"><div class="d num">24<small>11月・火</small></div><div class="x"><b class="num">13:00〜14:00</b><span>パーソナル60分</span></div><span class="chev" data-i="chev"></span></div>
+    </div>
+    <p style="font-size:13px;color:var(--ink2);text-align:center;margin-top:28px;line-height:1.6">開始の24時間前まで、日時の変更と<br>キャンセルができます。</p>
+  </div>
+</div>
+
+<!-- 5 チケット -->
+<div class="col" data-k="c-tickets">
+  <div class="label"><b>チケット</b><span>持っているチケットと、買い足すチケット</span></div>
+  <div class="phone" data-tabs="customer" data-tab="2">
+    <div class="hd"><div class="top"><span class="cap">担当 山田 健二</span></div><h1 class="lt">チケット</h1></div>
+    <div class="blk">
+      <div class="k"><span>4回チケット</span><span>期限なし</span></div>
+      <div class="big num">2<small>回</small><span class="of">／ 4回</span></div>
+      <div class="punch"><i class="used"></i><i class="book"></i><i class="left"></i><i class="left"></i></div>
+      <div class="foot"><div><span>予約済み</span><b class="num">1回</b></div><div><span>使用済み</span><b class="num">1回</b></div><div><span>購入日</span><b class="num">10月28日</b></div></div>
+    </div>
+    <div class="sec"><b>買い足す</b><span>カード決済</span></div>
+    <div class="plans">
+      <div class="plan"><div class="q num">4<small>回</small></div><div class="nm">4回チケット</div><div class="pr num">¥32,000</div><div class="per">1回あたり ¥8,000</div></div>
+      <div class="plan"><div class="q num">8<small>回</small></div><div class="nm">8回チケット</div><div class="pr num">¥60,000</div><div class="per">1回あたり ¥7,500</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 6 チケットを買う（シート） -->
+<div class="col" data-k="c-buy">
+  <div class="label"><b>チケットを買う</b><span>下から出るシートで金額を確認して支払う</span></div>
+  <div class="phone" data-tabs="customer" data-tab="2">
+    <div class="hd"><div class="top"><span class="cap">担当 山田 健二</span></div><h1 class="lt">チケット</h1></div>
+    <div class="blk"><div class="k"><span>4回チケット</span><span>期限なし</span></div><div class="big num">2<small>回</small><span class="of">／ 4回</span></div></div>
+    <div class="sheetbg"></div>
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="ttl"><span></span><b>8回チケット</b><span style="color:var(--ink2);font-size:15px">閉じる</span></div>
+      <p class="q">お支払い</p>
+      <p class="p num">¥60,000</p>
+      <div class="rowsx"><div><span>回数</span><b>8回</b></div><div><span>1回あたり</span><b class="num">¥7,500</b></div><div><span>有効期限</span><b>なし</b></div></div>
+      <div style="margin-top:20px"><span class="bigbtn">¥60,000を支払う</span></div>
+      <p class="note">カード決済（Stripe）に進みます。購入後すぐに予約できます。</p>
+    </div>
+  </div>
+</div>
+
+<!-- 7 マイページ -->
+<div class="col" data-k="c-me">
+  <div class="label"><b>マイページ</b><span>設定アプリと同じ形で、まとまりに分ける</span></div>
+  <div class="phone" data-tabs="customer" data-tab="3">
+    <div class="hd"><div class="top"><span class="cap"></span></div><h1 class="lt">マイページ</h1></div>
+    <div class="prof"><b>佐藤 花子</b><p>hanako@example.com</p></div>
+    <p class="gh">トレーニング</p>
+    <div class="rows">
+      <div class="r1"><div class="m"><div class="tt n">担当トレーナー</div></div><span class="v">山田 健二</span></div>
+      <div class="r1"><div class="m"><div class="tt n">目標</div></div><span class="v">週2回で筋力アップ</span></div>
+    </div>
+    <p class="gh">通知</p>
+    <div class="rows">
+      <div class="r1"><div class="m"><div class="tt n">LINEで受け取る</div><div class="st">予約の確定・前日のお知らせ</div></div><span class="sw"></span></div>
+    </div>
+    <p class="gh">そのほか</p>
+    <div class="rows">
+      <div class="r1"><div class="m"><div class="tt n">トレーナーに相談する</div></div><span class="chev" data-i="chev"></span></div>
+      <div class="r1"><div class="m"><div class="tt n">ホーム画面に追加する方法</div></div><span class="chev" data-i="chev"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 8 ログイン -->
+<div class="col" data-k="login">
+  <div class="label"><b>ログイン（トレーナー）</b><span>見出し・入力・黒いボタン1つ</span></div>
+  <div class="phone">
+    <div class="login">
+      <p class="wm">Limitless</p>
+      <h1>ログイン</h1>
+      <p class="lead">トレーナー用の管理画面です</p>
+      <div class="fs">
+        <div class="field"><label>メール</label><span>name@example.com</span></div>
+        <div class="field"><label>パスワード</label><span>必須</span><b style="font-size:15px;font-weight:600">表示</b></div>
+      </div>
+      <div style="margin-top:22px"><span class="bigbtn">ログイン</span></div>
+      <p class="alt">はじめての方は <b>新規登録</b></p>
+      <p class="foot">お客様は、トレーナーからLINEで届く<br>リンクから開いてください。</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<script src="kit.js"></script>
+</body>
+</html>
